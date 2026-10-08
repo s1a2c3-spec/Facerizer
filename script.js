@@ -1,4 +1,19 @@
 (function () {
+  // If a Supabase session exists in this browser, show "My account" instead of Log in / Sign up.
+  try {
+    var logged = false;
+    for (var i = 0; i < localStorage.length; i++) {
+      if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { logged = true; break; }
+    }
+    if (logged) {
+      var l = document.getElementById("nav-login"), s = document.getElementById("nav-signup");
+      if (l) { l.textContent = "My account"; l.setAttribute("href", "/account"); }
+      if (s) { s.style.display = "none"; }
+    }
+  } catch (e) {}
+})();
+
+(function () {
   var root = document.documentElement;
   var btn = document.getElementById("theme-toggle");
   var year = document.getElementById("year");
