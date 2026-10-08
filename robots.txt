@@ -26,4 +26,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://facerizer.com/sitemap.xml
+Sitemap: https://facerizer.vercel.app/sitemap.xml

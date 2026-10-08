@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/auth.css">
+<script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
+<title>My account | Facerizer</title>
+</head>
+<body data-page="account">
+<main class="auth-wrap"><div class="auth-card">
+<a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
+<h1>My account</h1>
+<div style="margin-top:1.25rem">
+  <div class="row"><span>Email</span><span id="acc-email">...</span></div>
+  <div class="row"><span>Email status</span><span id="acc-verified">...</span></div>
+</div>
+<form id="profile-form" novalidate>
+  <label>Name<input name="name" type="text" autocomplete="name"></label>
+  <label>Age range (optional)
+    <select name="age_range">
+      <option value="">Prefer not to say</option>
+      <option value="18-24">18 to 24</option>
+      <option value="25-34">25 to 34</option>
+      <option value="35-44">35 to 44</option>
+      <option value="45-54">45 to 54</option>
+      <option value="55+">55 and above</option>
+    </select>
+  </label>
+  <button class="btn btn-primary btn-lg" type="submit">Save</button>
+  <p id="msg" class="msg" role="status" aria-live="polite"></p>
+</form>
+<a href="/analyze/" class="btn btn-outline" style="width:100%;margin-top:.5rem">Analyze my face</a>
+<button id="logout" type="button" class="btn btn-outline" style="width:100%;margin-top:.75rem">Log out</button>
+<p class="note">Delete account and delete photos will be added with the photo storage update. Until then, email us and we will delete your data.</p>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/auth.js"></script>
+</body>
+</html>

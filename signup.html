@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/auth.css">
+<script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
+<title>Create account | Facerizer</title>
+</head>
+<body data-page="signup">
+<main class="auth-wrap"><div class="auth-card">
+<a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
+<h1>Create your account</h1>
+<p class="muted">Your first analysis is free. For adults 18 and over.</p>
+<form id="auth-form" novalidate>
+  <label>Name (optional)<input name="name" type="text" autocomplete="name"></label>
+  <label>Email<input name="email" type="email" required autocomplete="email"></label>
+  <label>Password (at least 8 characters)<input name="password" type="password" required minlength="8" autocomplete="new-password"></label>
+  <label class="check"><input type="checkbox" name="age"> I confirm that I am 18 years or older.</label>
+  <label class="check"><input type="checkbox" name="consent"> I agree to the Terms and Privacy Policy, and I consent to my photos being processed to create my analysis.</label>
+  <button class="btn btn-primary btn-lg" type="submit">Create account</button>
+  <p id="msg" class="msg" role="status" aria-live="polite"></p>
+</form>
+<p class="alt">Already have an account? <a href="/login">Log in</a></p>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/auth.js"></script>
+</body>
+</html>

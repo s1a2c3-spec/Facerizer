@@ -12,8 +12,8 @@ Facerizer is not a beauty rating and does not give medical advice. Its "AI Appea
 - What it does not do: judge attractiveness or worth, infer personality, ethnicity, health or any sensitive trait from a face, or diagnose skin conditions
 
 ## Pages
-- [Home](https://facerizer.com/): overview, how it works, features, pricing and FAQ
-- [Sitemap](https://facerizer.com/sitemap.xml)
+- [Home](https://facerizer.vercel.app/): overview, how it works, features, pricing and FAQ
+- [Sitemap](https://facerizer.vercel.app/sitemap.xml)
 
 ## Usage
-Content on this site may be quoted and summarized with attribution and a link to facerizer.com.
+Content on this site may be quoted and summarized with attribution and a link to facerizer.vercel.app.
