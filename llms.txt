@@ -1,0 +1,19 @@
+# Facerizer
+
+> Facerizer is an AI grooming and style coach. Users upload a clear photo and receive their face shape, a description of visible facial features, hairstyle, beard, glasses and general skincare recommendations, and a step-by-step appearance-improvement plan.
+
+Facerizer is not a beauty rating and does not give medical advice. Its "AI Appearance Analysis Score" is a subjective estimate based on visible characteristics in one photo. It is for adults aged 18 and over.
+
+## Key facts
+- What it does: face shape detection, visible feature analysis, hairstyle/beard/glasses recommendations, improvement plans
+- Who it is for: adults 18+, India-first, available worldwide
+- Pricing: 1 free analysis; Pro from INR 399 per month (GST inclusive, subject to change)
+- Privacy: photos are private, never sold or shared, not used for AI training without opt-in, and can be deleted at any time
+- What it does not do: judge attractiveness or worth, infer personality, ethnicity, health or any sensitive trait from a face, or diagnose skin conditions
+
+## Pages
+- [Home](https://facerizer.com/): overview, how it works, features, pricing and FAQ
+- [Sitemap](https://facerizer.com/sitemap.xml)
+
+## Usage
+Content on this site may be quoted and summarized with attribution and a link to facerizer.com.
