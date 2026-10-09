@@ -18,6 +18,21 @@
 
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
+  /* ---------------- GOOGLE ---------------- */
+  var gb = document.getElementById("google-btn");
+  if (gb) {
+    gb.addEventListener("click", function () {
+      gb.disabled = true;
+      show("Opening Google...");
+      sb.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin + "/account" }
+      }).then(function (res) {
+        if (res.error) { gb.disabled = false; show(friendly(res.error), "error"); }
+      });
+    });
+  }
+
   function friendly(err) {
     var m = (err && err.message) || "Something went wrong. Please try again.";
     if (/invalid login/i.test(m)) return "Email or password is incorrect.";

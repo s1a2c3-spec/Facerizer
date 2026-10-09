@@ -154,7 +154,42 @@
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   var form = $("prefs-form");
   var userId = null;
-  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores";
+  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at";
+
+  function showGate() {
+    var wrap = el("div", "gate");
+    wrap.setAttribute("role", "dialog");
+    wrap.setAttribute("aria-modal", "true");
+    var card = el("div", "gate-card");
+    card.appendChild(el("h2", "", "One last step"));
+    card.appendChild(el("p", "card-text", "Facerizer is for adults, and it works with photos of your face. Please confirm to continue."));
+    function check(text) {
+      var l = el("label", "gate-check");
+      var i = document.createElement("input"); i.type = "checkbox";
+      l.appendChild(i); l.appendChild(el("span", "", text));
+      card.appendChild(l);
+      return i;
+    }
+    var age = check("I confirm that I am 18 years or older.");
+    var con = check("I agree to the Terms and Privacy Policy, and I consent to my photos being processed to create my analysis.");
+    var m = el("p", "msg"); m.setAttribute("role", "status");
+    var go = el("button", "btn btn-primary btn-lg", "Continue"); go.type = "button"; go.style.width = "100%"; go.style.marginTop = "1rem";
+    var out = el("button", "btn btn-outline btn-sm", "Log out instead"); out.type = "button"; out.style.marginTop = "0.75rem";
+    card.appendChild(m); card.appendChild(go); card.appendChild(out);
+    wrap.appendChild(card); document.body.appendChild(wrap);
+    out.addEventListener("click", function () { sb.auth.signOut().then(function () { window.location.href = "/"; }); });
+    go.addEventListener("click", function () {
+      if (!age.checked || !con.checked) { m.textContent = "Please tick both boxes to continue."; m.className = "msg error"; return; }
+      go.disabled = true; m.textContent = "Saving..."; m.className = "msg";
+      sb.rpc("confirm_age_and_consent").then(function (res) {
+        if (res.error) {
+          console.error(res.error);
+          go.disabled = false; m.textContent = "Could not save. Run google-setup.sql in Supabase and try again."; m.className = "msg error"; return;
+        }
+        wrap.remove();
+      });
+    });
+  }
 
   $("logout").addEventListener("click", function () {
     sb.auth.signOut().then(function () { window.location.href = "/"; });
@@ -197,6 +232,7 @@
       hideScores = !!p.hide_scores;
       paintHeader(user, p.display_name);
       paint(demo ? SAMPLE : null, hideScores);
+      if (!p.age_confirmed_at || !p.consent_at) showGate();
     });
   });
 

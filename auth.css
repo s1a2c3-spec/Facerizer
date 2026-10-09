@@ -23,3 +23,7 @@
 .row { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
 .row span:first-child { color: var(--muted-fg); }
 .note { margin-top: 1.5rem; padding: 1rem; border-radius: 0.75rem; background: var(--muted); font-size: 0.8rem; color: var(--muted-fg); line-height: 1.6; }
+
+.btn-google { width: 100%; gap: 0.6rem; margin-top: 1.25rem; }
+.divider { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.25rem; font-size: 0.8rem; color: var(--muted-fg); }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
