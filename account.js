@@ -4,8 +4,152 @@
   var msgEl = $("msg");
   function say(t, type) { msgEl.textContent = t || ""; msgEl.className = "msg " + (type || ""); }
 
+  var ARC = 329.9; // length of the 270 degree gauge arc
+  var ICONS = {
+    jaw: '<svg viewBox="0 0 24 24"><path d="M4 6c0 8 3 13 8 14 5-1 8-6 8-14"/></svg>',
+    eye: '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    brow: '<svg viewBox="0 0 24 24"><path d="M3 15c3-6 10-8 18-4"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg>',
+    skin: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
+    hair: '<svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8.5 8.5L20 19M8.5 15.5L20 5"/></svg>',
+    glasses: '<svg viewBox="0 0 24 24"><circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/><path d="M10 14h4M3 12l1-5M21 12l-1-5"/></svg>',
+    grooming: '<svg viewBox="0 0 24 24"><path d="M5 4h14v6a7 7 0 01-14 0z"/><path d="M9 14c1 1.2 2 1.5 3 1.5s2-.3 3-1.5"/></svg>'
+  };
+
+  // Example data shown only with ?demo=1. Real results will use the same shape (added with the analysis update).
+  var SAMPLE = {
+    score: 82,
+    analyzed_at: new Date().toISOString(),
+    face_shape: { type: "Oval", confidence: 87 },
+    summary: "Your features are well balanced. A few grooming and styling changes could bring out your strengths even more.",
+    strengths: [
+      { icon: "jaw", title: "Defined jawline", text: "A clear lower-face contour" },
+      { icon: "eye", title: "Balanced eye area", text: "Eyes sit in good proportion" },
+      { icon: "brow", title: "Structured brows", text: "A clean, well-framed shape" },
+      { icon: "skin", title: "Even skin appearance", text: "Looks even and consistent in this photo" }
+    ],
+    recs: [
+      { icon: "hair", label: "Recommended hairstyle", title: "Textured crop", text: "Adds height and suits an oval face" },
+      { icon: "glasses", label: "Suggested glasses", title: "Rectangle frames", text: "Add definition without hiding your features" },
+      { icon: "grooming", label: "Grooming tip", title: "Short boxed beard", text: "Keeps lines sharp along the jaw" }
+    ],
+    plan: [
+      { t: "Week 1", d: "Grooming", s: "done" },
+      { t: "Week 2", d: "Skin and self-care", s: "current" },
+      { t: "Week 3", d: "Hair and styling", s: "upcoming" },
+      { t: "Week 4", d: "Presentation", s: "upcoming" }
+    ]
+  };
+
+  var EMPTY_PLAN = [
+    { t: "Week 1", d: "Grooming", s: "upcoming" },
+    { t: "Week 2", d: "Skin and self-care", s: "upcoming" },
+    { t: "Week 3", d: "Hair and styling", s: "upcoming" },
+    { t: "Week 4", d: "Presentation", s: "upcoming" }
+  ];
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function row(iconName, label, title, text) {
+    var li = el("li", "row2");
+    var ico = el("span", "ico");
+    ico.innerHTML = ICONS[iconName] || ""; // icons are fixed strings defined above
+    var tx = el("div", "tx");
+    if (label) tx.appendChild(el("small", "", label));
+    tx.appendChild(el("strong", "", title));
+    if (text) tx.appendChild(el("span", "d", text));
+    li.appendChild(ico); li.appendChild(tx);
+    return li;
+  }
+
+  function skeletonRow() {
+    var li = el("li", "row2");
+    li.appendChild(el("span", "ico"));
+    var tx = el("div", "tx");
+    tx.appendChild(el("span", "skel")); tx.appendChild(el("span", "skel"));
+    li.appendChild(tx);
+    return li;
+  }
+
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); }
+    catch (e) { return ""; }
+  }
+
+  function paint(r, hideScores) {
+    var num = $("score-num"), of = $("score-of"), val = $("g-val"), chips = $("chips");
+    chips.textContent = "";
+
+    // Score gauge
+    if (r && !hideScores) {
+      num.textContent = String(r.score);
+      of.textContent = "out of 100";
+      val.style.display = "";
+      val.setAttribute("stroke-dasharray", (ARC * Math.max(0, Math.min(100, r.score)) / 100) + " 439.8");
+    } else {
+      val.style.display = "none";
+      num.textContent = r && hideScores ? "Hidden" : "--";
+      num.style.fontSize = r && hideScores ? "1.3rem" : "";
+      of.textContent = r && hideScores ? "You chose to hide scores" : "out of 100";
+    }
+    if (r) {
+      if (r.face_shape) chips.appendChild(el("span", "chip", "Face shape: " + r.face_shape.type + " (" + r.face_shape.confidence + "% confident)"));
+      if (r.analyzed_at) chips.appendChild(el("span", "chip", "Analyzed " + fmtDate(r.analyzed_at)));
+      $("insight-text").textContent = r.summary || "";
+    }
+
+    // Strengths
+    var s = $("strengths"); s.textContent = "";
+    if (r) r.strengths.forEach(function (x) { s.appendChild(row(x.icon, "", x.title, x.text)); });
+    else { s.appendChild(skeletonRow()); s.appendChild(skeletonRow()); s.appendChild(skeletonRow()); }
+
+    // Recommendations
+    var rc = $("recs"); rc.textContent = "";
+    if (r) r.recs.forEach(function (x) { rc.appendChild(row(x.icon, x.label, x.title, x.text)); });
+    else {
+      rc.appendChild(row("hair", "Hairstyle", "Appears after your analysis", ""));
+      rc.appendChild(row("glasses", "Glasses", "Appears after your analysis", ""));
+      rc.appendChild(row("grooming", "Grooming", "Appears after your analysis", ""));
+    }
+
+    // Plan
+    var plan = r ? r.plan : EMPTY_PLAN;
+    var tl = $("timeline"); tl.textContent = "";
+    plan.forEach(function (p) {
+      var li = el("li", "step " + p.s);
+      li.appendChild(el("span", "node"));
+      li.appendChild(el("strong", "", p.t));
+      li.appendChild(el("span", "d", p.d));
+      tl.appendChild(li);
+    });
+    var pill = $("plan-pill");
+    pill.textContent = r ? "In progress" : "Not started";
+    pill.className = "pill" + (r ? " active" : "");
+    $("plan-note").textContent = r
+      ? "Tick off each step as you go. Your plan updates after your next analysis."
+      : "Your plan is built from your own analysis, so it starts after your first one.";
+    $("sub").textContent = r ? "Your style journey continues." : "Let's find what suits you.";
+  }
+
+  var params = window.location.search;
+  var demo = /[?&]demo=1/.test(params);
+  var hideScores = false;
+  paint(demo ? SAMPLE : null, hideScores);
+  if (demo) $("demo-banner").hidden = false;
+
+  // Open the settings panel from the avatar or footer link
+  function openSettings() { $("settings").open = true; }
+  $("avatar").addEventListener("click", openSettings);
+  var fl = document.querySelector("[data-open=settings]");
+  if (fl) fl.addEventListener("click", openSettings);
+  if (window.location.hash === "#settings") openSettings();
+
   var ready = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && cfg.SUPABASE_URL.indexOf("YOUR_") === -1 && window.supabase;
-  if (!ready) { say("Setup is not finished: add your Supabase details in config.js.", "error"); return; }
+  if (!ready) { openSettings(); say("Setup is not finished: add your Supabase details in config.js.", "error"); return; }
 
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   var form = $("prefs-form");
@@ -19,18 +163,11 @@
   function firstName(s) { return (s || "").trim().split(/\s+/)[0]; }
 
   function paintHeader(user, name) {
-    var shown = firstName(name) || firstName((user.user_metadata || {}).display_name) || (user.email || "").split("@")[0] || "there";
-    $("greet").textContent = "Hi, " + shown;
+    var shown = firstName(name) || firstName((user.user_metadata || {}).display_name) || (user.email || "").split("@")[0] || "";
+    $("greet").textContent = shown ? "Welcome back, " + shown : "Welcome back";
     $("avatar").textContent = (shown.charAt(0) || "F").toUpperCase();
-    var line = user.email || "";
-    if (user.created_at) {
-      try {
-        var d = new Date(user.created_at);
-        line += "  ·  Member since " + d.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
-      } catch (e) {}
-    }
-    $("email-line").textContent = line;
-    if (!user.email_confirmed_at) $("verify-banner").style.display = "block";
+    $("signed-in").textContent = "Signed in as " + (user.email || "");
+    if (!user.email_confirmed_at) $("verify-banner").hidden = false;
   }
 
   sb.auth.getSession().then(function (r) {
@@ -43,9 +180,11 @@
     sb.from("profiles").select(COLS).eq("id", userId).maybeSingle().then(function (res) {
       if (res.error) {
         console.error("Load profile failed:", res.error);
+        openSettings();
         return say("Could not load your details (" + res.error.message + ").", "error");
       }
       if (!res.data) {
+        openSettings();
         return say("Your profile record is missing. Run the latest SQL (setup-v2.sql) in Supabase, then refresh.", "error");
       }
       var p = res.data;
@@ -55,7 +194,9 @@
       form.elements["facial_hair_preference"].value = p.facial_hair_preference || "";
       form.elements["style_preference"].value = p.style_preference || "";
       form.elements["hide_scores"].checked = !!p.hide_scores;
+      hideScores = !!p.hide_scores;
       paintHeader(user, p.display_name);
+      paint(demo ? SAMPLE : null, hideScores);
     });
   });
 
@@ -82,8 +223,10 @@
         return say("Could not save: your profile record is missing. Run setup-v2.sql in Supabase.", "error");
       }
       say("Saved.", "ok");
-      $("greet").textContent = "Hi, " + (firstName(payload.display_name) || "there");
-      $("avatar").textContent = (firstName(payload.display_name) || "F").charAt(0).toUpperCase();
+      hideScores = payload.hide_scores;
+      $("greet").textContent = payload.display_name ? "Welcome back, " + firstName(payload.display_name) : "Welcome back";
+      $("avatar").textContent = ((firstName(payload.display_name) || "F").charAt(0)).toUpperCase();
+      paint(demo ? SAMPLE : null, hideScores);
     });
   });
 })();

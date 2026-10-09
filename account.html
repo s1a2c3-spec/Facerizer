@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>My account | Facerizer</title>
+<title>My dashboard | Facerizer</title>
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/auth.css">
@@ -13,125 +13,152 @@
 <script src="/script.js" defer></script>
 </head>
 <body data-page="dashboard">
-<div class="acc">
+<div class="dash">
 
-  <header class="acc-top">
+  <header class="dash-top">
     <a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
-    <div class="right">
+    <div class="top-right">
       <button type="button" id="theme-toggle" class="btn btn-outline icon-btn" aria-label="Switch theme">◐</button>
       <button type="button" id="logout" class="btn btn-outline btn-sm">Log out</button>
+      <a href="#settings" id="avatar" class="avatar-btn" aria-label="Profile settings">F</a>
     </div>
   </header>
 
-  <section class="hello" aria-label="Welcome">
-    <div class="avatar" id="avatar" aria-hidden="true">F</div>
-    <div>
-      <h1 id="greet">Welcome</h1>
-      <p class="sub" id="email-line"></p>
-    </div>
-  </section>
-
-  <div class="alert" id="verify-banner" role="alert">Please verify your email. Check your inbox for the link we sent when you signed up.</div>
-
-  <section class="start" aria-labelledby="start-title">
-    <div>
-      <h2 id="start-title">Ready for your face analysis?</h2>
-      <p>Your first analysis is free. Add a clear photo and get your face shape, strengths, and style picks.</p>
-      <a href="/analyze/" class="btn btn-lg">Analyze my face</a>
-    </div>
-    <svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="2"/><line x1="32" y1="8" x2="32" y2="56" stroke="#5FD3C0" stroke-width="1.5" stroke-dasharray="3 4"/><line x1="14" y1="24" x2="50" y2="24" stroke="#5FD3C0" stroke-width="1.5"/><line x1="14" y1="40" x2="50" y2="40" stroke="#5FD3C0" stroke-width="1.5"/></svg>
-  </section>
-
-  <div class="duo">
-    <section class="panel" aria-labelledby="plan-title">
-      <h2 id="plan-title">Your plan <span class="badge">Free</span></h2>
-      <p>1 analysis included. Upgrade for full reports, a skincare routine and a 30-day improvement plan.</p>
-      <a class="link" href="/#pricing">See Pro and Premium</a>
+  <main>
+    <section class="dash-hero" aria-label="Welcome">
+      <div>
+        <h1 id="greet">Welcome back</h1>
+        <p class="sub" id="sub">Let's find what suits you.</p>
+      </div>
+      <div class="hero-actions">
+        <a href="/analyze/" class="btn btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          Start new face analysis
+        </a>
+        <span class="plan-chip">Free plan · 1 analysis included</span>
+      </div>
     </section>
-    <section class="panel" aria-labelledby="report-title">
-      <h2 id="report-title">Latest report</h2>
-      <div class="empty">No reports yet. Your first analysis will show up here.</div>
-    </section>
-  </div>
 
-  <section class="panel wide" aria-labelledby="prefs-title">
-    <h2 id="prefs-title">About you</h2>
-    <p>Optional. These help tailor your hairstyle, grooming and style picks. You can change them any time.</p>
-    <form id="prefs-form" novalidate>
-      <div class="fields two">
-        <label>Name<input name="name" type="text" autocomplete="name" placeholder="Your name"></label>
-        <label>Age range
-          <select name="age_range">
-            <option value="">Prefer not to say</option>
-            <option value="18-24">18 to 24</option>
-            <option value="25-34">25 to 34</option>
-            <option value="35-44">35 to 44</option>
-            <option value="45-54">45 to 54</option>
-            <option value="55+">55 and above</option>
-          </select>
-        </label>
-      </div>
-      <div class="fields two" style="margin-top:1rem">
-        <label>Hair you prefer
-          <select name="hair_preference">
-            <option value="">No preference</option>
-            <option value="short">Short</option>
-            <option value="medium">Medium</option>
-            <option value="long">Long</option>
-          </select>
-        </label>
-        <label>Facial hair
-          <select name="facial_hair_preference">
-            <option value="">Skip this</option>
-            <option value="clean_shaven">Clean shaven</option>
-            <option value="stubble">Light stubble</option>
-            <option value="short_beard">Short beard</option>
-            <option value="full_beard">Full beard</option>
-            <option value="open">Open to suggestions</option>
-          </select>
-        </label>
-      </div>
-      <div class="fields" style="margin-top:1rem">
-        <label>Style you like
-          <select name="style_preference">
-            <option value="">Open to suggestions</option>
-            <option value="casual">Casual</option>
-            <option value="professional">Professional</option>
-            <option value="classic">Classic</option>
-            <option value="trendy">Trendy</option>
-          </select>
-        </label>
-      </div>
+    <div class="note-bar" id="demo-banner" hidden>This is a <strong>sample preview</strong> with example data, not your real result.</div>
+    <div class="note-bar warn" id="verify-banner" hidden role="alert">Please verify your email. Check your inbox for the link we sent when you signed up.</div>
 
-      <div class="switch-row">
-        <div>
-          <strong>Hide scores</strong>
-          <span class="hint">See only recommendations, not the AI Appearance Analysis Score.</span>
+    <div class="cards">
+
+      <section class="cx insights" aria-labelledby="ins-title">
+        <h2 id="ins-title">Appearance insights</h2>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 180 180" class="gauge" aria-hidden="true">
+            <circle class="g-track" cx="90" cy="90" r="70" transform="rotate(135 90 90)" stroke-dasharray="329.9 439.8"/>
+            <circle class="g-val" id="g-val" cx="90" cy="90" r="70" transform="rotate(135 90 90)" stroke-dasharray="0 439.8" style="display:none"/>
+          </svg>
+          <div class="gauge-center"><span id="score-num">--</span><span class="outof" id="score-of">out of 100</span></div>
         </div>
-        <label class="switch" aria-label="Hide scores">
-          <input type="checkbox" name="hide_scores">
-          <span class="track"></span>
-        </label>
-      </div>
+        <p class="gauge-label">AI Appearance Analysis Score</p>
+        <div class="chips" id="chips"></div>
+        <p class="card-text" id="insight-text">Take your first analysis to see your score, face shape and style picks.</p>
+        <p class="fine">This score reflects visible facial characteristics in a photo and is not an objective measure of beauty.</p>
+      </section>
 
-      <div class="save-row">
-        <button type="submit" class="btn btn-primary">Save changes</button>
-        <p id="msg" class="msg" role="status" aria-live="polite"></p>
-      </div>
-    </form>
-  </section>
+      <section class="cx" aria-labelledby="str-title">
+        <h2 id="str-title">Your strengths</h2>
+        <ul class="rows" id="strengths"></ul>
+      </section>
 
-  <section class="panel wide" aria-labelledby="privacy-title">
-    <h2 id="privacy-title">Privacy and your data</h2>
-    <p>Your photos are private to you. Facerizer never sells or shares face photos, and they are not used to train AI unless you choose to allow it.</p>
-    <p>Photo saving is not switched on yet, so nothing of yours is stored. Delete controls will appear here as soon as it is.</p>
-    <div class="danger">
-      <button type="button" class="btn btn-outline btn-sm" disabled>Delete my photos</button>
-      <button type="button" class="btn btn-outline btn-sm" disabled>Delete my account</button>
+      <section class="cx" aria-labelledby="rec-title">
+        <h2 id="rec-title">Recommendations</h2>
+        <ul class="rows" id="recs"></ul>
+      </section>
+
     </div>
-  </section>
 
-  <p class="foot-note">This score reflects visible facial characteristics in a photo and is not an objective measure of beauty.</p>
+    <section class="cx planx" aria-labelledby="plan-title">
+      <div class="plan-head">
+        <h2 id="plan-title">30-day improvement plan</h2>
+        <span class="pill" id="plan-pill">Not started</span>
+      </div>
+      <ol class="timeline" id="timeline"></ol>
+      <p class="card-text" id="plan-note">Your plan is built from your own analysis, so it starts after your first one.</p>
+    </section>
+
+    <details class="cx settings" id="settings">
+      <summary><h2>Profile settings</h2><span class="chev" aria-hidden="true">+</span></summary>
+      <p class="hint" id="signed-in" style="margin-top:.75rem"></p>
+      <p class="card-text">Optional. These help tailor your hairstyle, grooming and style picks. You can change them any time.</p>
+      <form id="prefs-form" novalidate>
+        <div class="fields two">
+          <label>Name<input name="name" type="text" autocomplete="name" placeholder="Your name"></label>
+          <label>Age range
+            <select name="age_range">
+              <option value="">Prefer not to say</option>
+              <option value="18-24">18 to 24</option>
+              <option value="25-34">25 to 34</option>
+              <option value="35-44">35 to 44</option>
+              <option value="45-54">45 to 54</option>
+              <option value="55+">55 and above</option>
+            </select>
+          </label>
+          <label>Hair you prefer
+            <select name="hair_preference">
+              <option value="">No preference</option>
+              <option value="short">Short</option>
+              <option value="medium">Medium</option>
+              <option value="long">Long</option>
+            </select>
+          </label>
+          <label>Facial hair
+            <select name="facial_hair_preference">
+              <option value="">Skip this</option>
+              <option value="clean_shaven">Clean shaven</option>
+              <option value="stubble">Light stubble</option>
+              <option value="short_beard">Short beard</option>
+              <option value="full_beard">Full beard</option>
+              <option value="open">Open to suggestions</option>
+            </select>
+          </label>
+          <label>Style you like
+            <select name="style_preference">
+              <option value="">Open to suggestions</option>
+              <option value="casual">Casual</option>
+              <option value="professional">Professional</option>
+              <option value="classic">Classic</option>
+              <option value="trendy">Trendy</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <strong>Hide scores</strong>
+            <span class="hint">See only recommendations, not the AI Appearance Analysis Score.</span>
+          </div>
+          <label class="switch" aria-label="Hide scores">
+            <input type="checkbox" name="hide_scores">
+            <span class="track"></span>
+          </label>
+        </div>
+
+        <div class="save-row">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <p id="msg" class="msg" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </details>
+
+    <section class="cx" id="privacy" aria-labelledby="priv-title">
+      <h2 id="priv-title">Privacy and your data</h2>
+      <p class="card-text">Your photos are private to you. Facerizer never sells or shares face photos, and they are not used to train AI unless you choose to allow it.</p>
+      <p class="card-text">Photo saving is not switched on yet, so nothing of yours is stored. Delete controls will appear here as soon as it is.</p>
+      <div class="danger">
+        <button type="button" class="btn btn-outline btn-sm" disabled>Delete my photos</button>
+        <button type="button" class="btn btn-outline btn-sm" disabled>Delete my account</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="dash-foot">
+    <nav aria-label="Dashboard footer"><a href="#settings" data-open="settings">Profile settings</a><a href="#privacy">Privacy and data</a><a href="/">Home</a></nav>
+    <p>Facerizer gives general style and grooming guidance. It is not medical advice.</p>
+  </footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
