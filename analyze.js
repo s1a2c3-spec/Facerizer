@@ -21,6 +21,8 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_detector/bla
 const LIB = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm";
 
 let detector = null;
+let sb = null;
+let uid = null;
 let previewUrl = null;
 window.facerizerPhoto = null; // { blob, width, height } after all checks pass
 
@@ -60,18 +62,49 @@ function setBusy(on) {
 async function requireLogin() {
   const ok = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_URL.includes("YOUR_") && window.supabase;
   if (!ok) return true; // setup not finished: let the page work for testing
-  const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   const { data } = await sb.auth.getSession();
   if (!data.session) {
     window.location.href = "/login";
     return false;
   }
-  const p = await sb.from("profiles").select("age_confirmed_at, consent_at").eq("id", data.session.user.id).maybeSingle();
+  uid = data.session.user.id;
+  const p = await sb.from("profiles").select("age_confirmed_at, consent_at").eq("id", uid).maybeSingle();
   if (p.data && (!p.data.age_confirmed_at || !p.data.consent_at)) {
     window.location.href = "/account"; // dashboard asks for 18+ and consent first
     return false;
   }
   return true;
+}
+
+async function savePhoto(btn) {
+  const photo = window.facerizerPhoto;
+  if (!photo || !sb || !uid) return say("Please log in and try again.", "error");
+  btn.disabled = true;
+  say("Saving your photo privately...");
+  const path = uid + "/" + crypto.randomUUID() + ".jpg";
+  const up = await sb.storage.from("photos").upload(path, photo.blob, { contentType: "image/jpeg", upsert: false });
+  if (up.error) {
+    console.error(up.error);
+    btn.disabled = false;
+    return say("Could not save the photo. Run m4-setup.sql in Supabase and try again.", "error");
+  }
+  const ins = await sb.from("photos").insert({ user_id: uid, path: path, width: photo.width, height: photo.height, bytes: photo.blob.size });
+  if (ins.error) {
+    console.error(ins.error);
+    await sb.storage.from("photos").remove([path]);
+    btn.disabled = false;
+    if (/limit/i.test(ins.error.message)) return say("You can keep up to 10 photos. Delete one in your dashboard first.", "error");
+    return say("Could not save the photo. Please try again.", "error");
+  }
+  $("result").textContent = "";
+  say("Saved privately. Only you can see it. Analysis arrives in the next update, and you can delete this photo any time from your dashboard.", "ok");
+  const a = document.createElement("a");
+  a.href = "/account#photos";
+  a.className = "btn btn-outline btn-lg";
+  a.style.width = "100%";
+  a.textContent = "Go to my dashboard";
+  $("result").appendChild(a);
 }
 
 async function getDetector() {
@@ -260,8 +293,8 @@ async function handleFile(file) {
   b.type = "button";
   b.className = "btn btn-primary btn-lg";
   b.style.width = "100%";
-  b.disabled = true;
-  b.textContent = "Start analysis (coming in the next update)";
+  b.textContent = "Save this photo";
+  b.addEventListener("click", function () { savePhoto(b); });
   res.appendChild(b);
 }
 

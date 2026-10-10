@@ -154,6 +154,7 @@
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   var form = $("prefs-form");
   var userId = null;
+  var accessToken = null;
   var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at";
 
   function showGate() {
@@ -191,6 +192,84 @@
     });
   }
 
+  function loadPhotos() {
+    var list = $("thumbs"), note = $("photos-note"), delAll = $("del-photos");
+    sb.from("photos").select("id, path, created_at").order("created_at", { ascending: false }).then(function (res) {
+      list.textContent = "";
+      if (res.error) {
+        console.error(res.error);
+        delAll.hidden = true;
+        note.textContent = "Could not load your photos (" + res.error.message + "). Run m4-setup.sql in Supabase.";
+        return;
+      }
+      var rows = res.data || [];
+      delAll.hidden = rows.length === 0;
+      if (!rows.length) {
+        note.textContent = "No saved photos yet. Photos you save for analysis will appear here, and only you can see them.";
+        return;
+      }
+      note.textContent = rows.length + " saved photo" + (rows.length > 1 ? "s" : "") + ". Only you can see them.";
+      sb.storage.from("photos").createSignedUrls(rows.map(function (r) { return r.path; }), 600).then(function (s) {
+        var urls = {};
+        (s.data || []).forEach(function (x) { if (x.path) urls[x.path] = x.signedUrl; });
+        rows.forEach(function (row) {
+          var li = el("li", "thumb");
+          var img = document.createElement("img");
+          img.alt = "Your saved photo";
+          img.loading = "lazy";
+          if (urls[row.path]) img.src = urls[row.path];
+          var meta = el("div", "meta");
+          meta.appendChild(el("span", "", fmtDate(row.created_at)));
+          var del = el("button", "", "Delete"); del.type = "button";
+          del.addEventListener("click", function () {
+            if (!window.confirm("Delete this photo permanently?")) return;
+            del.disabled = true;
+            sb.storage.from("photos").remove([row.path]).then(function (r1) {
+              if (r1.error) { del.disabled = false; return window.alert("Could not delete the photo. Please try again."); }
+              sb.from("photos").delete().eq("id", row.id).then(function () { loadPhotos(); });
+            });
+          });
+          meta.appendChild(del);
+          li.appendChild(img); li.appendChild(meta);
+          list.appendChild(li);
+        });
+      });
+    });
+  }
+
+  $("del-photos").addEventListener("click", function () {
+    if (!window.confirm("Delete ALL your saved photos permanently?")) return;
+    var btn = $("del-photos"); btn.disabled = true;
+    sb.from("photos").select("id, path").then(function (res) {
+      var rows = res.data || [];
+      if (!rows.length) { btn.disabled = false; return loadPhotos(); }
+      sb.storage.from("photos").remove(rows.map(function (r) { return r.path; })).then(function (r1) {
+        if (r1.error) { btn.disabled = false; return window.alert("Could not delete the photos. Please try again."); }
+        sb.from("photos").delete().eq("user_id", userId).then(function () { btn.disabled = false; loadPhotos(); });
+      });
+    });
+  });
+
+  $("del-account").addEventListener("click", function () {
+    var m = $("acc-msg");
+    var t = window.prompt("This permanently deletes your account and all your photos. Type DELETE to confirm.");
+    if (t !== "DELETE") return;
+    var btn = $("del-account"); btn.disabled = true;
+    m.textContent = "Deleting your account..."; m.className = "msg";
+    fetch("/api/delete-account", { method: "POST", headers: { Authorization: "Bearer " + accessToken } })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) {
+        if (!x.ok) throw new Error((x.j && x.j.error) || "Could not delete the account");
+        return sb.auth.signOut().catch(function () {});
+      })
+      .then(function () { window.location.href = "/?account_deleted=1"; })
+      .catch(function (err) {
+        btn.disabled = false;
+        m.textContent = err.message + ". If this keeps happening, check the Vercel settings for delete-account.";
+        m.className = "msg error";
+      });
+  });
+
   $("logout").addEventListener("click", function () {
     sb.auth.signOut().then(function () { window.location.href = "/"; });
   });
@@ -210,7 +289,9 @@
     if (!session) { window.location.href = "/login"; return; }
     var user = session.user;
     userId = user.id;
+    accessToken = session.access_token;
     paintHeader(user, "");
+    loadPhotos();
 
     sb.from("profiles").select(COLS).eq("id", userId).maybeSingle().then(function (res) {
       if (res.error) {

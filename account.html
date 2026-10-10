@@ -144,19 +144,28 @@
       </form>
     </details>
 
+    <section class="cx" id="photos" aria-labelledby="photos-title">
+      <div class="plan-head">
+        <h2 id="photos-title">Your photos</h2>
+        <button type="button" id="del-photos" class="btn btn-outline btn-sm" hidden>Delete all photos</button>
+      </div>
+      <p class="card-text" id="photos-note">Loading...</p>
+      <ul class="thumbs" id="thumbs"></ul>
+    </section>
+
     <section class="cx" id="privacy" aria-labelledby="priv-title">
       <h2 id="priv-title">Privacy and your data</h2>
-      <p class="card-text">Your photos are private to you. Facerizer never sells or shares face photos, and they are not used to train AI unless you choose to allow it.</p>
-      <p class="card-text">Photo saving is not switched on yet, so nothing of yours is stored. Delete controls will appear here as soon as it is.</p>
+      <p class="card-text">Your photos are private to you. Facerizer never sells or shares face photos, and they are not used to train AI unless you choose to allow it. You can delete any photo above at any time.</p>
+      <p class="card-text">Deleting your account permanently removes your profile and all your photos. This cannot be undone.</p>
       <div class="danger">
-        <button type="button" class="btn btn-outline btn-sm" disabled>Delete my photos</button>
-        <button type="button" class="btn btn-outline btn-sm" disabled>Delete my account</button>
+        <button type="button" id="del-account" class="btn btn-outline btn-sm">Delete my account</button>
       </div>
+      <p id="acc-msg" class="msg" role="status" aria-live="polite" style="margin-top:.75rem"></p>
     </section>
   </main>
 
   <footer class="dash-foot">
-    <nav aria-label="Dashboard footer"><a href="#settings" data-open="settings">Profile settings</a><a href="#privacy">Privacy and data</a><a href="/">Home</a></nav>
+    <nav aria-label="Dashboard footer"><a href="#settings" data-open="settings">Profile settings</a><a href="#photos">Your photos</a><a href="#privacy">Privacy and data</a><a href="/">Home</a></nav>
     <p>Facerizer gives general style and grooming guidance. It is not medical advice.</p>
   </footer>
 </div>
