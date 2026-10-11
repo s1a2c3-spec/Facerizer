@@ -160,6 +160,14 @@
       <div class="danger">
         <button type="button" id="del-account" class="btn btn-outline btn-sm">Delete my account</button>
       </div>
+      <div id="del-box" class="del-box" hidden>
+        <p class="card-text" style="margin-top:0"><strong>This permanently deletes your account and all your photos.</strong> Type DELETE in the box to confirm.</p>
+        <input id="del-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type DELETE here" aria-label="Type DELETE to confirm">
+        <div class="danger">
+          <button type="button" id="del-confirm" class="btn btn-primary btn-sm" disabled>Permanently delete my account</button>
+          <button type="button" id="del-cancel" class="btn btn-outline btn-sm">Cancel</button>
+        </div>
+      </div>
       <p id="acc-msg" class="msg" role="status" aria-live="polite" style="margin-top:.75rem"></p>
     </section>
   </main>

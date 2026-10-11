@@ -250,22 +250,44 @@
     });
   });
 
-  $("del-account").addEventListener("click", function () {
+  var delBox = $("del-box"), delInput = $("del-input"), delConfirm = $("del-confirm"), delOpen = $("del-account");
+  delOpen.addEventListener("click", function () {
+    delBox.hidden = false; delOpen.hidden = true; delInput.value = ""; delConfirm.disabled = true; delInput.focus();
+  });
+  $("del-cancel").addEventListener("click", function () {
+    delBox.hidden = true; delOpen.hidden = false; delInput.value = ""; delConfirm.disabled = true;
+    $("acc-msg").textContent = "";
+  });
+  delInput.addEventListener("input", function () {
+    delConfirm.disabled = delInput.value.trim().toUpperCase() !== "DELETE";
+  });
+  delConfirm.addEventListener("click", function () {
     var m = $("acc-msg");
-    var t = window.prompt("This permanently deletes your account and all your photos. Type DELETE to confirm.");
-    if (t !== "DELETE") return;
-    var btn = $("del-account"); btn.disabled = true;
+    if (delInput.value.trim().toUpperCase() !== "DELETE") return;
+    delConfirm.disabled = true; delInput.disabled = true;
     m.textContent = "Deleting your account..."; m.className = "msg";
     fetch("/api/delete-account", { method: "POST", headers: { Authorization: "Bearer " + accessToken } })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (r) {
+        return r.text().then(function (t) {
+          var j = {};
+          try { j = JSON.parse(t); } catch (e) {}
+          return { ok: r.ok, status: r.status, j: j };
+        });
+      })
       .then(function (x) {
-        if (!x.ok) throw new Error((x.j && x.j.error) || "Could not delete the account");
+        if (!x.ok) {
+          var d = x.j.error || ("Server returned " + x.status);
+          if (x.status === 404) d = "The delete function was not found (404). Check that api/delete-account.js is in GitHub and Vercel has redeployed";
+          if (x.j.detail) d += " [" + x.j.detail + "]";
+          throw new Error(d);
+        }
+        m.textContent = "Your account has been deleted."; m.className = "msg ok";
         return sb.auth.signOut().catch(function () {});
       })
       .then(function () { window.location.href = "/?account_deleted=1"; })
       .catch(function (err) {
-        btn.disabled = false;
-        m.textContent = err.message + ". If this keeps happening, check the Vercel settings for delete-account.";
+        delInput.disabled = false; delConfirm.disabled = false;
+        m.textContent = "Could not delete: " + err.message;
         m.className = "msg error";
       });
   });
