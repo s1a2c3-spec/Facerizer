@@ -172,7 +172,13 @@
       return i;
     }
     var age = check("I confirm that I am 18 years or older.");
-    var con = check("I agree to the Terms and Privacy Policy, and I consent to my photos being processed to create my analysis.");
+    var con = check("I agree to the ");
+    var cspan = con.parentNode.querySelector("span");
+    function link(href, label) { var a = document.createElement("a"); a.href = href; a.target = "_blank"; a.rel = "noopener"; a.textContent = label; return a; }
+    cspan.appendChild(link("/terms", "Terms"));
+    cspan.appendChild(document.createTextNode(" and "));
+    cspan.appendChild(link("/privacy", "Privacy Policy"));
+    cspan.appendChild(document.createTextNode(", and I consent to my photos being processed to create my analysis."));
     var m = el("p", "msg"); m.setAttribute("role", "status");
     var go = el("button", "btn btn-primary btn-lg", "Continue"); go.type = "button"; go.style.width = "100%"; go.style.marginTop = "1rem";
     var out = el("button", "btn btn-outline btn-sm", "Log out instead"); out.type = "button"; out.style.marginTop = "0.75rem";

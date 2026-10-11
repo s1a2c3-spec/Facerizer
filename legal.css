@@ -1,0 +1,16 @@
+/* Policy pages and footer links */
+.legal-top { max-width: 46rem; margin: 0 auto; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border); }
+.legal { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+.legal h1 { font-size: clamp(1.9rem, 6vw, 2.6rem); }
+.legal .updated { margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted-fg); }
+.legal h2 { font: 600 1.25rem var(--serif); margin-top: 2.25rem; }
+.legal p, .legal li { margin-top: 0.75rem; line-height: 1.75; font-size: 0.95rem; }
+.legal ul { padding-left: 1.2rem; margin: 0; }
+.legal li { margin-top: 0.4rem; }
+.legal a { color: var(--primary); }
+.legal .box { margin-top: 1.25rem; padding: 1rem 1.25rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card); }
+.legal .box p { margin-top: 0.4rem; }
+.legal-foot { max-width: 46rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted-fg); }
+.foot-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 1rem; font-size: 0.85rem; }
+.foot-links a { color: var(--muted-fg); text-decoration: none; }
+.foot-links a:hover { color: var(--fg); text-decoration: underline; }
