@@ -250,21 +250,16 @@
     });
   });
 
-  var delBox = $("del-box"), delInput = $("del-input"), delConfirm = $("del-confirm"), delOpen = $("del-account");
+  var delBox = $("del-box"), delConfirm = $("del-confirm"), delOpen = $("del-account");
   delOpen.addEventListener("click", function () {
-    delBox.hidden = false; delOpen.hidden = true; delInput.value = ""; delConfirm.disabled = true; delInput.focus();
+    delBox.hidden = false; delOpen.hidden = true;
   });
   $("del-cancel").addEventListener("click", function () {
-    delBox.hidden = true; delOpen.hidden = false; delInput.value = ""; delConfirm.disabled = true;
-    $("acc-msg").textContent = "";
-  });
-  delInput.addEventListener("input", function () {
-    delConfirm.disabled = delInput.value.trim().toUpperCase() !== "DELETE";
+    delBox.hidden = true; delOpen.hidden = false; $("acc-msg").textContent = "";
   });
   delConfirm.addEventListener("click", function () {
     var m = $("acc-msg");
-    if (delInput.value.trim().toUpperCase() !== "DELETE") return;
-    delConfirm.disabled = true; delInput.disabled = true;
+    delConfirm.disabled = true;
     m.textContent = "Deleting your account..."; m.className = "msg";
     fetch("/api/delete-account", { method: "POST", headers: { Authorization: "Bearer " + accessToken } })
       .then(function (r) {
@@ -286,7 +281,7 @@
       })
       .then(function () { window.location.href = "/?account_deleted=1"; })
       .catch(function (err) {
-        delInput.disabled = false; delConfirm.disabled = false;
+        delConfirm.disabled = false;
         m.textContent = "Could not delete: " + err.message;
         m.className = "msg error";
       });
