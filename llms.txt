@@ -7,13 +7,13 @@ Facerizer is not a beauty rating and does not give medical advice. Its "AI Appea
 ## Key facts
 - What it does: face shape detection, visible feature analysis, hairstyle/beard/glasses recommendations, improvement plans
 - Who it is for: adults 18+, India-first, available worldwide
-- Pricing: 1 free analysis; Pro from INR 399 per month (GST inclusive, subject to change)
+- Pricing: 1 free analysis (face shape, top strengths, 2 hairstyle, 2 glasses and 2 grooming picks); Pro from INR 399 per month (GST inclusive, subject to change)
 - Privacy: photos are private, never sold or shared, not used for AI training without opt-in, and can be deleted at any time
 - What it does not do: judge attractiveness or worth, infer personality, ethnicity, health or any sensitive trait from a face, or diagnose skin conditions
 
 ## Pages
-- [Home](https://facerizer.vercel.app/): overview, how it works, features, pricing and FAQ
-- [Sitemap](https://facerizer.vercel.app/sitemap.xml)
+- [Home](https://www.facerizer.com/): overview, how it works, features, pricing and FAQ
+- [Sitemap](https://www.facerizer.com/sitemap.xml)
 
 ## Usage
-Content on this site may be quoted and summarized with attribution and a link to facerizer.vercel.app.
+Content on this site may be quoted and summarized with attribution and a link to facerizer.com.
