@@ -12,7 +12,11 @@
     skin: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
     hair: '<svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8.5 8.5L20 19M8.5 15.5L20 5"/></svg>',
     glasses: '<svg viewBox="0 0 24 24"><circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/><path d="M10 14h4M3 12l1-5M21 12l-1-5"/></svg>',
-    grooming: '<svg viewBox="0 0 24 24"><path d="M5 4h14v6a7 7 0 01-14 0z"/><path d="M9 14c1 1.2 2 1.5 3 1.5s2-.3 3-1.5"/></svg>'
+    grooming: '<svg viewBox="0 0 24 24"><path d="M5 4h14v6a7 7 0 01-14 0z"/><path d="M9 14c1 1.2 2 1.5 3 1.5s2-.3 3-1.5"/></svg>',
+    lips: '<svg viewBox="0 0 24 24"><path d="M3 12c3-4 6-4 9-2 3-2 6-2 9 2-3 5-6 6-9 6s-6-1-9-6z"/></svg>',
+    nose: '<svg viewBox="0 0 24 24"><path d="M12 4v10c-2 0-3 1-3 2.5S10 19 12 19s3-1 3-2.5-1-2.5-3-2.5"/></svg>',
+    cheek: '<svg viewBox="0 0 24 24"><path d="M4 9c3 4 5 5 8 5s5-1 8-5"/><path d="M6 16c2 2 4 3 6 3s4-1 6-3"/></svg>',
+    harmony: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>'
   };
 
   // Example data shown only with ?demo=1. Real results will use the same shape (added with the analysis update).
@@ -57,7 +61,7 @@
   function row(iconName, label, title, text) {
     var li = el("li", "row2");
     var ico = el("span", "ico");
-    ico.innerHTML = ICONS[iconName] || ""; // icons are fixed strings defined above
+    ico.innerHTML = ICONS[iconName] || ICONS.harmony; // icons are fixed strings defined above
     var tx = el("div", "tx");
     if (label) tx.appendChild(el("small", "", label));
     tx.appendChild(el("strong", "", title));
@@ -85,7 +89,7 @@
     chips.textContent = "";
 
     // Score gauge
-    if (r && !hideScores) {
+    if (r && !hideScores && r.score != null) {
       num.textContent = String(r.score);
       of.textContent = "out of 100";
       val.style.display = "";
@@ -95,6 +99,12 @@
       num.textContent = r && hideScores ? "Hidden" : "--";
       num.style.fontSize = r && hideScores ? "1.3rem" : "";
       of.textContent = r && hideScores ? "You chose to hide scores" : "out of 100";
+    }
+    var oldLink = $("full-link"); if (oldLink) oldLink.remove();
+    if (r && r.id) {
+      var fl2 = el("a", "card-link", "View full report");
+      fl2.id = "full-link"; fl2.href = "/report?id=" + encodeURIComponent(r.id);
+      $("insight-text").parentNode.insertBefore(fl2, $("insight-text").nextSibling);
     }
     if (r) {
       if (r.face_shape) chips.appendChild(el("span", "chip", "Face shape: " + r.face_shape.type + " (" + r.face_shape.confidence + "% confident)"));
@@ -117,7 +127,8 @@
     }
 
     // Plan
-    var plan = r ? r.plan : EMPTY_PLAN;
+    var plan = r && r.plan ? r.plan : EMPTY_PLAN;
+    var hasPlan = !!(r && r.plan);
     var tl = $("timeline"); tl.textContent = "";
     plan.forEach(function (p) {
       var li = el("li", "step " + p.s);
@@ -127,18 +138,19 @@
       tl.appendChild(li);
     });
     var pill = $("plan-pill");
-    pill.textContent = r ? "In progress" : "Not started";
-    pill.className = "pill" + (r ? " active" : "");
-    $("plan-note").textContent = r
-      ? "Tick off each step as you go. Your plan updates after your next analysis."
-      : "Your plan is built from your own analysis, so it starts after your first one.";
+    pill.textContent = hasPlan ? "In progress" : (r ? "Pro feature" : "Not started");
+    pill.className = "pill" + (hasPlan ? " active" : "");
+    $("plan-note").textContent = hasPlan
+      ? "Your plan is built from your analysis. Open your full report for every task."
+      : (r ? "Upgrade to Pro to get your personalized 30-day plan." : "Your plan is built from your own analysis, so it starts after your first one.");
     $("sub").textContent = r ? "Your style journey continues." : "Let's find what suits you.";
   }
 
   var params = window.location.search;
   var demo = /[?&]demo=1/.test(params);
   var hideScores = false;
-  paint(demo ? SAMPLE : null, hideScores);
+  var latest = null;
+  paint(demo ? SAMPLE : latest, hideScores);
   if (demo) $("demo-banner").hidden = false;
 
   // Open the settings panel from the avatar or footer link
@@ -155,7 +167,7 @@
   var form = $("prefs-form");
   var userId = null;
   var accessToken = null;
-  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at";
+  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at, plan";
 
   function showGate() {
     var wrap = el("div", "gate");
@@ -293,6 +305,36 @@
       });
   });
 
+  function toReport(row) {
+    var x = row.result || {};
+    var recs = [];
+    if (x.hairstyles && x.hairstyles[0]) recs.push({ icon: "hair", label: "Recommended hairstyle", title: x.hairstyles[0].name, text: x.hairstyles[0].why });
+    if (x.glasses && x.glasses[0]) recs.push({ icon: "glasses", label: "Suggested glasses", title: x.glasses[0].shape + " frames", text: x.glasses[0].why });
+    if (x.grooming && x.grooming[0]) recs.push({ icon: "grooming", label: "Grooming tip", title: x.grooming[0].title, text: x.grooming[0].text });
+    var plan = null;
+    if (x.plan_weeks && x.plan_weeks.length) plan = x.plan_weeks.map(function (w, i) { return { t: "Week " + w.week, d: w.title, s: i === 0 ? "current" : "upcoming" }; });
+    return { id: row.id, score: x.score, analyzed_at: row.created_at, face_shape: x.face_shape, summary: x.summary, strengths: (x.strengths || []).slice(0, 4), recs: recs, plan: plan };
+  }
+
+  function loadLatest() {
+    sb.from("analyses").select("id, result, created_at").eq("status", "done").order("created_at", { ascending: false }).limit(1).maybeSingle().then(function (res) {
+      if (res.error) { console.error("Load analysis failed:", res.error); return; }
+      if (res.data && res.data.result) { latest = toReport(res.data); paint(demo ? SAMPLE : latest, hideScores); }
+    });
+  }
+
+  function updateChip(plan) {
+    var chip = $("plan-chip"); if (!chip) return;
+    var names = { free: "Free", pro: "Pro", premium: "Premium" }, caps = { free: 1, pro: 10, premium: 25 };
+    if (!names[plan]) plan = "free";
+    var q = sb.from("analyses").select("id", { count: "exact", head: true }).eq("status", "done");
+    if (plan !== "free") { var d = new Date(); q = q.gte("created_at", new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString()); }
+    q.then(function (res) {
+      var used = res.count || 0;
+      chip.textContent = names[plan] + " plan \u00b7 " + used + " of " + caps[plan] + " analyses used" + (plan === "free" ? "" : " this month");
+    });
+  }
+
   $("logout").addEventListener("click", function () {
     sb.auth.signOut().then(function () { window.location.href = "/"; });
   });
@@ -315,6 +357,7 @@
     accessToken = session.access_token;
     paintHeader(user, "");
     loadPhotos();
+    loadLatest();
 
     sb.from("profiles").select(COLS).eq("id", userId).maybeSingle().then(function (res) {
       if (res.error) {
@@ -334,8 +377,9 @@
       form.elements["style_preference"].value = p.style_preference || "";
       form.elements["hide_scores"].checked = !!p.hide_scores;
       hideScores = !!p.hide_scores;
+      updateChip(p.plan || "free");
       paintHeader(user, p.display_name);
-      paint(demo ? SAMPLE : null, hideScores);
+      paint(demo ? SAMPLE : latest, hideScores);
       if (!p.age_confirmed_at || !p.consent_at) showGate();
     });
   });
@@ -366,7 +410,7 @@
       hideScores = payload.hide_scores;
       $("greet").textContent = payload.display_name ? "Welcome back, " + firstName(payload.display_name) : "Welcome back";
       $("avatar").textContent = ((firstName(payload.display_name) || "F").charAt(0)).toUpperCase();
-      paint(demo ? SAMPLE : null, hideScores);
+      paint(demo ? SAMPLE : latest, hideScores);
     });
   });
 })();

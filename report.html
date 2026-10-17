@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your analysis | Facerizer</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/auth.css">
+<link rel="stylesheet" href="/account.css">
+<link rel="stylesheet" href="/report.css">
+<script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
+<script src="/script.js" defer></script>
+</head>
+<body data-page="report">
+<div class="dash">
+  <header class="dash-top">
+    <a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
+    <div class="top-right">
+      <button type="button" id="theme-toggle" class="btn btn-outline icon-btn" aria-label="Switch theme">◐</button>
+      <a href="/account" class="btn btn-outline btn-sm">Dashboard</a>
+    </div>
+  </header>
+
+  <main>
+    <p id="state" class="card-text" style="margin-top:2rem">Loading your report...</p>
+
+    <div id="report" hidden>
+      <section class="dash-hero">
+        <div>
+          <h1>Your Facerizer analysis</h1>
+          <p class="sub" id="r-date"></p>
+        </div>
+        <div class="hero-actions"><a href="/analyze/" class="btn btn-primary btn-lg">New analysis</a></div>
+      </section>
+
+      <div class="cards">
+        <section class="cx insights" aria-labelledby="ins-title">
+          <h2 id="ins-title">Appearance insights</h2>
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 180 180" class="gauge" aria-hidden="true">
+              <circle class="g-track" cx="90" cy="90" r="70" transform="rotate(135 90 90)" stroke-dasharray="329.9 439.8"/>
+              <circle class="g-val" id="g-val" cx="90" cy="90" r="70" transform="rotate(135 90 90)" stroke-dasharray="0 439.8" style="display:none"/>
+            </svg>
+            <div class="gauge-center"><span id="score-num">--</span><span class="outof" id="score-of">out of 100</span></div>
+          </div>
+          <p class="gauge-label">AI Appearance Analysis Score</p>
+          <div class="chips" id="chips"></div>
+          <p class="card-text" id="insight-text"></p>
+          <p class="fine">This score reflects visible facial characteristics in this photo and is not an objective measure of beauty. Lighting, angle and expression can change it.</p>
+        </section>
+
+        <section class="cx" aria-labelledby="str-title">
+          <h2 id="str-title">Your strengths</h2>
+          <ul class="rows" id="r-strengths"></ul>
+        </section>
+
+        <section class="cx" aria-labelledby="imp-title">
+          <h2 id="imp-title">Areas to refine</h2>
+          <ul class="rows" id="r-improve"></ul>
+        </section>
+      </div>
+
+      <section class="cx" aria-labelledby="hair-title"><h2 id="hair-title">Hairstyles for you</h2><ul class="rows" id="r-hair"></ul><div id="hair-lock"></div></section>
+      <section class="cx" aria-labelledby="gl-title"><h2 id="gl-title">Glasses that suit you</h2><ul class="rows" id="r-glasses"></ul></section>
+      <section class="cx" aria-labelledby="gr-title"><h2 id="gr-title">Grooming tips</h2><ul class="rows" id="r-grooming"></ul></section>
+      <section class="cx" aria-labelledby="ft-title"><h2 id="ft-title">Feature by feature</h2><div id="r-features"></div></section>
+      <section class="cx" aria-labelledby="sk-title"><h2 id="sk-title">Skincare routine</h2><div id="r-skin"></div></section>
+      <section class="cx" aria-labelledby="pl-title"><h2 id="pl-title">30-day improvement plan</h2><div id="r-plan"></div></section>
+
+      <section class="upsell" id="upsell" hidden>
+        <h2>Want the full picture?</h2>
+        <p>Pro unlocks all 5 hairstyles, the feature-by-feature report, your skincare routine and a 30-day plan, with up to 10 analyses a month.</p>
+        <a href="/#pricing" class="btn btn-lg">See Pro</a>
+      </section>
+
+      <p class="foot-note fine" style="text-align:center;margin-top:1.5rem">Facerizer gives general style and grooming guidance. It is not medical advice. Skincare notes are cosmetic only. Consult a qualified dermatologist for persistent or concerning skin issues.</p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/report.js"></script>
+</body>
+</html>
