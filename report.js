@@ -129,6 +129,8 @@
         var ul = el("ul"); (w.tasks || []).forEach(function (t) { ul.appendChild(el("li", "", t)); });
         d.appendChild(ul); pl.appendChild(d);
       });
+      var go = el("a", "ex-link", "Open your checklist and daily routine"); go.href = "/plan"; go.style.marginTop = "1rem";
+      pl.appendChild(go);
     } else pl.appendChild(locked("Your personalized 30-day plan is part of Pro."));
 
     $("upsell").hidden = !isFree;

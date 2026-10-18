@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your 30-day plan | Facerizer</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/auth.css">
+<link rel="stylesheet" href="/account.css">
+<link rel="stylesheet" href="/report.css">
+<link rel="stylesheet" href="/plan.css">
+<script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
+<script src="/script.js" defer></script>
+</head>
+<body data-page="plan">
+<div class="dash">
+  <header class="dash-top">
+    <a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
+    <div class="top-right">
+      <button type="button" id="theme-toggle" class="btn btn-outline icon-btn" aria-label="Switch theme">◐</button>
+      <a href="/account" class="btn btn-outline btn-sm">Dashboard</a>
+    </div>
+  </header>
+
+  <main>
+    <p id="state" class="card-text" style="margin-top:2rem">Loading your plan...</p>
+
+    <div id="locked" class="cx" hidden style="margin-top:2rem">
+      <h2>Your 30-day plan is part of Pro</h2>
+      <p class="card-text">Pro gives you a personalized plan built from your analysis, with tasks to tick off, a daily routine and a streak.</p>
+      <a href="/#pricing" class="btn btn-primary" style="margin-top:1rem">See Pro</a>
+    </div>
+
+    <div id="plan" hidden>
+      <section class="dash-hero">
+        <div>
+          <h1>Your 30-day plan</h1>
+          <p class="sub" id="p-sub"></p>
+        </div>
+        <div class="hero-actions"><a href="/report" id="p-report" class="btn btn-outline">View full report</a></div>
+      </section>
+
+      <div class="duo">
+        <section class="cx" aria-labelledby="pg-title">
+          <h2 id="pg-title" style="font:600 1.05rem var(--sans)">Progress</h2>
+          <div class="big" id="p-pct">0%</div>
+          <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="p-barwrap"><span id="p-bar"></span></div>
+          <p class="card-text" id="p-count"></p>
+        </section>
+
+        <section class="cx" aria-labelledby="dr-title">
+          <h2 id="dr-title" style="font:600 1.05rem var(--sans)">Daily routine</h2>
+          <span class="streak" id="p-streak">Streak: 0 days</span>
+          <div class="routine" id="p-routine"></div>
+          <button type="button" id="p-today" class="btn btn-primary today-btn">I did my routine today</button>
+          <p id="p-msg" class="msg" role="status" aria-live="polite" style="margin-top:.6rem"></p>
+        </section>
+      </div>
+
+      <div id="p-weeks"></div>
+
+      <section class="upsell" id="p-finish" hidden>
+        <h2>Your 30 days are done</h2>
+        <p>Time to see what changed. Take a fresh photo in the same light and angle, and run a new analysis.</p>
+        <a href="/analyze/" class="btn btn-lg">New analysis</a>
+      </section>
+
+      <p class="fine" style="text-align:center;margin-top:1.5rem">General style and grooming guidance only. Not medical advice.</p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/plan.js"></script>
+</body>
+</html>

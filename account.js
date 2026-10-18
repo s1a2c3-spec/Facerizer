@@ -143,6 +143,12 @@
     $("plan-note").textContent = hasPlan
       ? "Your plan is built from your analysis. Open your full report for every task."
       : (r ? "Upgrade to Pro to get your personalized 30-day plan." : "Your plan is built from your own analysis, so it starts after your first one.");
+    var oldPl = $("plan-link"); if (oldPl) oldPl.remove();
+    if (hasPlan && r.id) {
+      var pl2 = el("a", "card-link", "Open your checklist");
+      pl2.id = "plan-link"; pl2.href = "/plan";
+      $("plan-note").parentNode.insertBefore(pl2, $("plan-note").nextSibling);
+    }
     $("sub").textContent = r ? "Your style journey continues." : "Let's find what suits you.";
   }
 
