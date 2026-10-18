@@ -27,13 +27,40 @@
 
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
-  function row(icon, label, title, text, tags, example) {
+  var fbMap = {};
+  var userIdRef = null;
+  var analysisIdRef = null;
+
+  function feedback(type, name) {
+    var wrap = el("div", "fb");
+    var key = type + "|" + name;
+    var cur = fbMap[key] || null;
+    var like = el("button", cur && cur.liked === true ? "on" : "", "Like");
+    var no = el("button", cur && cur.liked === false ? "on" : "", "Not for me");
+    like.type = "button"; no.type = "button";
+    var sel = el("select"); sel.setAttribute("aria-label", "Why not?");
+    [["", "Why not? (optional)"], ["Too long", "Too long"], ["Too short", "Too short"], ["Too much upkeep", "Too much upkeep"], ["Not my style", "Not my style"], ["Does not suit my hair", "Does not suit my hair"]].forEach(function (o) { var op = el("option", "", o[1]); op.value = o[0]; sel.appendChild(op); });
+    sel.style.display = cur && cur.liked === false ? "" : "none";
+    if (cur && cur.note) sel.value = cur.note;
+    function save(liked, note) {
+      fbMap[key] = { liked: liked, note: note || null };
+      sb.from("analysis_feedback").upsert({ user_id: userIdRef, analysis_id: analysisIdRef, item_type: type, item_name: name, liked: liked, note: note || null }, { onConflict: "user_id,analysis_id,item_type,item_name" }).then(function (res) { if (res.error) console.error(res.error); });
+    }
+    like.addEventListener("click", function () { like.className = "on"; no.className = ""; sel.style.display = "none"; save(true, null); });
+    no.addEventListener("click", function () { no.className = "on"; like.className = ""; sel.style.display = ""; save(false, sel.value); });
+    sel.addEventListener("change", function () { save(false, sel.value); });
+    wrap.appendChild(like); wrap.appendChild(no); wrap.appendChild(sel);
+    return wrap;
+  }
+
+  function row(icon, label, title, text, tags, example, fb, barber) {
     var li = el("li", "row2");
     var ico = el("span", "ico"); ico.innerHTML = ICONS[icon] || ICONS.harmony;
     var tx = el("div", "tx");
     if (label) tx.appendChild(el("small", "", label));
     tx.appendChild(el("strong", "", title));
     if (text) tx.appendChild(el("span", "d", text));
+    if (barber) { var bq = el("span", "d", "Tell your barber: " + barber); bq.style.fontStyle = "italic"; tx.appendChild(bq); }
     if (tags && tags.length) { var w = el("div"); tags.forEach(function (t) { w.appendChild(el("span", "tag", t)); }); tx.appendChild(w); }
     if (example) {
       var a = el("a", "ex-link", "See examples");
@@ -41,6 +68,7 @@
       a.target = "_blank"; a.rel = "noopener";
       tx.appendChild(a);
     }
+    if (fb) tx.appendChild(feedback(fb.type, fb.name));
     li.appendChild(ico); li.appendChild(tx);
     return li;
   }
@@ -76,16 +104,28 @@
     if (r.improvements && r.improvements.length) fill("r-improve", r.improvements.map(function (s) { return row("harmony", "", s.title, s.text); }));
     else fill("r-improve", [locked("Areas to refine, with a practical fix for each, are part of Pro.")]);
 
+    // what we noticed about the hair (so the user can spot a wrong reading)
+    var hb = $("hair-based"); hb.textContent = "";
+    var vh = r.visible_hair;
+    if (vh) {
+      var bits = [];
+      if (vh.type && vh.type !== "unclear") bits.push(vh.type);
+      if (vh.length && vh.length !== "unclear") bits.push(vh.length + " length");
+      if (vh.density && vh.density !== "unclear") bits.push(vh.density);
+      if (bits.length) hb.textContent = "Based on what we can see: " + bits.join(", ") + " hair. If this looks wrong, tell us with the buttons below.";
+    }
+
     // hairstyles
     fill("r-hair", (r.hairstyles || []).map(function (h) {
-      return row("hair", "", h.name, h.why, ["Upkeep: " + h.maintenance, "Styling: " + h.styling, h.length + " length"], h.name + " hairstyle");
+      var tags = (h.category ? [h.category] : []).concat(["Upkeep: " + h.maintenance, "Styling: " + h.styling, h.length + " length"]);
+      return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", { type: "hairstyle", name: h.name }, h.ask_barber);
     }));
     $("hair-lock").textContent = "";
     if (isFree) $("hair-lock").appendChild(locked("3 more hairstyles, each with upkeep and styling effort, are part of Pro."));
 
     // glasses
     fill("r-glasses", (r.glasses || []).map(function (g) {
-      return row("glasses", g.tier === "best" ? "Best match" : "Worth trying", g.shape + " frames", g.why, null, g.shape + " glasses frames");
+      return row("glasses", g.tier === "best" ? "Best match" : "Worth trying", g.shape + " frames", g.why, null, g.shape + " glasses frames", { type: "glasses", name: g.shape });
     }));
 
     // grooming
@@ -141,11 +181,14 @@
   sb.auth.getSession().then(function (s) {
     var session = s.data.session;
     if (!session) { window.location.href = "/login"; return; }
+    userIdRef = session.user.id; analysisIdRef = id;
     Promise.all([
       sb.from("analyses").select("id, status, plan, result, created_at").eq("id", id).maybeSingle(),
-      sb.from("profiles").select("hide_scores").eq("id", session.user.id).maybeSingle()
+      sb.from("profiles").select("hide_scores").eq("id", session.user.id).maybeSingle(),
+      sb.from("analysis_feedback").select("item_type, item_name, liked, note").eq("analysis_id", id)
     ]).then(function (out) {
       var a = out[0], p = out[1];
+      ((out[2] && out[2].data) || []).forEach(function (f) { fbMap[f.item_type + "|" + f.item_name] = { liked: f.liked, note: f.note }; });
       if (a.error) { console.error(a.error); return state("Could not load this report (" + a.error.message + "). Run m5-setup.sql in Supabase.", true); }
       if (!a.data || a.data.status !== "done" || !a.data.result) return state("This report was not found, or it is not ready.", true);
       render(a.data.result, a.data.created_at, !!(p.data && p.data.hide_scores));
