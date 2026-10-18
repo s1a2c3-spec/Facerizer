@@ -29,6 +29,9 @@ const SYSTEM = [
   "Use gentle wording such as 'a potential area to refine', 'could be enhanced through styling' or 'may benefit from grooming'. Keep a positive, respectful tone.",
   "Respect the user's preferences if given. If no facial hair is visible, do not assume they want a beard; offer an optional 'explore facial-hair styles' tip instead.",
   "Treat the measured facts as correct and do not contradict them. Be specific and concise.",
+  "Users are mostly in India. Use hairstyle and glasses names that a barber or optician in India would recognise. Common hair there is dark, straight or wavy, and often thick.",
+  "Follow the user's styles_for preference (men's, women's or both). If it is empty, base the styles on the visible hair length and the other preferences, and make most of them suitable for anyone. Never state or guess the person's gender.",
+  "Hairstyles must be clearly different from each other in length or structure, so the user has real choices to pick from. Each 'why' must refer to the measured face shape or to the visible hair. Respect the user's maintenance preference.",
   "Reply with ONLY one JSON object and nothing else.",
 ].join("\n");
 
@@ -97,14 +100,17 @@ function buildPrompt(measured, prefs) {
     "cheekbones": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
     "skin_appearance": { "observation": "visible, cosmetic only", "suggestion": "general habit", "confidence": "low|medium|high" }
   },
-  "hairstyles": [ { "name": "", "why": "why it suits this face", "maintenance": "low|medium|high", "styling": "easy|moderate|hard", "length": "short|medium|long" } ],
+  "visible_hair": { "type": "straight|wavy|curly|coily|unclear", "length": "short|medium|long|unclear", "density": "thin|medium|thick|unclear", "hairline": "one short note, or unclear" },
+  "hairstyles": [ { "category": "Everyday|Trendy|Professional|Low-maintenance|Bold", "name": "", "why": "why it suits this face shape and this hair", "ask_barber": "one sentence the user can say to a barber or stylist", "maintenance": "low|medium|high", "styling": "easy|moderate|hard", "length": "short|medium|long" } ],
   "glasses": [ { "shape": "Round|Square|Rectangle|Aviator|Cat-eye|Browline", "why": "", "tier": "best|try" } ],
   "grooming": [ { "title": "", "text": "" } ],
   "skincare": { "morning": ["gentle cleanser", "moisturizer", "sunscreen"], "evening": ["gentle cleanser", "moisturizer"], "note": "General cosmetic guidance only." },
   "plan": [ { "week": 1, "title": "Grooming", "tasks": ["", ""] }, { "week": 2, "title": "Skin and self-care", "tasks": [] }, { "week": 3, "title": "Hair and styling", "tasks": [] }, { "week": 4, "title": "Presentation", "tasks": [] } ]
 }`,
     "",
-    "Counts: 4 strengths, 3 improvements, exactly 5 hairstyles (best first), 3 glasses (best first), 4 grooming tips, 4 plan weeks with 3 to 5 small daily-life tasks each.",
+    "Counts: 4 strengths, 3 improvements, 4 grooming tips, 4 plan weeks with 3 to 5 small daily-life tasks each.",
+    "Hairstyles: exactly 5, in this order and one per category: Everyday, Trendy, Professional, Low-maintenance, Bold. They must differ from each other in length or structure. First fill visible_hair from what you can see, then choose styles that work with that hair.",
+    "Glasses: 3 different shapes. First a safe classic (tier best), then a modern choice (tier best), then one to experiment with (tier try). In each 'why' mention frame size relative to the face and a suitable frame colour or material.",
   ].join("\n");
 }
 
@@ -127,8 +133,15 @@ function normalise(a) {
     strengths: arr(a.strengths).slice(0, 5).map((s) => ({ icon: str(s.icon, 12) || "harmony", title: str(s.title, 70), text: str(s.text, 220) })).filter((s) => s.title),
     improvements: arr(a.improvements).slice(0, 4).map((s) => ({ title: str(s.title, 70), text: str(s.text, 240) })).filter((s) => s.title),
     features,
+    visible_hair: {
+      type: pick(a.visible_hair && a.visible_hair.type, ["straight", "wavy", "curly", "coily", "unclear"], "unclear"),
+      length: pick(a.visible_hair && a.visible_hair.length, ["short", "medium", "long", "unclear"], "unclear"),
+      density: pick(a.visible_hair && a.visible_hair.density, ["thin", "medium", "thick", "unclear"], "unclear"),
+      hairline: str(a.visible_hair && a.visible_hair.hairline, 80),
+    },
     hairstyles: arr(a.hairstyles).slice(0, 5).map((h) => ({
-      name: str(h.name, 60), why: str(h.why, 240),
+      category: pick(h.category, ["Everyday", "Trendy", "Professional", "Low-maintenance", "Bold"], "Everyday"),
+      name: str(h.name, 60), why: str(h.why, 240), ask_barber: str(h.ask_barber, 220),
       maintenance: pick(h.maintenance, ["low", "medium", "high"], "medium"),
       styling: pick(h.styling, ["easy", "moderate", "hard"], "moderate"),
       length: pick(h.length, ["short", "medium", "long"], "short"),
@@ -235,7 +248,7 @@ module.exports = async function handler(req, res) {
     const metrics = validMetrics(body.metrics);
 
     // 3. Profile, 18+ and consent
-    const pr = await rest("profiles?id=eq." + uid + "&select=plan,age_confirmed_at,consent_at,age_range,hair_preference,facial_hair_preference,style_preference");
+    const pr = await rest("profiles?id=eq." + uid + "&select=plan,age_confirmed_at,consent_at,age_range,hair_preference,facial_hair_preference,style_preference,style_for,maintenance_preference");
     const profile = ((await pr.json()) || [])[0];
     if (!profile) return res.status(403).json({ error: "Profile not found" });
     if (!profile.age_confirmed_at || !profile.consent_at) return res.status(403).json({ error: "Please confirm 18+ and consent in your dashboard first" });
@@ -297,6 +310,8 @@ module.exports = async function handler(req, res) {
       hair_preference: profile.hair_preference || null,
       facial_hair_preference: profile.facial_hair_preference || null,
       style_preference: profile.style_preference || null,
+      styles_for: ({ men: "men's styles", women: "women's styles", both: "both men's and women's styles" })[profile.style_for] || null,
+      maintenance_preference: profile.maintenance_preference || null,
     };
     const prompt = buildPrompt(measured, prefs);
 
@@ -327,6 +342,7 @@ module.exports = async function handler(req, res) {
       sub_scores: scores ? { harmony: scores.harmony, proportion: scores.proportion, symmetry: scores.symmetry } : null,
       face_shape: faceShape,
       summary: full.summary,
+      visible_hair: full.visible_hair,
     };
     const fullResult = { ...core, strengths: full.strengths, improvements: full.improvements, features: full.features, hairstyles: full.hairstyles, glasses: full.glasses, grooming: full.grooming, skincare: full.skincare, plan_weeks: full.plan };
     const visible = plan === "free"
