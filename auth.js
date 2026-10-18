@@ -9,6 +9,9 @@
     msgEl.className = "msg " + (type || "");
   }
 
+  var hm = (window.location.hash || "").match(/error_description=([^&]+)/);
+  if (hm) show("Sign-in problem: " + decodeURIComponent(hm[1].replace(/\+/g, " ")), "error");
+
   var ready = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
     cfg.SUPABASE_URL.indexOf("YOUR_") === -1 && window.supabase;
   if (!ready) {
