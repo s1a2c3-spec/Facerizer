@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/report.css">
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 <script src="/script.js" defer></script>
+<script src="/pdf.js" defer></script>
 </head>
 <body data-page="report">
 <div class="dash">
@@ -33,6 +34,17 @@
           <p class="sub" id="r-date"></p>
         </div>
         <div class="hero-actions"><a href="/analyze/" class="btn btn-primary btn-lg">New analysis</a></div>
+      </section>
+
+      <section class="cx" id="dl-box" aria-labelledby="dl-title" hidden>
+        <h2 id="dl-title">Take it with you</h2>
+        <p class="card-text">Download a barber card to show your stylist, or your full report as a PDF. Your photo is not included.</p>
+        <div class="dl-row" id="dl-buttons">
+          <button type="button" id="dl-barber" class="btn btn-primary btn-sm">Barber card (PDF)</button>
+          <button type="button" id="dl-full" class="btn btn-outline btn-sm">Full report (PDF)</button>
+        </div>
+        <div id="dl-locked" hidden></div>
+        <p id="dl-msg" class="msg" role="status" aria-live="polite" style="margin-top:.6rem"></p>
       </section>
 
       <div class="cards">

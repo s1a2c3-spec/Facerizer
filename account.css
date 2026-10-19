@@ -139,3 +139,7 @@
 
 .card-link { display: inline-block; margin-top: 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--primary); text-decoration: none; }
 .card-link:hover { text-decoration: underline; }
+
+.hist-actions { display: flex; gap: 1rem; align-items: center; margin-top: 0.35rem; }
+.linkbtn { border: 0; background: transparent; padding: 0; font: 600 0.875rem var(--sans); color: var(--muted-fg); cursor: pointer; }
+.linkbtn:hover { color: #b3261e; text-decoration: underline; }

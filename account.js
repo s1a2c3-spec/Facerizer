@@ -311,6 +311,44 @@
       });
   });
 
+  function loadHistory() {
+    var list = $("hist-list"), note = $("hist-note");
+    sb.from("analyses").select("id, result, created_at").eq("status", "done").order("created_at", { ascending: false }).limit(30).then(function (res) {
+      list.textContent = "";
+      if (res.error) { console.error(res.error); note.textContent = "Could not load your reports (" + res.error.message + ")."; return; }
+      var rows = res.data || [];
+      if (!rows.length) { note.textContent = "No reports yet. Your analyses will be listed here."; return; }
+      note.textContent = rows.length + " report" + (rows.length > 1 ? "s" : "") + ". Only you can see them.";
+      rows.forEach(function (row) {
+        var x = row.result || {};
+        var li = el("li", "row2");
+        var ico = el("span", "ico"); ico.innerHTML = ICONS.harmony;
+        var tx = el("div", "tx");
+        tx.appendChild(el("strong", "", fmtDate(row.created_at)));
+        var bits = [];
+        if (x.face_shape) bits.push(x.face_shape.type + " face");
+        if (x.score != null && !hideScores) bits.push(x.score + "/100");
+        if (x.plan) bits.push(x.plan.charAt(0).toUpperCase() + x.plan.slice(1) + " plan");
+        tx.appendChild(el("span", "d", bits.join("  -  ")));
+        var act = el("div", "hist-actions");
+        var view = el("a", "card-link", "View report"); view.href = "/report?id=" + encodeURIComponent(row.id); view.style.marginTop = "0";
+        var del = el("button", "linkbtn", "Delete"); del.type = "button";
+        del.addEventListener("click", function () {
+          if (!window.confirm("Delete this report permanently?")) return;
+          del.disabled = true;
+          sb.from("analyses").delete().eq("id", row.id).then(function (r2) {
+            if (r2.error) { del.disabled = false; return window.alert("Could not delete the report. Please try again."); }
+            loadHistory(); loadLatest();
+          });
+        });
+        act.appendChild(view); act.appendChild(del);
+        tx.appendChild(act);
+        li.appendChild(ico); li.appendChild(tx);
+        list.appendChild(li);
+      });
+    });
+  }
+
   function toReport(row) {
     var x = row.result || {};
     var recs = [];
@@ -364,6 +402,7 @@
     paintHeader(user, "");
     loadPhotos();
     loadLatest();
+    loadHistory();
 
     sb.from("profiles").select(COLS).eq("id", userId).maybeSingle().then(function (res) {
       if (res.error) {

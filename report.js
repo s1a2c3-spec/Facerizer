@@ -82,8 +82,38 @@
   }
   function fill(id2, nodes) { var t = $(id2); t.textContent = ""; nodes.forEach(function (n) { t.appendChild(n); }); }
 
+  var current = null;
+
+  function loadJsPdf() {
+    return new Promise(function (resolve, reject) {
+      if (window.jspdf) return resolve();
+      var sc = document.createElement("script");
+      sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      sc.onload = resolve;
+      sc.onerror = function () { reject(new Error("Could not load the PDF tool. Check your internet and try again.")); };
+      document.head.appendChild(sc);
+    });
+  }
+  function download(kind) {
+    var m = $("dl-msg");
+    m.textContent = "Preparing your PDF..."; m.className = "msg";
+    loadJsPdf().then(function () {
+      if (!window.facerizerPdf) throw new Error("PDF file is missing. Upload pdf.js to GitHub.");
+      window.facerizerPdf(current.r, current.created, kind, { hideScores: current.hide });
+      m.textContent = "Done. Check your downloads."; m.className = "msg ok";
+    }).catch(function (e) { console.error(e); m.textContent = e.message || "Could not create the PDF."; m.className = "msg error"; });
+  }
+  $("dl-barber").addEventListener("click", function () { download("barber"); });
+  $("dl-full").addEventListener("click", function () { download("full"); });
+
   function render(r, created, hide) {
     var isFree = r.plan === "free" || !r.features;
+    current = { r: r, created: created, hide: hide };
+    $("dl-box").hidden = false;
+    if (isFree) {
+      $("dl-buttons").hidden = true;
+      var dl = $("dl-locked"); dl.hidden = false; dl.textContent = ""; dl.appendChild(locked("The barber card and PDF report are part of Pro."));
+    }
     $("r-date").textContent = "Analyzed " + new Date(created).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
     // score

@@ -24,3 +24,6 @@
 .fb button { border: 1px solid var(--border); background: transparent; color: var(--muted-fg); border-radius: 999px; font: 600 0.72rem var(--sans); padding: 0.28rem 0.75rem; cursor: pointer; }
 .fb button.on { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
 .fb select { height: 1.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--fg); font: 400 0.75rem var(--sans); padding: 0 0.6rem; }
+
+.dl-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+#dl-box { margin-top: 0; margin-bottom: 1rem; }
