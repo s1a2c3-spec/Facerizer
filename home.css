@@ -30,3 +30,20 @@
 .pv-tasks li { position: relative; padding: 0.3rem 0 0.3rem 1.5rem; }
 .pv-tasks li::before { content: ""; position: absolute; left: 0; top: 0.45rem; width: 0.9rem; height: 0.9rem; border: 2px solid var(--primary); border-radius: 0.25rem; }
 .pv-tasks li:first-child::before { background: var(--primary); }
+
+/* Hero: face drawing with the report preview floating on it */
+.hero-combo { position: relative; padding: 1.5rem; }
+.hero-combo .face { display: block; width: 100%; max-width: 17rem; margin: 0 auto; }
+.hero-combo .face svg { width: 100%; height: auto; display: block; }
+.hero-combo .mock { margin-top: 1rem; padding: 1rem; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28); }
+.hero-combo .mock-gauge { width: 4.2rem; }
+.hero-combo .mock-gauge .num { font-size: 1.25rem; }
+.hero-combo .mock-top strong { font-size: 0.95rem; }
+.hero-combo .mock-rows { margin-top: 0.8rem; }
+.hero-combo .art-note { margin-top: 1rem; }
+@media (min-width: 640px) {
+  .hero-combo { padding: 1.75rem 1.5rem 1.5rem 1.75rem; }
+  .hero-combo .face { margin: 0; width: 62%; max-width: 24rem; }
+  .hero-combo .mock { position: absolute; right: 1.25rem; bottom: 3.4rem; width: 56%; max-width: 21rem; margin: 0; }
+  .hero-combo .art-note { margin-top: 0.9rem; }
+}
