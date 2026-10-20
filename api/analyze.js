@@ -5,8 +5,8 @@
 
 const PLAN_LIMITS = {
   free: { lifetime: 1, daily: 1 },
-  pro: { monthly: 10, daily: 3 },
-  premium: { monthly: 25, daily: 5 },
+  pro: { monthly: 25, daily: 5 },
+  premium: { monthly: 50, daily: 8 },
 };
 
 // Starting values for face-shape rules. Tune these after looking at real beta results.
@@ -191,7 +191,11 @@ async function callGemini({ key, model, b64, prompt, extra }) {
     const cand = j.candidates && j.candidates[0];
     if (!cand || !cand.content) throw new Error("ai_empty: " + ((j.promptFeedback && j.promptFeedback.blockReason) || (cand && cand.finishReason) || "no content"));
     const text = (cand.content.parts || []).map((p) => p.text || "").join("").replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
-    return JSON.parse(text);
+    const u = j.usageMetadata || {};
+    return {
+      data: JSON.parse(text),
+      usage: { prompt: u.promptTokenCount || 0, output: u.candidatesTokenCount || 0, thoughts: u.thoughtsTokenCount || 0 },
+    };
   } finally {
     clearTimeout(timer);
   }
@@ -221,9 +225,12 @@ module.exports = async function handler(req, res) {
     });
 
   let analysisId = null;
+  const usageTotal = { prompt: 0, output: 0, thoughts: 0, calls: 0 };
   const failWith = async (status, error, detail) => {
     if (analysisId) {
-      await rest("analyses?id=eq." + analysisId, { method: "PATCH", body: JSON.stringify({ status: "failed", error: String(detail || error).slice(0, 300) }) }).catch(() => {});
+      const patch = { status: "failed", error: String(detail || error).slice(0, 300) };
+      if (usageTotal.calls > 0) patch.usage = usageTotal;
+      await rest("analyses?id=eq." + analysisId, { method: "PATCH", body: JSON.stringify(patch) }).catch(() => {});
     }
     return res.status(status).json({ error, detail: detail ? String(detail).slice(0, 220) : undefined });
   };
@@ -278,7 +285,7 @@ module.exports = async function handler(req, res) {
     if (used.length > cap || dayCount > limits.daily) {
       await rest("analyses?id=eq." + analysisId, { method: "DELETE" }).catch(() => {});
       analysisId = null;
-      const msg = limits.lifetime ? "Your free analysis has been used. Upgrade to Pro for 10 analyses a month." : used.length > cap ? "You have used all analyses for this month." : "You have reached today's limit. Please try again tomorrow.";
+      const msg = limits.lifetime ? "Your free analysis has been used. Upgrade to Pro for 25 analyses a month." : used.length > cap ? "You have used all analyses for this month." : "You have reached today's limit. Please try again tomorrow.";
       return res.status(403).json({ error: "limit", message: msg, plan });
     }
 
@@ -319,8 +326,9 @@ module.exports = async function handler(req, res) {
     let full = null, extra = "", lastErr = "";
     for (let attempt = 0; attempt < 2 && !full; attempt++) {
       try {
-        const raw = await callGemini({ key: GKEY, model: MODEL, b64, prompt, extra });
-        const cleaned = normalise(raw);
+        const out = await callGemini({ key: GKEY, model: MODEL, b64, prompt, extra });
+        usageTotal.prompt += out.usage.prompt; usageTotal.output += out.usage.output; usageTotal.thoughts += out.usage.thoughts; usageTotal.calls += 1;
+        const cleaned = normalise(out.data);
         const bad = unsafeWord(cleaned);
         if (bad) { lastErr = "unsafe_word"; extra = "Your previous answer used the word '" + bad + "', which is not allowed. Rewrite without it and follow every rule."; continue; }
         full = cleaned;
@@ -351,7 +359,7 @@ module.exports = async function handler(req, res) {
 
     const up = await rest("analyses?id=eq." + analysisId, {
       method: "PATCH",
-      body: JSON.stringify({ status: "done", result: visible, result_full: fullResult, error: null }),
+      body: JSON.stringify({ status: "done", result: visible, result_full: fullResult, usage: usageTotal, error: null }),
     });
     if (!up.ok) return failWith(500, "Could not save your report", "save " + up.status);
 
