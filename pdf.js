@@ -43,7 +43,7 @@
     doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(20);
     doc.text("Facerizer", M, 13);
     doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(95, 211, 192);
-    doc.text(kind === "barber" ? "Barber card" : "Your analysis report", M, 20);
+    doc.text((kind === "barber" ? "Barber card" : "Your analysis report") + (opts.sample ? "  (SAMPLE - example data)" : ""), M, 20);
     doc.setTextColor(220, 230, 232); doc.text(dateStr(), W - M, 20, { align: "right" });
     y = 36;
 
@@ -143,6 +143,6 @@
       doc.text("Facerizer  -  www.facerizer.com", M, H - 9);
       doc.text("Page " + p + " of " + pages, W - M, H - 9, { align: "right" });
     }
-    doc.save(kind === "barber" ? "facerizer-barber-card.pdf" : "facerizer-report.pdf");
+    doc.save((opts.sample ? "facerizer-sample-" : "facerizer-") + (kind === "barber" ? "barber-card.pdf" : "report.pdf"));
   };
 })();

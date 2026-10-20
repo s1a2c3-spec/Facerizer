@@ -13,6 +13,7 @@ Facerizer is not a beauty rating and does not give medical advice. Its "AI Appea
 
 ## Pages
 - [Home](https://www.facerizer.com/): overview, how it works, features, pricing and FAQ
+- [Example report](https://www.facerizer.com/sample): a full sample report with example data
 - [Sitemap](https://www.facerizer.com/sitemap.xml)
 
 ## Usage

@@ -28,6 +28,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/legal.css">
+<link rel="stylesheet" href="/home.css">
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 <script src="/script.js" defer></script>
 
@@ -110,6 +111,7 @@
     <nav aria-label="Main" class="nav">
       <a href="#how-it-works">How it works</a>
       <a href="#features">Features</a>
+      <a href="/sample">Example report</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -129,25 +131,27 @@
       <p class="lead">AI-powered facial analysis that helps you understand your features, discover what suits you, and build a personalized appearance-improvement plan.</p>
       <div class="actions">
         <a href="/analyze/" class="btn btn-primary btn-lg">Analyze my face</a>
-        <a href="#how-it-works" class="btn btn-outline btn-lg">See how it works</a>
+        <a href="/sample" class="btn btn-outline btn-lg">See an example report</a>
       </div>
       <p class="small">For adults 18 and over. Your photo stays private and you can delete it any time.</p>
     </div>
     <div class="hero-art">
-      <svg viewBox="0 0 400 480" role="img" aria-label="Illustration of a face outline with measurement guides for forehead, mid-face and lower face">
-        <path d="M200 40 C 290 40 335 110 335 210 C 335 320 275 430 200 440 C 125 430 65 320 65 210 C 65 110 110 40 200 40 Z" fill="none" stroke="#eef4f5" stroke-width="2" opacity="0.9"/>
-        <line class="draw" style="--len:440" x1="200" y1="20" x2="200" y2="460" stroke="#5FD3C0" stroke-width="1.5"/>
-        <line class="draw" style="--len:320" x1="40" y1="130" x2="360" y2="130" stroke="#5FD3C0" stroke-width="1.5"/>
-        <line class="draw d2" style="--len:320" x1="40" y1="250" x2="360" y2="250" stroke="#5FD3C0" stroke-width="1.5"/>
-        <line class="draw d3" style="--len:320" x1="40" y1="350" x2="360" y2="350" stroke="#5FD3C0" stroke-width="1.5"/>
-        <path d="M125 200 Q 150 184 175 200 Q 150 214 125 200 Z" fill="none" stroke="#eef4f5" stroke-width="2"/>
-        <path d="M225 200 Q 250 184 275 200 Q 250 214 225 200 Z" fill="none" stroke="#eef4f5" stroke-width="2"/>
-        <path d="M200 215 L 190 290 Q 200 300 212 290" fill="none" stroke="#eef4f5" stroke-width="2" opacity="0.7"/>
-        <path d="M160 355 Q 200 372 240 355" fill="none" stroke="#eef4f5" stroke-width="2" opacity="0.8"/>
-        <g fill="#5FD3C0"><circle cx="150" cy="200" r="4"/><circle cx="250" cy="200" r="4"/><circle cx="200" cy="130" r="4"/><circle cx="200" cy="250" r="4"/><circle cx="200" cy="350" r="4"/><circle cx="65" cy="210" r="4"/><circle cx="335" cy="210" r="4"/></g>
-        <g fill="#eef4f5" font-size="13" font-family="system-ui, sans-serif"><text x="48" y="122">Forehead</text><text x="48" y="242">Mid-face</text><text x="48" y="342">Lower face</text></g>
-      </svg>
-      <p class="art-note">Illustration. Measurements come from facial landmarks.</p>
+      <div class="mock" role="img" aria-label="Preview of an example Facerizer report">
+        <span class="mock-tag">Example</span>
+        <div class="mock-top">
+          <div class="mock-gauge">
+            <svg viewBox="0 0 90 90" aria-hidden="true"><circle class="mg-track" cx="45" cy="45" r="36" transform="rotate(135 45 45)" stroke-dasharray="169.6 226.2"/><circle class="mg-val" cx="45" cy="45" r="36" transform="rotate(135 45 45)" stroke-dasharray="139.1 226.2"/></svg>
+            <span class="num">82</span>
+          </div>
+          <div><strong>Oval face</strong><span class="s">87% confident</span><span class="s">Wavy, medium length, thick hair</span></div>
+        </div>
+        <ul class="mock-rows">
+          <li><b>Layered medium cut</b><span class="m">Everyday &middot; low upkeep</span><i>Tell your barber: "Medium layers, longer on top, light taper at the sides."</i></li>
+          <li><b>Rectangle frames</b><span class="m">Best match glasses shape</span></li>
+          <li><b>Short, even beard line</b><span class="m">Grooming tip for a sharper jaw</span></li>
+        </ul>
+      </div>
+      <p class="art-note">Example report with sample data.</p>
     </div>
   </section>
 
@@ -174,6 +178,26 @@
         <li><span class="step-n">Step 3</span><h3>Get your report</h3><p>See your face shape, strengths and the areas where grooming or styling can help.</p></li>
         <li><span class="step-n">Step 4</span><h3>Follow your plan</h3><p>Get hairstyle, beard, glasses and skincare picks, plus a step-by-step improvement plan.</p></li>
       </ol>
+    </div>
+  </section>
+
+  <section class="band-muted" aria-labelledby="preview-title">
+    <div class="wrap section">
+      <div class="preview">
+        <div>
+          <h2 id="preview-title">See what you get before you sign up</h2>
+          <p class="lead">Every report has your face shape, your strengths, hairstyle ideas with the words to tell your barber, glasses that suit you, and a 30-day plan you can tick off.</p>
+          <div class="actions">
+            <a href="/sample" class="btn btn-primary btn-lg">See an example report</a>
+          </div>
+          <p class="small">Example with sample data. No photo needed.</p>
+        </div>
+        <div class="pv-cards">
+          <div class="pv-card"><small>Hairstyle</small><b>Layered medium cut</b><span class="d">Layers use your natural wave and keep volume off the sides, which suits an oval face.</span><i>Tell your barber: "Medium layers, a little longer on top, light taper at the sides."</i><div class="pv-tags"><span>Everyday</span><span>Upkeep: low</span><span>Styling: easy</span></div></div>
+          <div class="pv-card"><small>Glasses</small><b>Rectangle frames</b><span class="d">Add definition without hiding your features. Pick a frame about as wide as your cheekbones.</span><div class="pv-tags"><span>Best match</span></div></div>
+          <div class="pv-card"><small>30-day plan &middot; Week 1</small><b>Grooming</b><ul class="pv-tasks"><li>Trim your facial hair along the jaw line</li><li>Clean up stray brow hairs</li><li>Book the recommended haircut</li></ul></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -256,7 +280,7 @@
     <a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
     <p class="muted">Understand your features. Improve your look.</p>
     <p class="fine">This score reflects visible facial characteristics in this photo and is not an objective measure of beauty. General cosmetic guidance only. Consult a qualified dermatologist for persistent or concerning skin issues.</p>
-    <nav class="foot-links" aria-label="Footer"><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/refund">Refund Policy</a><a href="/contact">Contact</a></nav>
+    <nav class="foot-links" aria-label="Footer"><a href="/sample">Example report</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/refund">Refund Policy</a><a href="/contact">Contact</a></nav>
     <p class="fine">© <span id="year">2026</span> Facerizer, operated by Sachin Patel. All rights reserved.</p>
   </div>
 </footer>
