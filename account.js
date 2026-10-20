@@ -369,7 +369,7 @@
 
   function updateChip(plan) {
     var chip = $("plan-chip"); if (!chip) return;
-    var names = { free: "Free", pro: "Pro", premium: "Premium" }, caps = { free: 1, pro: 10, premium: 25 };
+    var names = { free: "Free", pro: "Pro", premium: "Premium" }, caps = { free: 1, pro: 25, premium: 50 };
     if (!names[plan]) plan = "free";
     var q = sb.from("analyses").select("id", { count: "exact", head: true }).eq("status", "done");
     if (plan !== "free") { var d = new Date(); q = q.gte("created_at", new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString()); }
