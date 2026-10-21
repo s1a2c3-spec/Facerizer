@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="/home.css">
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 <script src="/script.js" defer></script>
+<script src="/hair.js" defer></script>
 
 <script type="application/ld+json">
 {
@@ -111,6 +112,7 @@
     <nav aria-label="Main" class="nav">
       <a href="#how-it-works">How it works</a>
       <a href="#features">Features</a>
+      <a href="/face-shapes">Face shapes</a>
       <a href="/sample">Example report</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
@@ -161,7 +163,7 @@
           <div><strong>Oval face</strong><span class="s">87% confident</span></div>
         </div>
         <ul class="mock-rows">
-          <li><b>Layered medium cut</b><span class="m">Everyday &middot; low upkeep</span><i>Tell your barber: "Medium layers, longer on top."</i></li>
+          <li class="with-art"><span class="mock-art" data-hair="layered"></span><div><b>Layered medium cut</b><span class="m">Everyday &middot; low upkeep</span><i>Tell your barber: "Medium layers, longer on top."</i></div></li>
           <li><b>Rectangle frames</b><span class="m">Best match glasses shape</span></li>
         </ul>
       </div>
@@ -207,7 +209,7 @@
           <p class="small">Example with sample data. No photo needed.</p>
         </div>
         <div class="pv-cards">
-          <div class="pv-card"><small>Hairstyle</small><b>Layered medium cut</b><span class="d">Layers use your natural wave and keep volume off the sides, which suits an oval face.</span><i>Tell your barber: "Medium layers, a little longer on top, light taper at the sides."</i><div class="pv-tags"><span>Everyday</span><span>Upkeep: low</span><span>Styling: easy</span></div></div>
+          <div class="pv-card"><span class="pv-art" data-hair="layered"></span><small>Hairstyle</small><b>Layered medium cut</b><span class="d">Layers use your natural wave and keep volume off the sides, which suits an oval face.</span><i>Tell your barber: "Medium layers, a little longer on top, light taper at the sides."</i><div class="pv-tags"><span>Everyday</span><span>Upkeep: low</span><span>Styling: easy</span></div></div>
           <div class="pv-card"><small>Glasses</small><b>Rectangle frames</b><span class="d">Add definition without hiding your features. Pick a frame about as wide as your cheekbones.</span><div class="pv-tags"><span>Best match</span></div></div>
           <div class="pv-card"><small>30-day plan &middot; Week 1</small><b>Grooming</b><ul class="pv-tasks"><li>Trim your facial hair along the jaw line</li><li>Clean up stray brow hairs</li><li>Book the recommended haircut</li></ul></div>
         </div>
@@ -294,7 +296,7 @@
     <a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
     <p class="muted">Understand your features. Improve your look.</p>
     <p class="fine">This score reflects visible facial characteristics in this photo and is not an objective measure of beauty. General cosmetic guidance only. Consult a qualified dermatologist for persistent or concerning skin issues.</p>
-    <nav class="foot-links" aria-label="Footer"><a href="/sample">Example report</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/refund">Refund Policy</a><a href="/contact">Contact</a></nav>
+    <nav class="foot-links" aria-label="Footer"><a href="/face-shapes">Face shapes</a><a href="/sample">Example report</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/refund">Refund Policy</a><a href="/contact">Contact</a></nav>
     <p class="fine">© <span id="year">2026</span> Facerizer, operated by Sachin Patel. All rights reserved.</p>
   </div>
 </footer>

@@ -71,9 +71,14 @@
   };
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
-  function row(icon, label, title, text, tags, example, barber) {
+  function hairArt(h) {
+    var H = window.facerizerHair;
+    return H ? H.svg(H.keyFor(h.name, h.length)) : null;
+  }
+  function row(icon, label, title, text, tags, example, barber, art) {
     var li = el("li", "row2");
-    var ico = el("span", "ico"); ico.innerHTML = ICONS[icon] || ICONS.harmony;
+    var ico = el("span", art ? "ico art" : "ico");
+    ico.innerHTML = art || ICONS[icon] || ICONS.harmony;
     var tx = el("div", "tx");
     if (label) tx.appendChild(el("small", "", label));
     tx.appendChild(el("strong", "", title));
@@ -104,7 +109,7 @@
   $("hair-based").textContent = "Based on what we can see: " + vh.type + ", " + vh.length + " length, " + vh.density + " hair. Your own report reads your hair from your photo.";
   fill("r-hair", R.hairstyles.map(function (h) {
     var tags = [h.category, "Upkeep: " + h.maintenance, "Styling: " + h.styling, h.length + " length"];
-    return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", h.ask_barber);
+    return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", h.ask_barber, hairArt(h));
   }));
   fill("r-glasses", R.glasses.map(function (g) {
     return row("glasses", g.tier === "best" ? "Best match" : "Worth trying", g.shape + " frames", g.why, null, g.shape + " glasses frames");

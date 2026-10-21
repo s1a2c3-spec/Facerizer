@@ -47,3 +47,10 @@
   .hero-combo .mock { position: absolute; right: 1.25rem; bottom: 3.4rem; width: 56%; max-width: 21rem; margin: 0; }
   .hero-combo .art-note { margin-top: 0.9rem; }
 }
+
+/* Hairstyle illustrations on the landing page */
+.mock-rows li.with-art { display: flex; gap: 0.7rem; align-items: center; }
+.mock-art { width: 3.6rem; flex-shrink: 0; }
+.mock-art svg { width: 100%; height: auto; display: block; }
+.pv-art { float: right; width: 4.8rem; margin: 0 0 0.4rem 0.8rem; }
+.pv-art svg { width: 100%; height: auto; display: block; }

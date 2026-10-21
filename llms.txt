@@ -14,6 +14,14 @@ Facerizer is not a beauty rating and does not give medical advice. Its "AI Appea
 ## Pages
 - [Home](https://www.facerizer.com/): overview, how it works, features, pricing and FAQ
 - [Example report](https://www.facerizer.com/sample): a full sample report with example data
+- [Face shapes guide](https://www.facerizer.com/face-shapes): how to find your face shape, and what suits each shape
+- [Oval face hairstyles](https://www.facerizer.com/oval-face-hairstyles): hairstyles, glasses and beard styles
+- [Round face hairstyles](https://www.facerizer.com/round-face-hairstyles): hairstyles, glasses and beard styles
+- [Square face hairstyles](https://www.facerizer.com/square-face-hairstyles): hairstyles, glasses and beard styles
+- [Oblong face hairstyles](https://www.facerizer.com/oblong-face-hairstyles): hairstyles, glasses and beard styles
+- [Heart face hairstyles](https://www.facerizer.com/heart-face-hairstyles): hairstyles, glasses and beard styles
+- [Diamond face hairstyles](https://www.facerizer.com/diamond-face-hairstyles): hairstyles, glasses and beard styles
+- [Triangle face hairstyles](https://www.facerizer.com/triangle-face-hairstyles): hairstyles, glasses and beard styles
 - [Sitemap](https://www.facerizer.com/sitemap.xml)
 
 ## Usage

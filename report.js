@@ -53,9 +53,15 @@
     return wrap;
   }
 
-  function row(icon, label, title, text, tags, example, fb, barber) {
+  function hairArt(h) {
+    var H = window.facerizerHair;
+    return H ? H.svg(H.keyFor(h.name, h.length)) : null;
+  }
+
+  function row(icon, label, title, text, tags, example, fb, barber, art) {
     var li = el("li", "row2");
-    var ico = el("span", "ico"); ico.innerHTML = ICONS[icon] || ICONS.harmony;
+    var ico = el("span", art ? "ico art" : "ico");
+    ico.innerHTML = art || ICONS[icon] || ICONS.harmony;
     var tx = el("div", "tx");
     if (label) tx.appendChild(el("small", "", label));
     tx.appendChild(el("strong", "", title));
@@ -148,7 +154,7 @@
     // hairstyles
     fill("r-hair", (r.hairstyles || []).map(function (h) {
       var tags = (h.category ? [h.category] : []).concat(["Upkeep: " + h.maintenance, "Styling: " + h.styling, h.length + " length"]);
-      return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", { type: "hairstyle", name: h.name }, h.ask_barber);
+      return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", { type: "hairstyle", name: h.name }, h.ask_barber, hairArt(h));
     }));
     $("hair-lock").textContent = "";
     if (isFree) $("hair-lock").appendChild(locked("3 more hairstyles, each with upkeep and styling effort, are part of Pro."));
