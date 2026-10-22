@@ -145,4 +145,65 @@
     }
     doc.save((opts.sample ? "facerizer-sample-" : "facerizer-") + (kind === "barber" ? "barber-card.pdf" : "report.pdf"));
   };
+
+  // ---------- Progress report (Premium) ----------
+  window.facerizerProgressPdf = function (m) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: "mm", format: "a4" });
+    var W = 210, H = 297, M = 16, CW = W - 2 * M, y = M;
+    function ensure(h) { if (y + h > H - 20) { doc.addPage(); y = M; } }
+    function text(str, size, style, color, gap, indent) {
+      doc.setFont("helvetica", style || "normal"); doc.setFontSize(size); doc.setTextColor.apply(doc, color || INK);
+      var lines = doc.splitTextToSize(clean(str), CW - (indent || 0)), lh = size * 0.3528 * 1.4;
+      ensure(lines.length * lh);
+      lines.forEach(function (l) { doc.text(l, M + (indent || 0), y + size * 0.3528); y += lh; });
+      y += gap || 0;
+    }
+    function heading(str) { y += 4; ensure(14); text(str, 14, "bold", TEAL, 1); doc.setDrawColor.apply(doc, LINE); doc.line(M, y, W - M, y); y += 3; }
+    function d(x) { try { return new Date(x).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch (e) { return ""; } }
+
+    doc.setFillColor.apply(doc, INK); doc.rect(0, 0, W, 26, "F");
+    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text("Facerizer", M, 13);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(95, 211, 192); doc.text("Progress report", M, 20);
+    doc.setTextColor(220, 230, 232); doc.text(d(new Date().toISOString()), W - M, 20, { align: "right" });
+    y = 36;
+
+    if (m.first) text("Day 1 was " + d(m.first) + ". Today is day " + m.dayNo + ".", 11, "normal", INK, 2);
+    heading("Summary");
+    text("Analyses done: " + m.analyses.length, 11, "normal", INK, 0.5);
+    text("Current streak: " + m.streak + " days   |   Longest streak: " + m.longest + " days", 11, "normal", INK, 0.5);
+    text("Tasks done: " + m.tasks + "   |   Days with the routine ticked (last 12 weeks): " + (m.heatCount || 0), 11, "normal", INK, 1);
+
+    heading("Scores");
+    if (m.hide) text("Scores are hidden in your settings, so they are not shown here.", 10, "italic", MUTED, 1);
+    else {
+      var pts = m.analyses.filter(function (a) { return a.score != null; });
+      if (!pts.length) text("No scores yet.", 10, "normal", MUTED, 1);
+      pts.forEach(function (a) { text(d(a.date) + "   -   " + a.score + " / 100" + (a.shape ? "   -   " + a.shape + " face" : ""), 10.5, "normal", INK, 0.6); });
+      if (pts.length >= 2) {
+        var diff = pts[pts.length - 1].score - pts[0].score;
+        y += 2;
+        text(Math.abs(diff) < 4 ? "Change since Day 1: no clear change. Differences under 4 points usually come from light, angle or expression." : "Change since Day 1: " + (diff > 0 ? "+" : "") + diff + " points. Check that your photos used the same light and angle.", 10, "italic", MUTED, 1);
+      }
+      text("This score reflects visible facial characteristics in a photo and is not an objective measure of beauty.", 8.5, "italic", MUTED, 1);
+    }
+
+    heading("Checkpoints");
+    if (!m.checkpoints.length) text("Checkpoints appear after your first analysis.", 10, "normal", MUTED, 1);
+    var lab = { done: "Done", due: "Due now", upcoming: "Upcoming", missed: "Missed" };
+    m.checkpoints.forEach(function (c) { text("Day " + c.day + "   -   " + lab[c.status] + "   -   around " + d(c.date), 10.5, "normal", INK, 0.6); });
+
+    heading("Habits");
+    text("Tasks done in each of the last 8 weeks (week starting):", 10.5, "normal", INK, 1);
+    (m.weeks || []).forEach(function (w) { text(d(w.date) + ":  " + w.n + " task" + (w.n === 1 ? "" : "s"), 10, "normal", INK, 0.3, 4); });
+
+    var pages = doc.getNumberOfPages();
+    for (var i = 1; i <= pages; i++) {
+      doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor.apply(doc, MUTED);
+      doc.text("General style and grooming guidance only. Not medical advice.", M, H - 14);
+      doc.text("Facerizer  -  www.facerizer.com", M, H - 9);
+      doc.text("Page " + i + " of " + pages, W - M, H - 9, { align: "right" });
+    }
+    doc.save("facerizer-progress-report.pdf");
+  };
 })();

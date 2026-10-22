@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your progress | Facerizer</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/auth.css">
+<link rel="stylesheet" href="/account.css">
+<link rel="stylesheet" href="/report.css">
+<link rel="stylesheet" href="/progress.css">
+<script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
+<script src="/script.js" defer></script>
+<script src="/pdf.js" defer></script>
+</head>
+<body data-page="progress">
+<div class="dash">
+  <header class="dash-top">
+    <a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
+    <div class="top-right">
+      <button type="button" id="theme-toggle" class="btn btn-outline icon-btn" aria-label="Switch theme">◐</button>
+      <a href="/account" class="btn btn-outline btn-sm">Dashboard</a>
+    </div>
+  </header>
+
+  <main>
+    <p id="state" class="card-text" style="margin-top:2rem">Loading your progress...</p>
+
+    <div id="locked" class="cx" hidden style="margin-top:2rem">
+      <h2>Advanced progress is part of Premium</h2>
+      <p class="card-text">Premium shows your score over time, Day 1, 30, 60 and 90 checkpoints, a habit heatmap, weekly task counts and a downloadable progress report.</p>
+      <div class="cta-row" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem">
+        <a href="/#pricing" class="btn btn-primary">See Premium</a>
+        <a href="/progress?demo=1" class="btn btn-outline">See a sample</a>
+      </div>
+    </div>
+
+    <div id="prog" hidden>
+      <div class="note-bar" id="demo-bar" hidden style="margin-top:1.25rem"><strong>Sample preview.</strong> This uses example data, not your own.</div>
+
+      <section class="dash-hero">
+        <div>
+          <h1>Your progress</h1>
+          <p class="sub" id="p-sub"></p>
+        </div>
+        <div class="hero-actions"><a href="/analyze/" class="btn btn-primary btn-lg">New analysis</a></div>
+      </section>
+
+      <div class="stats" id="stats"></div>
+
+      <section class="cx" aria-labelledby="sc-title">
+        <h2 id="sc-title">Score over time</h2>
+        <div class="chart" id="c-score"></div>
+        <p class="pnote" id="c-note"></p>
+      </section>
+
+      <section class="cx" aria-labelledby="cp-title">
+        <h2 id="cp-title">Checkpoints</h2>
+        <p class="card-text">Take a new photo at Day 1, 30, 60 and 90 in the same light and at the same angle, so the comparison is fair.</p>
+        <ul class="cp-list" id="cp-list"></ul>
+      </section>
+
+      <section class="cx" aria-labelledby="ch-title">
+        <h2 id="ch-title">What changed since Day 1</h2>
+        <div id="chg"></div>
+      </section>
+
+      <div class="duo">
+        <section class="cx" aria-labelledby="ht-title">
+          <h2 id="ht-title">Daily routine, last 12 weeks</h2>
+          <div class="heat-wrap"><div class="heat" id="heat"></div></div>
+          <p class="pnote" id="heat-note"></p>
+        </section>
+        <section class="cx" aria-labelledby="wk-title">
+          <h2 id="wk-title">Tasks done each week</h2>
+          <div class="bars" id="bars"></div>
+          <p class="pnote">The last 8 weeks.</p>
+        </section>
+      </div>
+
+      <section class="cx" aria-labelledby="rp-title">
+        <h2 id="rp-title">Progress report</h2>
+        <p class="card-text">Download a PDF with your scores, checkpoints and habits. Your photos are not included.</p>
+        <div style="margin-top:1rem"><button type="button" id="dl-progress" class="btn btn-primary btn-sm">Download progress report (PDF)</button></div>
+        <p id="dl-msg" class="msg" role="status" aria-live="polite" style="margin-top:.6rem"></p>
+      </section>
+
+      <p class="fine" style="text-align:center;margin-top:1.5rem">Scores can move with light, angle and expression, so use them as a rough guide only. General style and grooming guidance. Not medical advice.</p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/progress.js"></script>
+</body>
+</html>
