@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Before and after | Facerizer</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/auth.css">
+<link rel="stylesheet" href="/account.css">
+<link rel="stylesheet" href="/report.css">
+<link rel="stylesheet" href="/progress.css">
+<link rel="stylesheet" href="/compare.css">
+<script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
+<script src="/script.js" defer></script>
+<script src="/hair.js" defer></script>
+</head>
+<body data-page="compare">
+<div class="dash">
+  <header class="dash-top">
+    <a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
+    <div class="top-right">
+      <button type="button" id="theme-toggle" class="btn btn-outline icon-btn" aria-label="Switch theme">◐</button>
+      <a href="/account" class="btn btn-outline btn-sm">Dashboard</a>
+    </div>
+  </header>
+
+  <main>
+    <p id="state" class="card-text" style="margin-top:2rem">Loading...</p>
+
+    <div id="locked" class="cx" hidden style="margin-top:2rem">
+      <h2>Before and after is part of Premium</h2>
+      <p class="card-text">Premium lets you put two of your photos side by side, slide between them, and see what changed in your reports and routine.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem">
+        <a href="/#pricing" class="btn btn-primary">See Premium</a>
+        <a href="/compare?demo=1" class="btn btn-outline">See a sample</a>
+      </div>
+    </div>
+
+    <div id="cmp" hidden>
+      <div class="note-bar" id="demo-bar" hidden style="margin-top:1.25rem"><strong>Sample preview.</strong> The pictures here are illustrations, not real photos.</div>
+
+      <section class="dash-hero">
+        <div>
+          <h1>Before and after</h1>
+          <p class="sub">Compare two of your analyses.</p>
+        </div>
+        <div class="hero-actions"><a href="/analyze/" class="btn btn-primary btn-lg">New analysis</a></div>
+      </section>
+
+      <section class="cx" aria-labelledby="pick-title">
+        <h2 id="pick-title">Choose two photos</h2>
+        <div class="cmp-controls">
+          <label>Before<select id="sel-b"></select></label>
+          <label>After<select id="sel-a"></select></label>
+          <button type="button" id="swap" class="btn btn-outline btn-sm">Swap</button>
+        </div>
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" id="v-slider" class="on">Slider</button>
+          <button type="button" id="v-side">Side by side</button>
+        </div>
+
+        <div id="slider-wrap">
+          <div class="ba-stage" id="stage">
+            <div class="ba-pane" id="ba-b"></div>
+            <div class="ba-pane after" id="ba-a"></div>
+            <span class="ba-tag l">Before</span><span class="ba-tag r">After</span>
+            <div class="ba-line" id="ba-line"></div>
+            <div class="ba-handle" id="ba-handle" aria-hidden="true">&#8596;</div>
+            <input type="range" class="ba-range" id="ba-range" min="0" max="100" value="50" aria-label="Slide to compare the before and after photos">
+          </div>
+          <p class="side-cap" id="cap-both"></p>
+        </div>
+
+        <div id="side-wrap" class="side" hidden>
+          <div><div class="ba-stage"><div class="ba-pane" id="sb-b"></div><span class="ba-tag l">Before</span></div><p class="side-cap" id="cap-b"></p></div>
+          <div><div class="ba-stage"><div class="ba-pane" id="sb-a"></div><span class="ba-tag l">After</span></div><p class="side-cap" id="cap-a"></p></div>
+        </div>
+        <p class="cmp-note">Your photos are shown only to you and are not included in any download.</p>
+      </section>
+
+      <section class="cx" aria-labelledby="chg-title">
+        <h2 id="chg-title">What changed</h2>
+        <div id="diff"></div>
+        <div class="period" id="period"></div>
+        <p class="cmp-note">Differences under 4 points usually come from light, angle or expression, so treat them as no clear change. Facerizer looks at grooming, styling and presentation, and never says your face has improved or got worse.</p>
+      </section>
+
+      <section class="cx" aria-labelledby="tip-title">
+        <h2 id="tip-title">For a fair comparison</h2>
+        <ul class="checklist">
+          <li>Use the same light, ideally natural light facing a window.</li>
+          <li>Look straight at the camera with a relaxed expression.</li>
+          <li>Keep the camera at eye level and the same distance.</li>
+          <li>Take the photo at a similar time of day.</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/compare.js"></script>
+</body>
+</html>
