@@ -22,6 +22,8 @@ Facerizer is not a beauty rating and does not give medical advice. Its "AI Appea
 - [Heart face hairstyles](https://www.facerizer.com/heart-face-hairstyles): hairstyles, glasses and beard styles
 - [Diamond face hairstyles](https://www.facerizer.com/diamond-face-hairstyles): hairstyles, glasses and beard styles
 - [Triangle face hairstyles](https://www.facerizer.com/triangle-face-hairstyles): hairstyles, glasses and beard styles
+- [About us](https://www.facerizer.com/about): who runs Facerizer and how it works
+- [Pricing](https://www.facerizer.com/pricing): plans and prices in INR
 - [Sitemap](https://www.facerizer.com/sitemap.xml)
 
 ## Usage
