@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Your 30-day plan | Facerizer</title>
+<title>Your plan | Facerizer</title>
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/auth.css">
@@ -36,7 +36,7 @@
     <div id="plan" hidden>
       <section class="dash-hero">
         <div>
-          <h1>Your 30-day plan</h1>
+          <h1 id="p-title">Your 30-day plan</h1>
           <p class="sub" id="p-sub"></p>
         </div>
         <div class="hero-actions"><a href="/report" id="p-report" class="btn btn-outline">View full report</a></div>
@@ -59,11 +59,13 @@
         </section>
       </div>
 
+      <div class="tabs" id="p-tabs" role="tablist" aria-label="Plan months"></div>
+      <div id="p-month"></div>
       <div id="p-weeks"></div>
 
       <section class="upsell" id="p-finish" hidden>
-        <h2>Your 30 days are done</h2>
-        <p>Time to see what changed. Take a fresh photo in the same light and angle, and run a new analysis.</p>
+        <h2 id="p-finish-h">Your 30 days are done</h2>
+        <p id="p-finish-p">Time to see what changed. Take a fresh photo in the same light and angle, and run a new analysis.</p>
         <a href="/analyze/" class="btn btn-lg">New analysis</a>
       </section>
 

@@ -16,3 +16,16 @@
 .task input { width: 1.25rem; height: 1.25rem; margin-top: 0.1rem; accent-color: var(--primary); flex-shrink: 0; }
 .task.done span { text-decoration: line-through; color: var(--muted-fg); }
 .today-btn { margin-top: 1rem; width: 100%; }
+
+.tabs { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin-top: 1.25rem; }
+.tabs button { border: 0; background: transparent; color: var(--muted-fg); font: 600 0.8rem var(--sans); padding: 0.55rem 1.1rem; cursor: pointer; }
+.tabs button.on { background: var(--primary); color: var(--on-primary); }
+.tabs button.lock::after { content: " \1F512"; font-size: 0.7rem; }
+.month-head { margin-top: 1rem; }
+.month-head h2 { font: 600 1.2rem var(--serif); }
+.month-head p { margin-top: 0.4rem; font-size: 0.9rem; color: var(--muted-fg); line-height: 1.6; }
+.teaser { margin-top: 1rem; }
+.teaser .btn { margin-top: 1rem; }
+.keep { margin-top: 1rem; }
+.keep h3 { font-size: 0.95rem; margin-top: 0.9rem; }
+.keep p { font-size: 0.85rem; color: var(--muted-fg); margin-top: 0.2rem; line-height: 1.6; }
