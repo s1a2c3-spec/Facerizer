@@ -255,11 +255,12 @@ module.exports = async function handler(req, res) {
     const metrics = validMetrics(body.metrics);
 
     // 3. Profile, 18+ and consent
-    const pr = await rest("profiles?id=eq." + uid + "&select=plan,age_confirmed_at,consent_at,age_range,hair_preference,facial_hair_preference,style_preference,style_for,maintenance_preference");
+    const pr = await rest("profiles?id=eq." + uid + "&select=plan,age_confirmed_at,consent_at,age_range,hair_preference,facial_hair_preference,style_preference,style_for,maintenance_preference,plan_expires_at");
     const profile = ((await pr.json()) || [])[0];
     if (!profile) return res.status(403).json({ error: "Profile not found" });
     if (!profile.age_confirmed_at || !profile.consent_at) return res.status(403).json({ error: "Please confirm 18+ and consent in your dashboard first" });
-    const plan = PLAN_LIMITS[profile.plan] ? profile.plan : "free";
+    const expired = profile.plan_expires_at && new Date(profile.plan_expires_at).getTime() < Date.now();
+    const plan = !expired && PLAN_LIMITS[profile.plan] ? profile.plan : "free";
     const limits = PLAN_LIMITS[plan];
 
     // 4. The photo must belong to this user
