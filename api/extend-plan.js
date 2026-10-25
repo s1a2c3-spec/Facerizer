@@ -116,10 +116,10 @@ module.exports = async function handler(req, res) {
     const analysisId = body && typeof body.analysis_id === "string" ? body.analysis_id : "";
     if (!/^[0-9a-f-]{36}$/i.test(analysisId)) return res.status(400).json({ error: "Report not found" });
 
-    const pr = await rest("profiles?id=eq." + uid + "&select=plan,age_range,hair_preference,facial_hair_preference,style_preference,maintenance_preference");
+    const pr = await rest("profiles?id=eq." + uid + "&select=plan,age_range,hair_preference,facial_hair_preference,style_preference,maintenance_preference,plan_expires_at");
     const profile = ((await pr.json()) || [])[0];
     if (!profile) return res.status(403).json({ error: "Profile not found" });
-    if (profile.plan !== "premium") return res.status(403).json({ error: "premium_only", message: "The 60 and 90-day plans are part of Premium." });
+    if (profile.plan !== "premium" || (profile.plan_expires_at && new Date(profile.plan_expires_at).getTime() < Date.now())) return res.status(403).json({ error: "premium_only", message: "The 60 and 90-day plans are part of Premium." });
 
     const ar = await rest("analyses?id=eq." + analysisId + "&user_id=eq." + uid + "&status=eq.done&select=id,result,result_full,plan_ext");
     const analysis = ((await ar.json()) || [])[0];
