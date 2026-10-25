@@ -39,6 +39,14 @@
     });
   }
 
+  function nextUrl() {
+    try {
+      var n = localStorage.getItem("fz_next");
+      if (n && /^\/[a-z]/i.test(n)) { localStorage.removeItem("fz_next"); return n; }
+    } catch (e) {}
+    return "/account";
+  }
+
   function friendly(err) {
     var m = (err && err.message) || "Something went wrong. Please try again.";
     if (/invalid login/i.test(m)) return "Email or password is incorrect.";
@@ -79,7 +87,7 @@
         if (u && u.identities && u.identities.length === 0) {
           return show("This email is already registered. Please log in instead.", "error");
         }
-        if (res.data.session) { window.location.href = "/account"; return; }
+        if (res.data.session) { window.location.href = nextUrl(); return; }
         f.reset();
         show("Account created. Check your email and click the verification link, then log in.", "ok");
       });
@@ -88,7 +96,7 @@
 
   /* ---------------- LOG IN ---------------- */
   if (page === "login") {
-    sb.auth.getSession().then(function (r) { if (r.data.session) window.location.href = "/account"; });
+    sb.auth.getSession().then(function (r) { if (r.data.session) window.location.href = nextUrl(); });
     var lf = document.getElementById("auth-form");
     lf.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -98,7 +106,7 @@
       sb.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
         setBusy(lf, false);
         if (res.error) return show(friendly(res.error), "error");
-        window.location.href = "/account";
+        window.location.href = nextUrl();
       });
     });
   }
@@ -143,7 +151,7 @@
         setBusy(rf, false);
         if (res.error) return show(friendly(res.error), "error");
         show("Password updated. Taking you to your account...", "ok");
-        setTimeout(function () { window.location.href = "/account"; }, 1200);
+        setTimeout(function () { window.location.href = nextUrl(); }, 1200);
       });
     });
   }

@@ -173,7 +173,7 @@
   var form = $("prefs-form");
   var userId = null;
   var accessToken = null;
-  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at, plan, style_for, maintenance_preference";
+  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at, plan, plan_expires_at, style_for, maintenance_preference";
 
   function showGate() {
     var wrap = el("div", "gate");
@@ -349,6 +349,26 @@
     });
   }
 
+  function loadPayments() {
+    var list = $("pay-list"), note = $("pay-note");
+    if (!list) return;
+    sb.from("payments").select("created_at, plan, period, amount, status, paid_at").eq("status", "paid").order("created_at", { ascending: false }).limit(20).then(function (res) {
+      list.textContent = "";
+      if (res.error) { console.error(res.error); note.textContent = "Could not load your payments."; return; }
+      var rows = res.data || [];
+      if (!rows.length) { note.textContent = "No payments yet."; return; }
+      note.textContent = "Your payments";
+      rows.forEach(function (p) {
+        var li = el("li", "row2");
+        var ico = el("span", "ico"); ico.innerHTML = ICONS.harmony;
+        var tx = el("div", "tx");
+        tx.appendChild(el("strong", "", (p.plan === "premium" ? "Premium" : "Pro") + " - " + (p.period === "year" ? "1 year" : "1 month")));
+        tx.appendChild(el("span", "d", fmtDate(p.paid_at || p.created_at) + "  -  Rs. " + Math.round(p.amount / 100).toLocaleString("en-IN")));
+        li.appendChild(ico); li.appendChild(tx); list.appendChild(li);
+      });
+    });
+  }
+
   function toReport(row) {
     var x = row.result || {};
     var recs = [];
@@ -367,7 +387,7 @@
     });
   }
 
-  function updateChip(plan) {
+  function updateChip(plan, until) {
     var chip = $("plan-chip"); if (!chip) return;
     var names = { free: "Free", pro: "Pro", premium: "Premium" }, caps = { free: 1, pro: 25, premium: 50 };
     if (!names[plan]) plan = "free";
@@ -375,7 +395,7 @@
     if (plan !== "free") { var d = new Date(); q = q.gte("created_at", new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString()); }
     q.then(function (res) {
       var used = res.count || 0;
-      chip.textContent = names[plan] + " plan \u00b7 " + used + " of " + caps[plan] + " analyses used" + (plan === "free" ? "" : " this month");
+      chip.textContent = names[plan] + " plan \u00b7 " + used + " of " + caps[plan] + " analyses used" + (plan === "free" ? "" : " this month") + (until && plan !== "free" ? " \u00b7 until " + fmtDate(until) : "");
     });
   }
 
@@ -396,6 +416,10 @@
   sb.auth.getSession().then(function (r) {
     var session = r.data.session;
     if (!session) { window.location.href = "/login"; return; }
+    try {
+      var nx = localStorage.getItem("fz_next");
+      if (nx && /^\/[a-z]/i.test(nx)) { localStorage.removeItem("fz_next"); window.location.href = nx; return; }
+    } catch (e) {}
     var user = session.user;
     userId = user.id;
     accessToken = session.access_token;
@@ -403,6 +427,7 @@
     loadPhotos();
     loadLatest();
     loadHistory();
+    loadPayments();
 
     sb.from("profiles").select(COLS).eq("id", userId).maybeSingle().then(function (res) {
       if (res.error) {
@@ -424,7 +449,7 @@
       form.elements["maintenance_preference"].value = p.maintenance_preference || "";
       form.elements["hide_scores"].checked = !!p.hide_scores;
       hideScores = !!p.hide_scores;
-      updateChip(p.plan || "free");
+      updateChip(p.plan || "free", p.plan_expires_at);
       paintHeader(user, p.display_name);
       paint(demo ? SAMPLE : latest, hideScores);
       if (!p.age_confirmed_at || !p.consent_at) showGate();

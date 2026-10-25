@@ -1,0 +1,19 @@
+.co { max-width: 34rem; margin: 0 auto; padding: 0 1.25rem 3rem; }
+.co-card { background: var(--card); border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.75rem 1.5rem; margin-top: 1.5rem; }
+.co-card h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+.co-price { font: 600 2.6rem/1 var(--serif); margin-top: 1rem; }
+.co-price span { font: 400 1rem var(--sans); color: var(--muted-fg); }
+.co-save { margin-top: 0.4rem; font-size: 0.85rem; color: var(--primary); font-weight: 600; min-height: 1.2rem; }
+.co-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin-top: 1.25rem; }
+.co-seg button { border: 0; background: transparent; color: var(--muted-fg); font: 600 0.85rem var(--sans); padding: 0.6rem 1.2rem; cursor: pointer; }
+.co-seg button.on { background: var(--primary); color: var(--on-primary); }
+.co-list { margin: 1.25rem 0 0; padding: 0; list-style: none; font-size: 0.9rem; }
+.co-list li { position: relative; padding: 0.3rem 0 0.3rem 1.5rem; }
+.co-list li::before { content: "\2713"; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+.co-pay { width: 100%; margin-top: 1.5rem; }
+.co-fine { margin-top: 1rem; font-size: 0.78rem; color: var(--muted-fg); line-height: 1.65; }
+.co-fine a { color: var(--primary); }
+.co-info { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 0.9rem; background: var(--muted); font-size: 0.85rem; }
+.co-test { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 0.9rem; background: var(--accent); color: var(--accent-foreground); border: 1px solid var(--primary); font-size: 0.8rem; line-height: 1.6; }
+.co-other { margin-top: 1rem; font-size: 0.85rem; }
+.co-other a { color: var(--primary); }
