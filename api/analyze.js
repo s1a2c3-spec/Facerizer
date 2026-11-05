@@ -9,6 +9,31 @@ const PLAN_LIMITS = {
   premium: { monthly: 50, daily: 8 },
 };
 
+// Report language: the website stays in English; only the AI-written text follows this choice.
+const LANGS = ["en", "hinglish", "hi"];
+const LANG_MAX_TOKENS = { en: 6000, hinglish: 7500, hi: 9000 };
+const KEEP_ENGLISH = "Keep these exactly in English, because the app depends on them: all JSON keys; icon; category; maintenance; styling; length; tier; confidence; visible_hair type, length and density; face_shape_estimate; the hairstyle 'name' (use the standard English name a barber would know); and the glasses 'shape'.";
+const LANG_RULES = {
+  en: "",
+  hinglish: [
+    "LANGUAGE: Write every human-readable text value (summary, strengths, improvements, feature notes, hairline note, hairstyle 'why' and 'ask_barber', glasses 'why', grooming, skincare items, plan titles and tasks) in simple everyday Hinglish: Hindi written in English (Roman) letters, the way people in India chat on WhatsApp, for example 'Aapke face ka shape oval hai, isliye ...'. Do NOT use Devanagari script. Keep it friendly, clear and short. Common English words such as hairstyle, beard, trim and sunscreen are fine.",
+    "'ask_barber' must be a short sentence the user can say to a barber in Hinglish, for example 'Sides chhote rakhna, upar thoda lamba chhodna.'",
+    KEEP_ENGLISH,
+    "The rules against judging looks apply in every language. Never use words meaning beautiful, attractive or handsome, such as sundar, khoobsurat or aakarshak.",
+  ].join("\n"),
+  hi: [
+    "LANGUAGE: Write every human-readable text value (summary, strengths, improvements, feature notes, hairline note, hairstyle 'why' and 'ask_barber', glasses 'why', grooming, skincare items, plan titles and tasks) in simple everyday Hindi in Devanagari script (आम बोलचाल की हिंदी). Keep sentences short. Common English words people really use, such as hairstyle, beard, trim and sunscreen, may stay in English letters.",
+    "'ask_barber' must be a short sentence the user can say to a barber in Hindi, for example 'साइड्स छोटे रखना, ऊपर थोड़ा लंबा छोड़ना।' It may keep the English hairstyle name.",
+    KEEP_ENGLISH,
+    "The rules against judging looks apply in every language. Never use words meaning beautiful, attractive or handsome, such as सुंदर, खूबसूरत or आकर्षक.",
+  ].join("\n"),
+};
+const SKIN_NOTE = {
+  en: "General cosmetic guidance only. Consult a qualified dermatologist for persistent or concerning skin issues.",
+  hinglish: "Ye sirf general cosmetic salah hai. Skin ki koi lagataar ya chinta wali dikkat ho to kisi qualified dermatologist se milein.",
+  hi: "यह केवल सामान्य कॉस्मेटिक सलाह है। त्वचा की कोई लगातार या चिंताजनक समस्या हो तो किसी योग्य डर्मेटोलॉजिस्ट से मिलें।",
+};
+
 // Starting values for face-shape rules. Tune these after looking at real beta results.
 const SHAPES = {
   Oval: { lw: 1.42, jaw: 0.78, fore: 0.76 },
@@ -38,6 +63,10 @@ const SYSTEM = [
 const BANNED = /\b(ugly|hideous|unattractive|attractive|beautiful|handsome|pretty|sexy|gorgeous|fat|obese|disfigured|deformed|stupid|worthless)\b/i;
 const MEDICAL = /\b(acne|pimples?|rosacea|melasma|eczema|psoriasis|dermatitis|cancer|tumou?rs?|disease|diseases|diagnos\w*|infection|syndrome|disorder|surgery|surgical|botox|fillers?|rhinoplasty)\b/i;
 const SENSITIVE = /\b(ethnic\w*|race|racial|religio\w*|caste|politic\w*|personality|intelligen\w*|sexual orientation|nationality)\b/i;
+
+// Hindi and Hinglish word checks (JS \\b does not work with Devanagari, so Hindi uses plain matching).
+const HI_BAD = /(सुंदर|सुन्दर|खूबसूरत|ख़ूबसूरत|बदसूरत|कुरूप|आकर्षक|हैंडसम|सेक्सी|ब्यूटीफुल|मुंहासे|मुहांसे|सर्जरी|बोटॉक्स|फिलर|एक्जिमा|कैंसर|बीमारी|संक्रमण|धर्म|जाति|नस्ल|राजनीति|व्यक्तित्व|बुद्धिमत्ता|राष्ट्रीयता)/;
+const HINGLISH_BAD = /\b(sundar|sundarta|sunder|khoobsurat|khubsurat|khubsoorat|badsurat|badsoorat|aakarshak|akarshak|muhase|muhaase|munhase|bimari|bimaari|sankraman|dharm|dharma|jaatiwad|jativad|nasl|rajniti|vyaktitva)\b/i;
 
 const clamp = (v, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
 const closeness = (v, target, tol) => clamp(100 * (1 - Math.abs(v - target) / tol));
@@ -74,7 +103,8 @@ function computeScores(m) {
   return { overall: Math.round(0.5 * proportion + 0.5 * symmetry), harmony: Math.round(harmony), proportion, symmetry };
 }
 
-function buildPrompt(measured, prefs) {
+function buildPrompt(measured, prefs, lang) {
+  const langLine = lang === "hinglish" ? "Report language: Hinglish (Hindi in English letters), as set in the system rules." : lang === "hi" ? "Report language: Hindi in Devanagari, as set in the system rules." : "";
   return [
     "Analyze the face in the photo for grooming and styling.",
     "",
@@ -110,11 +140,12 @@ function buildPrompt(measured, prefs) {
     "",
     "Counts: 4 strengths, 3 improvements, 4 grooming tips, 4 plan weeks with 3 to 5 small daily-life tasks each.",
     "Hairstyles: exactly 5, in this order and one per category: Everyday, Trendy, Professional, Low-maintenance, Bold. They must differ from each other in length or structure. First fill visible_hair from what you can see, then choose styles that work with that hair.",
+    langLine,
     "Glasses: 3 different shapes. First a safe classic (tier best), then a modern choice (tier best), then one to experiment with (tier try). In each 'why' mention frame size relative to the face and a suitable frame colour or material.",
   ].join("\n");
 }
 
-function normalise(a) {
+function normalise(a, lang) {
   const arr = (x) => (Array.isArray(x) ? x : []);
   const str = (x, n = 400) => (typeof x === "string" ? x.trim().slice(0, n) : "");
   const pick = (x, list, fallback) => (list.includes(x) ? x : fallback);
@@ -151,7 +182,7 @@ function normalise(a) {
     skincare: {
       morning: arr(a.skincare && a.skincare.morning).slice(0, 6).map((x) => str(x, 120)).filter(Boolean),
       evening: arr(a.skincare && a.skincare.evening).slice(0, 6).map((x) => str(x, 120)).filter(Boolean),
-      note: "General cosmetic guidance only. Consult a qualified dermatologist for persistent or concerning skin issues.",
+      note: SKIN_NOTE[lang] || SKIN_NOTE.en,
     },
     plan: arr(a.plan).slice(0, 4).map((w, i) => ({ week: i + 1, title: str(w.title, 50), tasks: arr(w.tasks).slice(0, 6).map((t) => str(t, 160)).filter(Boolean) })).filter((w) => w.title),
   };
@@ -168,11 +199,11 @@ function flatten(o, acc = []) {
 
 function unsafeWord(obj) {
   const text = flatten(obj).join(" \n ");
-  const m = text.match(BANNED) || text.match(MEDICAL) || text.match(SENSITIVE);
+  const m = text.match(BANNED) || text.match(MEDICAL) || text.match(SENSITIVE) || text.match(HI_BAD) || text.match(HINGLISH_BAD);
   return m ? m[0] : null;
 }
 
-async function callGemini({ key, model, b64, prompt, extra }) {
+async function callGemini({ key, model, b64, prompt, extra, system, maxTokens }) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 50000);
   try {
@@ -181,9 +212,9 @@ async function callGemini({ key, model, b64, prompt, extra }) {
       signal: ctrl.signal,
       headers: { "Content-Type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM }] },
+        systemInstruction: { parts: [{ text: system || SYSTEM }] },
         contents: [{ role: "user", parts: [{ text: prompt + (extra ? "\n\n" + extra : "") }, { inline_data: { mime_type: "image/jpeg", data: b64 } }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 6000, responseMimeType: "application/json" },
+        generationConfig: { temperature: 0.4, maxOutputTokens: maxTokens || 6000, responseMimeType: "application/json" },
       }),
     });
     if (!r.ok) throw new Error("ai_http_" + r.status + ": " + (await r.text()).slice(0, 220));
@@ -263,6 +294,17 @@ module.exports = async function handler(req, res) {
     const plan = !expired && PLAN_LIMITS[profile.plan] ? profile.plan : "free";
     const limits = PLAN_LIMITS[plan];
 
+    // Report language: what the page sent, else the saved choice, else English.
+    // (Read in its own query, so the analysis still works if sql/10 has not been run yet.)
+    let lang = typeof body.language === "string" && LANGS.includes(body.language) ? body.language : "";
+    if (!lang) {
+      try {
+        const lr = await rest("profiles?id=eq." + uid + "&select=language");
+        if (lr.ok) { const lrow = ((await lr.json()) || [])[0]; if (lrow && LANGS.includes(lrow.language)) lang = lrow.language; }
+      } catch (e) {}
+    }
+    lang = lang || "en";
+
     // 4. The photo must belong to this user
     const phr = await rest("photos?id=eq." + photoId + "&user_id=eq." + uid + "&select=id,path");
     const photo = ((await phr.json()) || [])[0];
@@ -321,17 +363,18 @@ module.exports = async function handler(req, res) {
       styles_for: ({ men: "men's styles", women: "women's styles", both: "both men's and women's styles" })[profile.style_for] || null,
       maintenance_preference: profile.maintenance_preference || null,
     };
-    const prompt = buildPrompt(measured, prefs);
+    const prompt = buildPrompt(measured, prefs, lang);
+    const system = LANG_RULES[lang] ? SYSTEM + "\n" + LANG_RULES[lang] : SYSTEM;
 
     // 8. Ask the AI (one retry if the wording is unsafe or the JSON is broken)
     let full = null, extra = "", lastErr = "";
     for (let attempt = 0; attempt < 2 && !full; attempt++) {
       try {
-        const out = await callGemini({ key: GKEY, model: MODEL, b64, prompt, extra });
+        const out = await callGemini({ key: GKEY, model: MODEL, b64, prompt, extra, system, maxTokens: LANG_MAX_TOKENS[lang] });
         usageTotal.prompt += out.usage.prompt; usageTotal.output += out.usage.output; usageTotal.thoughts += out.usage.thoughts; usageTotal.calls += 1;
-        const cleaned = normalise(out.data);
+        const cleaned = normalise(out.data, lang);
         const bad = unsafeWord(cleaned);
-        if (bad) { lastErr = "unsafe_word"; extra = "Your previous answer used the word '" + bad + "', which is not allowed. Rewrite without it and follow every rule."; continue; }
+        if (bad) { lastErr = "unsafe_word"; extra = "Your previous answer used the word '" + bad + "', which is not allowed. Rewrite without it (and without any word with the same meaning in any language) and follow every rule, including the report language."; continue; }
         full = cleaned;
       } catch (e) {
         lastErr = String(e.message || e);
@@ -347,6 +390,7 @@ module.exports = async function handler(req, res) {
     const faceShape = shape || { type: full.face_shape_estimate || "Oval", confidence: 55 };
     const core = {
       plan,
+      language: lang,
       score: scores ? scores.overall : null,
       sub_scores: scores ? { harmony: scores.harmony, proportion: scores.proportion, symmetry: scores.symmetry } : null,
       face_shape: faceShape,
