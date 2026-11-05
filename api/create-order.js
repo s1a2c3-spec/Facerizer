@@ -1,11 +1,14 @@
 // Creates a Razorpay order for a prepaid Pro or Premium pass.
 // Vercel Environment Variables needed: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
+// Optional: INTL_PAYMENTS=on opens payments from outside India (USD). Leave it unset until Razorpay approves international payments.
 const lib = require("./_lib");
 
 module.exports = async function handler(req, res) {
   const e = lib.env();
   if (req.method === "GET") {
-    return res.status(200).json({ status: "ready", supabase: Boolean(e.SB && e.KEY), razorpay: Boolean(e.RZP_ID && e.RZP_SECRET), mode: e.RZP_ID ? (e.RZP_ID.startsWith("rzp_test_") ? "test" : "live") : "none" });
+    const c = lib.currencyFor(req);
+    res.setHeader("Cache-Control", "no-store");
+    return res.status(200).json({ status: "ready", country: c.country || null, currency: c.currency, prices: lib.displayPrices(c.currency), can_pay: c.currency === "INR" || e.INTL_ON, supabase: Boolean(e.SB && e.KEY), razorpay: Boolean(e.RZP_ID && e.RZP_SECRET), mode: e.RZP_ID ? (e.RZP_ID.startsWith("rzp_test_") ? "test" : "live") : "none" });
   }
   if (req.method !== "POST") { res.setHeader("Allow", "GET, POST"); return res.status(405).json({ error: "Method not allowed" }); }
   if (!e.SB || !e.KEY || !e.RZP_ID || !e.RZP_SECRET) return res.status(500).json({ error: "Payments are not configured yet", detail: "Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Vercel, then Redeploy" });
@@ -18,8 +21,13 @@ module.exports = async function handler(req, res) {
     if (typeof body === "string") { try { body = JSON.parse(body); } catch (x) { body = {}; } }
     body = body || {};
     const plan = body.plan, period = body.period;
-    if (!lib.PRICES[plan] || !lib.PRICES[plan][period]) return res.status(400).json({ error: "Please choose a plan and a period" });
-    const amount = lib.PRICES[plan][period];
+    if (!lib.PRICES.INR[plan] || !lib.PRICES.INR[plan][period]) return res.status(400).json({ error: "Please choose a plan and a period" });
+
+    // India pays INR, everyone else pays USD. Chosen here from the connection, never from the browser.
+    const cur = lib.currencyFor(req);
+    const currency = cur.currency;
+    if (currency === "USD" && !e.INTL_ON) return res.status(403).json({ error: "Payments from outside India are not open yet. Please check back soon.", code: "intl_off" });
+    const amount = lib.PRICES[currency][plan][period];
 
     const pr = await lib.rest("profiles?id=eq." + user.id + "&select=plan,plan_expires_at,age_confirmed_at,consent_at");
     const profile = ((await pr.json()) || [])[0];
@@ -37,16 +45,17 @@ module.exports = async function handler(req, res) {
     if (((await recent.json()) || []).length >= 10) return res.status(429).json({ error: "Too many attempts. Please wait a while and try again." });
 
     const receipt = ("fz_" + Date.now().toString(36) + user.id.slice(0, 8)).slice(0, 40);
-    const o = await lib.rzp("POST", "/orders", { amount, currency: "INR", receipt, notes: { user_id: user.id, plan, period } });
+    const o = await lib.rzp("POST", "/orders", { amount, currency, receipt, notes: { user_id: user.id, plan, period, country: cur.country || "" } });
     if (!o.ok || !o.json.id) return res.status(502).json({ error: "Could not start the payment", detail: String((o.json.error && o.json.error.description) || o.text).slice(0, 200) });
 
     const ins = await lib.rest("payments", {
       method: "POST",
-      body: JSON.stringify({ user_id: user.id, razorpay_order_id: o.json.id, plan, period, amount, status: "created" }),
+      // INR orders do not send "currency" (the column defaults to INR), so India keeps working even before sql/11 is run.
+      body: JSON.stringify(Object.assign({ user_id: user.id, razorpay_order_id: o.json.id, plan, period, amount, status: "created" }, currency === "INR" ? {} : { currency })),
     });
     if (!ins.ok) return res.status(500).json({ error: "Could not save the order", detail: (await ins.text()).slice(0, 200) });
 
-    return res.status(200).json({ ok: true, order_id: o.json.id, amount, currency: "INR", key_id: e.RZP_ID, email: user.email || "", mode: e.RZP_ID.startsWith("rzp_test_") ? "test" : "live" });
+    return res.status(200).json({ ok: true, order_id: o.json.id, amount, currency, key_id: e.RZP_ID, email: user.email || "", mode: e.RZP_ID.startsWith("rzp_test_") ? "test" : "live" });
   } catch (x) {
     return res.status(500).json({ error: "Something went wrong. Please try again.", detail: String((x && x.message) || x).slice(0, 200) });
   }
