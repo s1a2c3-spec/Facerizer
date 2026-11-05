@@ -25,11 +25,12 @@ module.exports = async function handler(req, res) {
     if (!lib.checkoutSignature(orderId, paymentId, sig)) return res.status(400).json({ error: "Payment could not be verified" });
 
     // confirm with Razorpay that the money is for this order and this amount
+    // (the order was created by our server in INR or USD, and a payment must match its order's amount and currency)
     let pay = await lib.rzp("GET", "/payments/" + paymentId);
     if (!pay.ok) return res.status(502).json({ error: "Could not confirm the payment with Razorpay", detail: pay.text.slice(0, 200) });
     if (pay.json.order_id !== orderId || pay.json.amount !== row.amount) return res.status(400).json({ error: "Payment details do not match" });
     if (pay.json.status === "authorized") {
-      const cap = await lib.rzp("POST", "/payments/" + paymentId + "/capture", { amount: row.amount, currency: "INR" });
+      const cap = await lib.rzp("POST", "/payments/" + paymentId + "/capture", { amount: row.amount, currency: pay.json.currency || "INR" });
       if (!cap.ok) return res.status(502).json({ error: "Could not complete the payment", detail: cap.text.slice(0, 200) });
       pay = cap;
     }
