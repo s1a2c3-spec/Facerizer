@@ -352,7 +352,7 @@
   function loadPayments() {
     var list = $("pay-list"), note = $("pay-note");
     if (!list) return;
-    sb.from("payments").select("created_at, plan, period, amount, status, paid_at").eq("status", "paid").order("created_at", { ascending: false }).limit(20).then(function (res) {
+    sb.from("payments").select("created_at, plan, period, amount, status, paid_at, currency").eq("status", "paid").order("created_at", { ascending: false }).limit(20).then(function (res) {
       list.textContent = "";
       if (res.error) { console.error(res.error); note.textContent = "Could not load your payments."; return; }
       var rows = res.data || [];
@@ -363,7 +363,7 @@
         var ico = el("span", "ico"); ico.innerHTML = ICONS.harmony;
         var tx = el("div", "tx");
         tx.appendChild(el("strong", "", (p.plan === "premium" ? "Premium" : "Pro") + " - " + (p.period === "year" ? "1 year" : "1 month")));
-        tx.appendChild(el("span", "d", fmtDate(p.paid_at || p.created_at) + "  -  Rs. " + Math.round(p.amount / 100).toLocaleString("en-IN")));
+        tx.appendChild(el("span", "d", fmtDate(p.paid_at || p.created_at) + "  -  " + (p.currency === "USD" ? "$" + (p.amount / 100).toFixed(2) : "Rs. " + Math.round(p.amount / 100).toLocaleString("en-IN"))));
         li.appendChild(ico); li.appendChild(tx); list.appendChild(li);
       });
     });

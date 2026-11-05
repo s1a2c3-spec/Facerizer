@@ -5,7 +5,12 @@
   function fmt(d) { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); }
   function msg(t, type) { var m = $("msg"); m.textContent = t || ""; m.className = "msg " + (type || ""); }
   function state(t, err) { var s = $("state"); s.hidden = false; s.textContent = t; s.style.color = err ? "#b3261e" : ""; }
-  function inr(n) { return "\u20B9" + n.toLocaleString("en-IN"); }
+  // Money for display only. The real price is decided by the server (INR in India, USD elsewhere).
+  var CUR = "INR", CAN_PAY = true;
+  function money(n) {
+    if (CUR === "USD") { n = Math.round(n * 100) / 100; return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); }
+    return "\u20B9" + n.toLocaleString("en-IN");
+  }
 
   var PRICE = { pro: { month: 399, year: 2999 }, premium: { month: 699, year: 5299 } };
   var NAME = { pro: "Pro", premium: "Premium" };
@@ -30,16 +35,16 @@
   function paint() {
     var p = PRICE[plan][period];
     $("co-title").textContent = NAME[plan] + " plan";
-    $("co-price").textContent = inr(p);
+    $("co-price").textContent = money(p);
     var per = el("span", "", period === "year" ? " for 1 year" : " for 1 month");
     $("co-price").appendChild(per);
-    $("co-save").textContent = period === "year" ? "You save " + inr(PRICE[plan].month * 12 - PRICE[plan].year) + " compared with 12 months" : "";
+    $("co-save").textContent = period === "year" ? "You save " + money(Math.round((PRICE[plan].month * 12 - PRICE[plan].year) * 100) / 100) + " compared with 12 months" : "";
     $("p-month").className = period === "month" ? "on" : ""; $("p-year").className = period === "year" ? "on" : "";
     var ul = $("co-list"); ul.textContent = "";
     FEATS[plan].forEach(function (f) { ul.appendChild(el("li", "", f)); });
-    $("pay").textContent = "Pay " + inr(p) + " securely";
+    $("pay").textContent = "Pay " + money(p) + " securely";
     var fine = $("co-fine"); fine.textContent = "";
-    fine.appendChild(document.createTextNode("This is a prepaid pass: you pay once and get " + NAME[plan] + " for " + (period === "year" ? "1 year" : "30 days") + " from the day you pay. It does not renew by itself. Price includes applicable taxes. Payments are handled by Razorpay, and we never see your card or UPI details. By paying you agree to our "));
+    fine.appendChild(document.createTextNode("This is a prepaid pass: you pay once and get " + NAME[plan] + " for " + (period === "year" ? "1 year" : "30 days") + " from the day you pay. It does not renew by itself. " + (CUR === "USD" ? "The price is in US dollars (USD). Your bank or card issuer may add its own currency conversion charges. Payments are handled by Razorpay, and we never see your card details. " : "Price includes applicable taxes. Payments are handled by Razorpay, and we never see your card or UPI details. ") + "By paying you agree to our "));
     var a1 = el("a", "", "Terms"); a1.href = "/terms"; a1.target = "_blank"; a1.rel = "noopener";
     var a2 = el("a", "", "Refund Policy"); a2.href = "/refund"; a2.target = "_blank"; a2.rel = "noopener";
     fine.appendChild(a1); fine.appendChild(document.createTextNode(" and ")); fine.appendChild(a2); fine.appendChild(document.createTextNode("."));
@@ -132,8 +137,12 @@
         t.textContent = "Test mode: no real money is used. Use Razorpay's test card from its docs (any future expiry, any CVV), or the test UPI ID success@razorpay.";
       }
       if (st.status === "ready" && !st.razorpay) { state("Payments are not switched on yet. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Vercel and Redeploy.", true); return; }
+      // Prices and currency come from the server (it knows the visitor's country).
+      if (st.currency === "USD" && st.prices && st.prices.pro && st.prices.premium) { CUR = "USD"; PRICE = st.prices; }
+      CAN_PAY = st.can_pay !== false;
       paint(); info();
       $("state").hidden = true; $("box").hidden = false;
+      if (!CAN_PAY) { $("pay").disabled = true; msg("Payments from outside India are not open yet. Please check back soon.", "error"); }
     });
   });
 })();
