@@ -74,7 +74,21 @@ async function requireLogin() {
     window.location.href = "/account"; // dashboard asks for 18+ and consent first
     return false;
   }
+  await loadLanguage();
   return true;
+}
+
+// Report language picker. Stored in the profile (needs sql/10-language.sql); if that is missing, the choice still works for this analysis.
+async function loadLanguage() {
+  const sel = $("lang");
+  if (!sel || !sb) return;
+  try {
+    const r = await sb.from("profiles").select("language").eq("id", uid).maybeSingle();
+    if (r.data && r.data.language) sel.value = r.data.language;
+  } catch (e) {}
+  sel.addEventListener("change", async () => {
+    try { await sb.from("profiles").update({ language: sel.value }).eq("id", uid); } catch (e) {}
+  });
 }
 
 const LM_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -165,7 +179,7 @@ async function analyzeNow(btn) {
     r = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-      body: JSON.stringify({ photo_id: ins.data.id, metrics: metrics }),
+      body: JSON.stringify({ photo_id: ins.data.id, metrics: metrics, language: ($("lang") && $("lang").value) || undefined }),
     });
     const t = await r.text();
     try { j = JSON.parse(t); } catch (e) { j = {}; }

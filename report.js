@@ -102,6 +102,10 @@
   }
   function download(kind) {
     var m = $("dl-msg");
+    if (current && current.r && current.r.language === "hi") {
+      m.textContent = "PDF for Hindi reports is coming soon. Please use the Hinglish or English report for PDF, or read it on this page."; m.className = "msg";
+      return;
+    }
     m.textContent = "Preparing your PDF..."; m.className = "msg";
     loadJsPdf().then(function () {
       if (!window.facerizerPdf) throw new Error("PDF file is missing. Upload pdf.js to GitHub.");

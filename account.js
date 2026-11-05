@@ -173,7 +173,7 @@
   var form = $("prefs-form");
   var userId = null;
   var accessToken = null;
-  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at, plan, plan_expires_at, style_for, maintenance_preference";
+  var COLS = "display_name, age_range, hair_preference, facial_hair_preference, style_preference, hide_scores, age_confirmed_at, consent_at, plan, plan_expires_at, style_for, maintenance_preference, language";
 
   function showGate() {
     var wrap = el("div", "gate");
@@ -447,6 +447,7 @@
       form.elements["style_preference"].value = p.style_preference || "";
       form.elements["style_for"].value = p.style_for || "";
       form.elements["maintenance_preference"].value = p.maintenance_preference || "";
+      form.elements["language"].value = p.language || "en";
       form.elements["hide_scores"].checked = !!p.hide_scores;
       hideScores = !!p.hide_scores;
       updateChip(p.plan || "free", p.plan_expires_at);
@@ -469,6 +470,7 @@
       style_preference: form.elements["style_preference"].value || null,
       style_for: form.elements["style_for"].value || null,
       maintenance_preference: form.elements["maintenance_preference"].value || null,
+      language: form.elements["language"].value || "en",
       hide_scores: form.elements["hide_scores"].checked
     };
     sb.from("profiles").update(payload).eq("id", userId).select("display_name").then(function (res) {
