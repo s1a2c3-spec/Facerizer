@@ -14,6 +14,19 @@ const BANNED = /\b(ugly|hideous|unattractive|attractive|beautiful|handsome|prett
 const MEDICAL = /\b(acne|pimples?|rosacea|melasma|eczema|psoriasis|dermatitis|cancer|tumou?rs?|disease|diseases|diagnos\w*|infection|syndrome|disorder|surgery|surgical|botox|fillers?|rhinoplasty)\b/i;
 const SENSITIVE = /\b(ethnic\w*|race|racial|religio\w*|caste|politic\w*|personality|intelligen\w*|sexual orientation|nationality)\b/i;
 
+// Plan language: follows the language of the report. The website itself stays in English.
+const LANGS = ["en", "hinglish", "hi"];
+const LANG_MAX_TOKENS = { en: 6000, hinglish: 7500, hi: 9000 };
+const KEEP_ENGLISH = "Keep all JSON keys in English. Write every text value (theme, intro, week titles, tasks, keep_going titles and texts) in the chosen language.";
+const LANG_RULES = {
+  en: "",
+  hinglish: "LANGUAGE: Write in simple everyday Hinglish: Hindi written in English (Roman) letters, the way people in India chat on WhatsApp, for example 'Is hafte apne baalon ko trim karwayein.' Do NOT use Devanagari script. Keep it friendly, clear and short. Common English words such as hairstyle, beard, trim and sunscreen are fine. Never use words meaning beautiful, attractive or handsome (such as sundar, khoobsurat, aakarshak). " + KEEP_ENGLISH,
+  hi: "LANGUAGE: Write in simple everyday Hindi in Devanagari script (आम बोलचाल की हिंदी). Keep sentences short. Common English words people really use, such as hairstyle, beard, trim and sunscreen, may stay in English letters. Never use words meaning beautiful, attractive or handsome (such as सुंदर, खूबसूरत, आकर्षक). " + KEEP_ENGLISH,
+};
+// Hindi and Hinglish word checks (JS \\b does not work with Devanagari, so Hindi uses plain matching).
+const HI_BAD = /(सुंदर|सुन्दर|खूबसूरत|ख़ूबसूरत|बदसूरत|कुरूप|आकर्षक|हैंडसम|सेक्सी|ब्यूटीफुल|मुंहासे|मुहांसे|सर्जरी|बोटॉक्स|फिलर|एक्जिमा|कैंसर|बीमारी|संक्रमण|धर्म|जाति|नस्ल|राजनीति|व्यक्तित्व|बुद्धिमत्ता|राष्ट्रीयता)/;
+const HINGLISH_BAD = /\b(sundar|sundarta|sunder|khoobsurat|khubsurat|khubsoorat|badsurat|badsoorat|aakarshak|akarshak|muhase|muhaase|munhase|bimari|bimaari|sankraman|dharm|dharma|jaatiwad|jativad|nasl|rajniti|vyaktitva)\b/i;
+
 function flatten(o, acc = []) {
   if (typeof o === "string") acc.push(o);
   else if (Array.isArray(o)) o.forEach((x) => flatten(x, acc));
@@ -22,7 +35,7 @@ function flatten(o, acc = []) {
 }
 function unsafeWord(obj) {
   const text = flatten(obj).join(" \n ");
-  const m = text.match(BANNED) || text.match(MEDICAL) || text.match(SENSITIVE);
+  const m = text.match(BANNED) || text.match(MEDICAL) || text.match(SENSITIVE) || text.match(HI_BAD) || text.match(HINGLISH_BAD);
   return m ? m[0] : null;
 }
 
@@ -63,7 +76,7 @@ function normalise(a) {
   };
 }
 
-async function callGemini(key, model, prompt, extra) {
+async function callGemini(key, model, prompt, extra, system, maxTokens) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 50000);
   try {
@@ -72,9 +85,9 @@ async function callGemini(key, model, prompt, extra) {
       signal: ctrl.signal,
       headers: { "Content-Type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM }] },
+        systemInstruction: { parts: [{ text: system || SYSTEM }] },
         contents: [{ role: "user", parts: [{ text: prompt + (extra ? "\n\n" + extra : "") }] }],
-        generationConfig: { temperature: 0.5, maxOutputTokens: 6000, responseMimeType: "application/json" },
+        generationConfig: { temperature: 0.5, maxOutputTokens: maxTokens || 6000, responseMimeType: "application/json" },
       }),
     });
     if (!r.ok) throw new Error("ai_http_" + r.status + ": " + (await r.text()).slice(0, 200));
@@ -127,6 +140,17 @@ module.exports = async function handler(req, res) {
     if (analysis.plan_ext) return res.status(200).json({ ok: true, existing: true });
 
     const r = analysis.result_full || analysis.result || {};
+
+    // Language: the report's own language first, else the saved choice, else English.
+    let lang = LANGS.includes(r.language) ? r.language : "";
+    if (!lang) {
+      try {
+        const lr = await rest("profiles?id=eq." + uid + "&select=language");
+        if (lr.ok) { const lrow = ((await lr.json()) || [])[0]; if (lrow && LANGS.includes(lrow.language)) lang = lrow.language; }
+      } catch (e) {}
+    }
+    lang = lang || "en";
+    const system = LANG_RULES[lang] ? SYSTEM + "\n" + LANG_RULES[lang] : SYSTEM;
     const ctx = {
       face_shape: r.face_shape && r.face_shape.type,
       visible_hair: r.visible_hair,
@@ -145,11 +169,11 @@ module.exports = async function handler(req, res) {
     const usage = { prompt: 0, output: 0, thoughts: 0, calls: 0 };
     for (let attempt = 0; attempt < 2 && !ext; attempt++) {
       try {
-        const out = await callGemini(GKEY, MODEL, prompt, extra);
+        const out = await callGemini(GKEY, MODEL, prompt, extra, system, LANG_MAX_TOKENS[lang]);
         usage.prompt += out.usage.prompt; usage.output += out.usage.output; usage.thoughts += out.usage.thoughts; usage.calls += 1;
         const cleaned = normalise(out.data);
         const bad = unsafeWord(cleaned);
-        if (bad) { lastErr = "unsafe_word"; extra = "Your previous answer used the word '" + bad + "', which is not allowed. Rewrite without it."; continue; }
+        if (bad) { lastErr = "unsafe_word"; extra = "Your previous answer used the word '" + bad + "', which is not allowed. Rewrite without it (and without any word with the same meaning in any language), in the chosen language."; continue; }
         ext = cleaned;
       } catch (e) {
         lastErr = String(e.message || e);
@@ -161,6 +185,7 @@ module.exports = async function handler(req, res) {
       return res.status(502).json({ error: hint, detail: lastErr.slice(0, 200) });
     }
 
+    ext.language = lang;
     ext.usage = usage;
     ext.created_at = new Date().toISOString();
     const up = await rest("analyses?id=eq." + analysisId, { method: "PATCH", body: JSON.stringify({ plan_ext: ext }) });
