@@ -1,10 +1,17 @@
 // Shared helpers for the payment functions. Files starting with "_" are not public URLs.
 const crypto = require("crypto");
 
-// Prices in paise (INR x 100). The server decides the price, never the browser.
+// Prices in the smallest unit: paise for INR (x 100) and cents for USD (x 100).
+// The server decides the price, never the browser. India pays INR; everyone else pays USD.
 const PRICES = {
-  pro: { month: 39900, year: 299900 },
-  premium: { month: 69900, year: 529900 },
+  INR: {
+    pro: { month: 39900, year: 299900 },
+    premium: { month: 69900, year: 529900 },
+  },
+  USD: {
+    pro: { month: 599, year: 5900 },
+    premium: { month: 899, year: 8900 },
+  },
 };
 const PERIOD_DAYS = { month: 30, year: 365 };
 
@@ -16,7 +23,27 @@ lib.env = () => ({
   RZP_ID: process.env.RAZORPAY_KEY_ID,
   RZP_SECRET: process.env.RAZORPAY_KEY_SECRET,
   WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET,
+  // Switch for payments from outside India. Keep it off until Razorpay has approved international payments.
+  INTL_ON: ["on", "true", "1", "yes"].includes(String(process.env.INTL_PAYMENTS || "").toLowerCase()),
+  // Testing only: set to INR or USD in Vercel to make everybody see that currency. Remove it after testing.
+  FORCE_CURRENCY: String(process.env.FORCE_CURRENCY || "").toUpperCase(),
 });
+
+// Which currency this visitor pays in. Vercel tells us the country from the connection, so the browser cannot choose.
+// Unknown country is treated as India (INR), which is how payments worked before.
+lib.currencyFor = (req) => {
+  const { FORCE_CURRENCY } = lib.env();
+  const country = String((req.headers && req.headers["x-vercel-ip-country"]) || "").toUpperCase();
+  if (FORCE_CURRENCY === "INR" || FORCE_CURRENCY === "USD") return { country, currency: FORCE_CURRENCY };
+  return { country, currency: !country || country === "IN" ? "INR" : "USD" };
+};
+
+// Prices for a currency in normal units (for showing on the page): 399, 2999, 5.99 ...
+lib.displayPrices = (currency) => {
+  const t = PRICES[currency] || PRICES.INR, out = {};
+  Object.keys(t).forEach((plan) => { out[plan] = { month: t[plan].month / 100, year: t[plan].year / 100 }; });
+  return out;
+};
 
 lib.rest = (path, init = {}) => {
   const { SB, KEY } = lib.env();
