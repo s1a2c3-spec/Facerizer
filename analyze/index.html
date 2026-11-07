@@ -25,6 +25,8 @@
   #checks .skip .mark { color: var(--muted-fg); }
   #checks .note { color: var(--muted-fg); display: block; font-size: 0.8rem; }
   #result { margin-top: 1.25rem; }
+  .lang-pick { display: block; margin-top: 1.25rem; font-size: 0.9rem; font-weight: 600; }
+  .lang-pick select { display: block; width: 100%; margin-top: 0.35rem; padding: 0.6rem 0.7rem; font: inherit; border: 1px solid var(--border); border-radius: 0.6rem; background: var(--card, transparent); color: inherit; }
 </style>
 </head>
 <body data-page="analyze">
@@ -40,6 +42,15 @@
     <li>Your whole face should be visible</li>
     <li>One person only, clear and high resolution</li>
   </ul>
+
+  <label class="lang-pick" for="lang">Report language
+    <select id="lang">
+      <option value="en">English</option>
+      <option value="hinglish">Hinglish (Hindi in English letters)</option>
+      <option value="hi">हिंदी (Hindi)</option>
+    </select>
+  </label>
+  <p class="small" style="margin-top:.4rem">Your report and plan will be written in this language. The website stays in English.</p>
 
   <div class="pick" id="pick">
     <label class="btn btn-primary btn-lg" for="cam">Take a selfie</label>
