@@ -47,6 +47,18 @@
   .ex-check a:hover { text-decoration: underline; }
   .ex-stats { margin-top: 1rem; font-size: 0.9rem; color: var(--muted-fg); }
   .ex-done { margin-top: 0.9rem; }
+  .ex-sync { margin-top: 0.75rem; font-size: 0.85rem; color: var(--muted-fg); }
+  .ex-sync a { color: var(--primary); font-weight: 600; }
+  .ex-import { margin-top: 0.75rem; padding: 0.8rem 1rem; border: 1px dashed var(--border); border-radius: 0.8rem; font-size: 0.88rem; }
+  .ex-import:empty { display: none; }
+  .ex-import p { margin: 0; }
+  .ex-cta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+  .ex-graph { display: flex; gap: 0.45rem; align-items: stretch; height: 8rem; margin-top: 0.4rem; }
+  .ex-graph .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; font-size: 0.65rem; color: var(--muted-fg); }
+  .ex-graph .bar { width: 100%; max-width: 2.2rem; background: var(--primary); border-radius: 0.35rem 0.35rem 0 0; }
+  .ex-graph .bar.zero { background: var(--border); }
+  .ex-graph .n { font-size: 0.75rem; font-weight: 600; color: var(--fg); margin-bottom: 0.15rem; }
+  .ex-graph .l { margin-top: 0.3rem; white-space: nowrap; }
 </style>
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 </head>
@@ -85,7 +97,10 @@
     <ul class="ex-check" id="ex-check"></ul>
     <button type="button" class="btn btn-primary ex-done" id="ex-done">Mark today as done</button>
     <p class="ex-stats" id="ex-stats"></p>
-    <p class="fine">Your ticks and streak are saved only in this browser on this device. Clearing your browser data removes them.</p>
+    <h3 style="margin-top:1.25rem;font-size:.95rem">Days done per week (last 8 weeks)</h3>
+    <div class="ex-graph" id="ex-graph" role="img" aria-label="Days done per week"></div>
+    <p class="ex-sync" id="ex-sync"></p>
+    <div class="ex-import" id="ex-import"></div>
   </section>
 </div>
 
@@ -103,6 +118,8 @@
   <nav class="foot-links" aria-label="Legal"><a href="/about">About us</a><a href="/pricing">Pricing</a><a href="/exercises">Face exercises</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/refund">Refund Policy</a><a href="/shipping-policy">Delivery Policy</a><a href="/contact">Contact</a></nav>
   <p style="margin-top:1rem">&copy; 2026 Facerizer, operated by Sachin Patel. All rights reserved.</p>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
 <script src="/exercises-data.js"></script>
 <script src="/exercises.js"></script>
 </body>
