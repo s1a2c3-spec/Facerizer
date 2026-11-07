@@ -116,6 +116,38 @@
   $("dl-barber").addEventListener("click", function () { download("barber"); });
   $("dl-full").addEventListener("click", function () { download("full"); });
 
+  // Exercise starter: 3 easy exercises and how to begin, in the report language. Same for every plan.
+  function renderExercises(r) {
+    var D = window.FZ_EX, sec = $("ex-sec"), box = $("r-ex");
+    if (!D || !box) { if (sec) { sec.hidden = true; } return; }
+    var lang = (r && D.ui[r.language]) ? r.language : "en", L = D.ui[lang];
+    var byId = {}; D.list.forEach(function (e) { byId[e.id] = e; });
+    box.textContent = "";
+    box.appendChild(el("p", "card-text", L.intro));
+    var grid = el("div", "fgrid");
+    D.starter.forEach(function (id) {
+      var e = byId[id]; if (!e) { return; }
+      var t = e.t[lang], c = el("div", "fcard");
+      c.appendChild(el("h3", "", t.n));
+      c.appendChild(el("p", "", L.dose + ": " + t.d));
+      var ol = el("ol"); ol.style.cssText = "margin:.5rem 0 0;padding-left:1.1rem;font-size:.82rem;color:var(--muted-fg);line-height:1.6";
+      t.s.forEach(function (x) { ol.appendChild(el("li", "", x)); });
+      c.appendChild(ol); grid.appendChild(c);
+    });
+    box.appendChild(grid);
+    L.weeks.forEach(function (w) {
+      var d = el("div", "wk"); d.appendChild(el("h3", "", w.t)); d.appendChild(el("p", "fine", w.x)); box.appendChild(d);
+    });
+    box.appendChild(el("p", "fine", L.tips));
+    box.appendChild(el("p", "fine", L.safety));
+    box.appendChild(el("p", "fine", L.evidence));
+    var go = el("a", "ex-link", "See all exercises and build your routine"); go.href = "/exercises"; go.style.marginTop = "1rem";
+    go.addEventListener("click", function () { try { localStorage.setItem("fz_ex_lang", lang); } catch (e2) {} });
+    box.appendChild(go);
+    box.setAttribute("lang", lang === "hi" ? "hi" : lang === "hinglish" ? "hi-Latn" : "en-IN");
+    sec.hidden = false;
+  }
+
   function render(r, created, hide) {
     var isFree = r.plan === "free" || !r.features;
     current = { r: r, created: created, hide: hide };
@@ -212,6 +244,8 @@
       var go = el("a", "ex-link", "Open your checklist and daily routine"); go.href = "/plan"; go.style.marginTop = "1rem";
       pl.appendChild(go);
     } else pl.appendChild(locked("Your personalized 30-day plan is part of Pro."));
+
+    try { renderExercises(r); } catch (e) { var xs = $("ex-sec"); if (xs) { xs.hidden = true; } }
 
     $("upsell").hidden = !isFree;
     $("state").hidden = true;
