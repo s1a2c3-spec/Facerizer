@@ -15,8 +15,8 @@
   var PRICE = { pro: { month: 399, year: 2999 }, premium: { month: 699, year: 5299 } };
   var NAME = { pro: "Pro", premium: "Premium" };
   var FEATS = {
-    pro: ["Up to 25 analyses a month", "Full report with all 5 hairstyles and barber instructions", "Feature-by-feature report and skincare routine", "30-day plan with checklist and daily streak", "Report history, PDF report and barber card"],
-    premium: ["Everything in Pro", "Up to 50 analyses a month", "60 and 90-day plans", "Before and after comparison", "Advanced progress tracking and report"]
+    pro: ["Up to 25 analyses a month", "Full report with all 5 hairstyles and barber instructions", "Feature-by-feature report and skincare routine", "30-day plan with checklist and daily streak", "Report history, PDF report and barber card", "Face exercises with a starter plan and progress graph"],
+    premium: ["Everything in Pro", "Up to 50 analyses a month", "60 and 90-day plans", "Before and after comparison", "Advanced progress tracking and report", "Face exercises with a starter plan and progress graph"]
   };
 
   var plan = new URLSearchParams(window.location.search).get("plan");
