@@ -21,7 +21,7 @@
     <a href="/" class="logo" aria-label="Facerizer home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#12303A"/><ellipse cx="32" cy="32" rx="14" ry="19" fill="none" stroke="#5FD3C0" stroke-width="3"/><line x1="32" y1="10" x2="32" y2="54" stroke="#5FD3C0" stroke-width="2" stroke-dasharray="3 4"/></svg><span>Facerizer</span></a>
     <div class="top-right">
       <button type="button" id="theme-toggle" class="btn btn-outline icon-btn" aria-label="Switch theme">◐</button>
-      <a href="/account" class="btn btn-outline btn-sm">Dashboard</a>
+      <a href="/account" id="dash-link" class="btn btn-outline btn-sm">Dashboard</a>
     </div>
   </header>
 
@@ -34,7 +34,16 @@
           <h1>Your Facerizer analysis</h1>
           <p class="sub" id="r-date"></p>
         </div>
-        <div class="hero-actions"><a href="/analyze/" class="btn btn-primary btn-lg">New analysis</a></div>
+        <div class="hero-actions" id="hero-actions"><a href="/analyze/" class="btn btn-primary btn-lg">New analysis</a></div>
+      </section>
+
+      <section class="cx" id="guest-box" hidden style="margin-bottom:1rem">
+        <h2 data-i18n="guest.after_first">Sign up to save this report and get one more free analysis.</h2>
+        <p class="card-text" data-i18n="guest.keep_note">Without signing up, this report stays in this browser for 7 days.</p>
+        <div class="dl-row">
+          <a href="/signup" id="guest-signup" class="btn btn-primary btn-lg" data-i18n="guest.signup">Sign up free</a>
+          <a href="/login" class="btn btn-outline btn-lg" data-i18n="guest.login">I already have an account</a>
+        </div>
       </section>
 
       <section class="cx" id="dl-box" aria-labelledby="dl-title" hidden>
@@ -97,6 +106,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
 <script src="/exercises-data.js"></script>
+<script src="/translations.js"></script>
 <script src="/report.js"></script>
 </body>
 </html>

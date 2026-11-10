@@ -416,6 +416,7 @@
   sb.auth.getSession().then(function (r) {
     var session = r.data.session;
     if (!session) { window.location.href = "/login"; return; }
+    if (session.user && session.user.is_anonymous === true) { window.location.href = "/signup"; return; } // guest: sign up first
     try {
       var nx = localStorage.getItem("fz_next");
       if (nx && /^\/[a-z]/i.test(nx)) { localStorage.removeItem("fz_next"); window.location.href = nx; return; }

@@ -24,6 +24,8 @@ let detector = null;
 let sb = null;
 let uid = null;
 let previewUrl = null;
+let guestMode = false;        // true: visitor without an account (needs Vercel env GUEST_MODE=on)
+const T = (key, fallback) => (window.FZ_I18N ? window.FZ_I18N.t(key) : fallback);
 window.facerizerPhoto = null; // { blob, width, height } after all checks pass
 
 function say(text, type) {
@@ -59,15 +61,61 @@ function setBusy(on) {
   $("pick").classList.toggle("busy", on);
 }
 
+async function guestStatus() {
+  try {
+    const r = await fetch("/api/guest-status", { cache: "no-store" });
+    if (!r.ok) return { enabled: false };
+    return await r.json();
+  } catch (e) { return { enabled: false }; }
+}
+
+// Keep the small site texts (guest messages) in step with the report language dropdown: English or Hinglish.
+function bindLangSync() {
+  const sel = $("lang");
+  if (!sel || !window.FZ_I18N) return;
+  const sync = () => window.FZ_I18N.setLang(sel.value === "hinglish" ? "hinglish" : "en");
+  sel.addEventListener("change", sync);
+  if (sel.value === "hinglish") sync();
+}
+
 async function requireLogin() {
   const ok = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_URL.includes("YOUR_") && window.supabase;
   if (!ok) return true; // setup not finished: let the page work for testing
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   const { data } = await sb.auth.getSession();
-  if (!data.session) {
-    window.location.href = "/login";
-    return false;
+
+  // No account (or a guest session): allowed only while guest mode is on, otherwise log in as before.
+  if (!data.session || data.session.user.is_anonymous === true) {
+    const gs = await guestStatus();
+    if (!gs.enabled) { window.location.href = "/login"; return false; }
+    guestMode = true;
+    $("acct-link").hidden = true;
+    if (window.FZ_I18N && window.FZ_I18N.lang === "hinglish" && $("lang")) $("lang").value = "hinglish";
+    bindLangSync();
+    if (data.session) {
+      uid = data.session.user.id;
+      // A returning guest who already has a finished report: show it, no second guest analysis.
+      const last = await sb.from("analyses").select("id").eq("status", "done").order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (last.data && last.data.id) {
+        $("an-form").hidden = true;
+        $("an-sub").hidden = true;
+        $("guest-used").hidden = false;
+        const rl = $("guest-used-report");
+        rl.href = "/report?id=" + encodeURIComponent(last.data.id);
+        rl.hidden = false;
+        return false;
+      }
+    } else if (!gs.available) {
+      $("an-form").hidden = true;
+      $("an-sub").hidden = true;
+      say(T("limit.busy", "Free analyses are paused for today because many people are using Facerizer. Please try again tomorrow."), "error");
+      return false;
+    }
+    $("guest-intro").hidden = false;
+    $("guest-consent-box").hidden = false;
+    return true;
   }
+
   uid = data.session.user.id;
   const p = await sb.from("profiles").select("age_confirmed_at, consent_at").eq("id", uid).maybeSingle();
   if (p.data && (!p.data.age_confirmed_at || !p.data.consent_at)) {
@@ -89,6 +137,7 @@ async function loadLanguage() {
   sel.addEventListener("change", async () => {
     try { await sb.from("profiles").update({ language: sel.value }).eq("id", uid); } catch (e) {}
   });
+  bindLangSync();
 }
 
 const LM_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -139,7 +188,22 @@ function measureFace(lm, W, H) {
 
 async function analyzeNow(btn) {
   const photo = window.facerizerPhoto;
-  if (!photo || !sb || !uid) return say("Please log in and try again.", "error");
+  if (!photo || !sb) return say("Please log in and try again.", "error");
+  if (guestMode) {
+    const box = $("guest-consent");
+    if (!box || !box.checked) return say(T("guest.need_consent", "Please tick the box to continue."), "error");
+    if (!uid) {
+      // First guest analysis: make the temporary (anonymous) account. The tick above is the 18+ and consent.
+      btn.disabled = true;
+      const a = await sb.auth.signInAnonymously({ options: { data: { age_confirmed: "true", consent: "true" } } });
+      if (a.error || !a.data || !a.data.user) {
+        console.error(a.error);
+        btn.disabled = false;
+        return say("Could not start the analysis. Please try again, or log in.", "error");
+      }
+      uid = a.data.user.id;
+    }
+  } else if (!uid) return say("Please log in and try again.", "error");
   btn.disabled = true;
   const steps = ["Preparing your photo...", "Mapping visible facial features...", "Analyzing proportions...", "Generating personalized recommendations...", "Building your improvement plan..."];
   let i = 0;
@@ -195,11 +259,15 @@ async function analyzeNow(btn) {
     return;
   }
   btn.disabled = false;
+  if (r.status === 429 && j.error === "busy") {
+    return say(T("limit.busy", j.message || "Free analyses are paused for today. Please try again tomorrow."), "error");
+  }
   if (r.status === 403 && j.error === "limit") {
     say(j.message || "You have reached your limit.", "error");
     const a = document.createElement("a");
-    a.href = "/#pricing"; a.className = "btn btn-outline btn-lg"; a.style.width = "100%"; a.style.marginTop = "0.75rem";
-    a.textContent = "See Pro and Premium";
+    a.className = "btn btn-outline btn-lg"; a.style.width = "100%"; a.style.marginTop = "0.75rem";
+    if (j.guest) { a.href = "/signup"; a.textContent = T("guest.signup", "Sign up free"); }
+    else { a.href = "/#pricing"; a.textContent = "See Pro and Premium"; }
     $("result").appendChild(a);
     return;
   }

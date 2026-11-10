@@ -1,7 +1,20 @@
 {
   "cleanUrls": true,
   "functions": {
-    "api/analyze.js": { "maxDuration": 60 },
-    "api/extend-plan.js": { "maxDuration": 60 }
-  }
+    "api/analyze.js": {
+      "maxDuration": 60
+    },
+    "api/extend-plan.js": {
+      "maxDuration": 60
+    },
+    "api/cleanup-guests.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cleanup-guests",
+      "schedule": "17 3 * * *"
+    }
+  ]
 }

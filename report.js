@@ -28,6 +28,20 @@
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
   var fbMap = {};
+  var isGuest = false; // true for a visitor who analysed without an account (guest mode)
+
+  // Guest: show the sign-up box, hide Dashboard / New analysis / Pro upsell (a guest has no dashboard).
+  function guestUi() {
+    var box = $("guest-box");
+    if (!box) return;
+    box.hidden = !isGuest;
+    if (!isGuest) return;
+    var d = $("dash-link"), h = $("hero-actions");
+    if (d) d.style.display = "none";   // style, not "hidden": .btn has its own display and would ignore the attribute
+    if (h) h.style.display = "none";
+    var su = $("guest-signup");
+    if (su) su.addEventListener("click", function () { try { localStorage.setItem("fz_next", window.location.pathname + window.location.search); } catch (e) {} });
+  }
   var userIdRef = null;
   var analysisIdRef = null;
 
@@ -247,7 +261,8 @@
 
     try { renderExercises(r); } catch (e) { var xs = $("ex-sec"); if (xs) { xs.hidden = true; } }
 
-    $("upsell").hidden = !isFree;
+    $("upsell").hidden = !isFree || isGuest;
+    guestUi();
     $("state").hidden = true;
     $("report").hidden = false;
   }
@@ -256,6 +271,7 @@
     var session = s.data.session;
     if (!session) { window.location.href = "/login"; return; }
     userIdRef = session.user.id; analysisIdRef = id;
+    isGuest = !!(session.user && session.user.is_anonymous === true);
     Promise.all([
       sb.from("analyses").select("id, status, plan, result, created_at").eq("id", id).maybeSingle(),
       sb.from("profiles").select("hide_scores").eq("id", session.user.id).maybeSingle(),

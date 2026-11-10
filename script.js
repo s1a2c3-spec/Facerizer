@@ -24,7 +24,17 @@
   try {
     var logged = false;
     for (var i = 0; i < localStorage.length; i++) {
-      if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { logged = true; break; }
+      var k = localStorage.key(i);
+      if (/^sb-.*-auth-token$/.test(k)) {
+        logged = true;
+        // A guest (anonymous user) has not signed up yet, so keep showing Log in / Sign up.
+        try {
+          var v = JSON.parse(localStorage.getItem(k));
+          var u = v && (v.user || (v.currentSession && v.currentSession.user));
+          if (u && u.is_anonymous === true) logged = false;
+        } catch (e) {}
+        break;
+      }
     }
     if (logged) {
       var l = document.getElementById("nav-login"), s = document.getElementById("nav-signup");

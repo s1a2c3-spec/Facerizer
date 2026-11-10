@@ -27,14 +27,17 @@
     gb.addEventListener("click", function () {
       gb.disabled = true;
       show("Opening Google...");
-      sb.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/account",
-          queryParams: { prompt: "select_account" } // always show the Google account chooser
-        }
+      var opts = {
+        redirectTo: window.location.origin + "/account",
+        queryParams: { prompt: "select_account" } // always show the Google account chooser
+      };
+      // A guest who signs up with Google keeps their report: the Google login is linked to the same account.
+      sb.auth.getSession().then(function (s) {
+        var cur = s.data && s.data.session;
+        var guest = page === "signup" && cur && cur.user && cur.user.is_anonymous === true;
+        return guest ? sb.auth.linkIdentity({ provider: "google", options: opts }) : sb.auth.signInWithOAuth({ provider: "google", options: opts });
       }).then(function (res) {
-        if (res.error) { gb.disabled = false; show(friendly(res.error), "error"); }
+        if (res && res.error) { gb.disabled = false; show(friendly(res.error), "error"); }
       });
     });
   }
@@ -52,6 +55,9 @@
     if (/invalid login/i.test(m)) return "Email or password is incorrect.";
     if (/not confirmed/i.test(m)) return "Please verify your email first. Check your inbox for the link.";
     if (/rate limit|too many/i.test(m)) return "Too many attempts. Please wait a few minutes and try again.";
+    if (/already (been )?registered|email.*exists/i.test(m)) return "This email is already registered. Please log in instead.";
+    if (/already linked|identity.*already|already.*identity/i.test(m)) return window.FZ_I18N ? window.FZ_I18N.t("guest.google_conflict") : "This Google account already has a Facerizer account. Please log in instead.";
+    if (/manual linking/i.test(m)) return "Google sign-up is not available right now. Please use email instead.";
     return m;
   }
   function setBusy(form, on) {
@@ -66,6 +72,25 @@
   /* ---------------- SIGN UP ---------------- */
   if (page === "signup") {
     var f = document.getElementById("auth-form");
+    // A guest (made an analysis without an account) is upgraded to a full account, so the report is kept.
+    sb.auth.getSession().then(function (s) {
+      var cur = s.data && s.data.session, gn = document.getElementById("guest-note");
+      if (gn && cur && cur.user && cur.user.is_anonymous === true) gn.hidden = false;
+    });
+    function upgradeGuest(email, password, name) {
+      return sb.auth.updateUser(
+        { email: email, password: password, data: { display_name: name } },
+        { emailRedirectTo: window.location.origin + "/login" }
+      ).then(function (res) {
+        setBusy(f, false);
+        if (res.error) return show(friendly(res.error), "error");
+        var u = res.data && res.data.user;
+        if (u && name) { try { sb.from("profiles").update({ display_name: name }).eq("id", u.id).then(function () {}); } catch (e) {} }
+        // Email confirmation off: the user is permanent now. On: they stay a guest until they open the emailed link.
+        if (u && u.email && u.is_anonymous !== true) { window.location.href = nextUrl(); return; }
+        show(window.FZ_I18N ? window.FZ_I18N.t("guest.pending") : "Almost done. Open the link we emailed you to finish signing up. Your report is saved.", "ok");
+      });
+    }
     f.addEventListener("submit", function (e) {
       e.preventDefault();
       var email = val(f, "email"), password = f.elements["password"].value, name = val(f, "name");
@@ -73,7 +98,14 @@
       if (!f.elements["age"].checked) return show("You must be 18 or older to use Facerizer.", "error");
       if (!f.elements["consent"].checked) return show("Please accept the Terms and Privacy Policy to continue.", "error");
       setBusy(f, true); show("Creating your account...");
-      sb.auth.signUp({
+      sb.auth.getSession().then(function (s) {
+        var cur = s.data && s.data.session;
+        if (cur && cur.user && cur.user.is_anonymous === true) return upgradeGuest(email, password, name);
+        return normalSignUp(email, password, name);
+      });
+    });
+    function normalSignUp(email, password, name) {
+      return sb.auth.signUp({
         email: email,
         password: password,
         options: {
@@ -91,12 +123,12 @@
         f.reset();
         show("Account created. Check your email and click the verification link, then log in.", "ok");
       });
-    });
+    }
   }
 
   /* ---------------- LOG IN ---------------- */
   if (page === "login") {
-    sb.auth.getSession().then(function (r) { if (r.data.session) window.location.href = nextUrl(); });
+    sb.auth.getSession().then(function (r) { if (r.data.session && r.data.session.user.is_anonymous !== true) window.location.href = nextUrl(); });
     var lf = document.getElementById("auth-form");
     lf.addEventListener("submit", function (e) {
       e.preventDefault();
