@@ -9,6 +9,17 @@ const PLAN_LIMITS = {
   premium: { monthly: 50, daily: 8 },
 };
 
+// Guest mode (Vercel env GUEST_MODE=on). While it is off, everything below behaves exactly as before.
+// ON: a visitor without an account gets 1 analysis (guest), and signing up gives free users 2 in total.
+const GUEST_LIMITS = { lifetime: 1, daily: 1 };
+const FREE_LIMITS_GUEST_MODE = { lifetime: 2, daily: 2 };
+function envInt(name, dflt) {
+  const raw = process.env[name];
+  if (raw === undefined || raw === "") return dflt;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 0 ? n : dflt;
+}
+
 // Report language: the website stays in English; only the AI-written text follows this choice.
 const LANGS = ["en", "hinglish", "hi"];
 const LANG_MAX_TOKENS = { en: 6000, hinglish: 7500, hi: 9000 };
@@ -275,7 +286,10 @@ module.exports = async function handler(req, res) {
     const user = await who.json();
     const uid = user && user.id;
     if (!uid) return res.status(401).json({ error: "Please log in again" });
-    if (!user.email_confirmed_at) return res.status(403).json({ error: "Please verify your email first" });
+    // A guest (anonymous user) has no email. Only allowed while GUEST_MODE is on.
+    const GUEST_ON = String(process.env.GUEST_MODE || "").toLowerCase() === "on";
+    const isGuest = GUEST_ON && user.is_anonymous === true;
+    if (!isGuest && !user.email_confirmed_at) return res.status(403).json({ error: "Please verify your email first" });
 
     // 2. Input
     let body = req.body;
@@ -292,7 +306,8 @@ module.exports = async function handler(req, res) {
     if (!profile.age_confirmed_at || !profile.consent_at) return res.status(403).json({ error: "Please confirm 18+ and consent in your dashboard first" });
     const expired = profile.plan_expires_at && new Date(profile.plan_expires_at).getTime() < Date.now();
     const plan = !expired && PLAN_LIMITS[profile.plan] ? profile.plan : "free";
-    const limits = PLAN_LIMITS[plan];
+    let limits = PLAN_LIMITS[plan];
+    if (GUEST_ON && plan === "free") limits = isGuest ? GUEST_LIMITS : FREE_LIMITS_GUEST_MODE;
 
     // Report language: what the page sent, else the saved choice, else English.
     // (Read in its own query, so the analysis still works if sql/10 has not been run yet.)
@@ -314,7 +329,7 @@ module.exports = async function handler(req, res) {
     const ins = await rest("analyses", {
       method: "POST",
       headers: { Prefer: "return=representation" },
-      body: JSON.stringify({ user_id: uid, photo_id: photoId, status: "processing", plan, model: MODEL }),
+      body: JSON.stringify({ user_id: uid, photo_id: photoId, status: "processing", plan, model: MODEL, ...(isGuest ? { is_guest: true } : {}) }),
     });
     if (!ins.ok) return res.status(500).json({ error: "Could not start the analysis", detail: (await ins.text()).slice(0, 200) });
     analysisId = ((await ins.json()) || [])[0].id;
@@ -328,8 +343,31 @@ module.exports = async function handler(req, res) {
     if (used.length > cap || dayCount > limits.daily) {
       await rest("analyses?id=eq." + analysisId, { method: "DELETE" }).catch(() => {});
       analysisId = null;
-      const msg = limits.lifetime ? "Your free analysis has been used. Upgrade to Pro for 25 analyses a month." : used.length > cap ? "You have used all analyses for this month." : "You have reached today's limit. Please try again tomorrow.";
-      return res.status(403).json({ error: "limit", message: msg, plan });
+      const msg = isGuest ? "Sign up to unlock one more free analysis." : limits.lifetime ? (GUEST_ON ? "Your 2 free analyses have been used. Upgrade to Pro for 25 analyses a month." : "Your free analysis has been used. Upgrade to Pro for 25 analyses a month.") : used.length > cap ? "You have used all analyses for this month." : "You have reached today's limit. Please try again tomorrow.";
+      return res.status(403).json({ error: "limit", message: msg, plan, ...(isGuest ? { guest: true } : {}) });
+    }
+
+    // Daily caps on free analyses (only while GUEST_MODE is on). 0 = no cap. They protect the AI bill.
+    //   GUEST_DAILY_CAP: analyses by guests in the last 24 hours (default 50)
+    //   FREE_DAILY_CAP:  all free-plan analyses, guests and signed-up free users together, in the last 24 hours (default 100)
+    if (GUEST_ON && plan === "free") {
+      const since = encodeURIComponent(new Date(now - 24 * 3600 * 1000).toISOString());
+      const recent = (rows) => (rows || []).filter((r) => r.status === "done" || now - new Date(r.created_at).getTime() < 5 * 60 * 1000).length;
+      const guestCap = envInt("GUEST_DAILY_CAP", 50), freeCap = envInt("FREE_DAILY_CAP", 100);
+      let busy = false;
+      if (isGuest && guestCap > 0) {
+        const gr = await rest("analyses?is_guest=eq.true&created_at=gte." + since + "&status=in.(done,processing)&select=id,status,created_at&limit=2000");
+        if (gr.ok && recent(await gr.json()) > guestCap) busy = true;
+      }
+      if (!busy && freeCap > 0) {
+        const fr = await rest("analyses?plan=eq.free&created_at=gte." + since + "&status=in.(done,processing)&select=id,status,created_at&limit=5000");
+        if (fr.ok && recent(await fr.json()) > freeCap) busy = true;
+      }
+      if (busy) {
+        await rest("analyses?id=eq." + analysisId, { method: "DELETE" }).catch(() => {});
+        analysisId = null;
+        return res.status(429).json({ error: "busy", message: "Free analyses are paused for today because many people are using Facerizer. Please try again tomorrow." });
+      }
     }
 
     // 6. Fetch the photo file
