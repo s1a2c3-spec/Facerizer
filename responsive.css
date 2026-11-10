@@ -1,0 +1,63 @@
+/* Facerizer responsive helpers (Phase 1). NOT linked from any page yet, so nothing changes on the site.
+ * Phase 3 onward: <link rel="stylesheet" href="/responsive.css"> AFTER styles.css.
+ * Everything uses the .fz- prefix, so it cannot clash with old classes. Uses the colours from styles.css (--primary, --card, --border ...).
+ *
+ * Rules these helpers keep (320px is the smallest screen):
+ *   body-size text never below 14px  |  buttons and inputs at least 48px high  |  no sideways scroll
+ *   nothing hidden on small screens, only re-arranged  |  sizes in rem and min-height, so a big Android font (200%) just grows
+ */
+
+/* ---------- page frame ---------- */
+.fz-wrap { width: 100%; max-width: 72rem; margin-inline: auto;
+  padding-inline: max(1rem, env(safe-area-inset-left), env(safe-area-inset-right));
+  padding-bottom: env(safe-area-inset-bottom); }
+.fz-narrow { max-width: 44rem; margin-inline: auto; }          /* readable column on laptops */
+
+/* Long words and flex children must be allowed to shrink, or they push the page sideways */
+.fz-safe, .fz-safe * { min-width: 0; overflow-wrap: anywhere; }
+.fz-media { max-width: 100%; height: auto; display: block; }
+
+/* ---------- text: 14px floor ---------- */
+.fz-text  { font-size: max(1rem, 14px); line-height: 1.6; }
+.fz-small { font-size: max(0.875rem, 14px); line-height: 1.55; color: var(--muted-fg, #52666e); }  /* captions, fine print, tags */
+.fz-title { font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem); line-height: 1.2; }
+.fz-h2    { font-size: clamp(1.25rem, 1.05rem + 1vw, 1.5rem); line-height: 1.3; }
+
+/* ---------- stacking and grids ---------- */
+.fz-stack { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+.fz-grid  { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.fz-row   { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
+/* ---------- buttons, inputs, tap targets (48px) ---------- */
+.fz-btn, .fz-input, .fz-select {
+  min-height: 3rem; min-width: 3rem; box-sizing: border-box; max-width: 100%;
+  font: 600 max(1rem, 14px) var(--sans, system-ui, sans-serif); }
+.fz-btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .5rem 1.25rem; border-radius: 999px;
+  border: 1px solid var(--border, #d9e1e4); background: transparent; color: var(--fg, #112a33); text-decoration: none; cursor: pointer; text-align: center; line-height: 1.25; }
+.fz-btn-primary { background: var(--primary, #1f7a6f); color: var(--on-primary, #fff); border-color: transparent; }
+.fz-input, .fz-select { width: 100%; padding: .5rem .875rem; border-radius: .75rem; border: 1px solid var(--border, #d9e1e4);
+  background: var(--card, #fff); color: var(--fg, #112a33); font-size: 16px; /* 16px stops iPhone Safari zooming into the field */ }
+.fz-tap { display: inline-flex; align-items: center; min-height: 3rem; padding-inline: .5rem; }   /* plain text links in lists, menus, footers */
+.fz-actions { display: flex; flex-direction: column; gap: .75rem; }
+.fz-actions > .fz-btn { width: 100%; }
+@media (min-width: 640px) { .fz-actions { flex-direction: row; flex-wrap: wrap; } .fz-actions > .fz-btn { width: auto; } }
+
+/* ---------- cards, chips ---------- */
+.fz-card { background: var(--card, #fff); border: 1px solid var(--border, #d9e1e4); border-radius: 1.25rem; padding: 1.25rem; }
+@media (min-width: 640px) { .fz-card { padding: 1.5rem; } }
+.fz-chips { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0; list-style: none; }
+.fz-chip { display: inline-flex; align-items: center; min-height: 2rem; padding: .25rem .75rem; border-radius: 999px;
+  background: var(--muted, #e9eef0); color: var(--fg, #112a33); font-size: max(0.875rem, 14px); line-height: 1.3; }
+
+/* ---------- wide content scrolls inside its own box, never the page ---------- */
+.fz-scroll-x { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ---------- small phones: same content, re-arranged ---------- */
+@media (max-width: 480px) {
+  .fz-hide-label-sm .fz-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } /* keeps text for screen readers; use only if an icon explains it */
+  .fz-card { border-radius: 1rem; padding: 1rem; }
+}
+
+/* ---------- accessibility ---------- */
+.fz-btn:focus-visible, .fz-input:focus-visible, .fz-select:focus-visible, .fz-tap:focus-visible { outline: 3px solid var(--primary, #1f7a6f); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .fz-btn, .fz-card { transition: none !important; } }
