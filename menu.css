@@ -1,0 +1,76 @@
+/* Facerizer menu (Phase 3). Loaded by menu.js. Uses the colours of styles.css.
+   Rules kept: 320px smallest screen, text 14px or more, buttons 48px or more, no sideways scroll, big Android fonts grow the layout. */
+:root { --fz-danger: #b3261e; --fz-danger-bg: #fdecea; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fz-danger: #ff9a92; --fz-danger-bg: #3a1a18; } }
+:root[data-theme="dark"] { --fz-danger: #ff9a92; --fz-danger-bg: #3a1a18; }
+
+/* long links (web address, email) wrap instead of pushing the page sideways */
+main a, article a, section a { overflow-wrap: break-word; }
+
+/* ---------- header: room for the burger, 48px buttons, no overflow ---------- */
+header .btn, header .icon-btn, header .avatar-btn, .top-right .btn { min-height: 3rem; min-width: 3rem; }
+header .icon-btn, header .avatar-btn { width: 3rem; height: 3rem; }
+header.legal-top { gap: 0.5rem; }
+.fz-hdr-end { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 0.5rem; margin-left: auto; }
+.bar-end, .top-right { gap: 0.5rem; }
+@media (max-width: 1099px) { header.site .nav { display: none; } }      /* landing links live in the menu below 1100px */
+@media (max-width: 479px) {
+  header.site .bar { height: auto; min-height: 4rem; flex-wrap: wrap; row-gap: 0.25rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  header.site .bar-end { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+  header.dash-top { flex-wrap: wrap; row-gap: 0.5rem; }
+  header.dash-top .top-right { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+  header.legal-top { flex-wrap: wrap; row-gap: 0.5rem; }
+}
+
+/* ---------- burger button ---------- */
+.fz-burger { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 3rem; height: 3rem; padding: 0;
+  border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--fg); cursor: pointer; }
+.fz-burger:hover { background: var(--muted); }
+.fz-burger-fixed { position: fixed; z-index: 60; top: max(0.75rem, env(safe-area-inset-top)); right: max(0.75rem, env(safe-area-inset-right)); background: var(--card); }
+
+/* ---------- panel ---------- */
+.fz-menu [hidden], .fz-overlay[hidden], .fz-menu[hidden], .fz-lightbox[hidden] { display: none !important; }
+.fz-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(8, 16, 20, 0.55); }
+.fz-menu { position: fixed; z-index: 100; top: 0; right: 0; bottom: 0; width: min(24rem, 100vw); display: flex; flex-direction: column;
+  background: var(--card); color: var(--fg); border-left: 1px solid var(--border); box-shadow: -8px 0 40px rgba(0, 0, 0, 0.25);
+  padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); animation: fz-in 0.18s ease-out; }
+@keyframes fz-in { from { transform: translateX(2rem); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fz-menu { animation: none; } }
+html.fz-lock, html.fz-lock body { overflow: hidden; }
+
+.fz-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.75rem 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+.fz-head h2 { font: 600 1.125rem/1.3 var(--sans); letter-spacing: 0; margin: 0; }
+.fz-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.fz-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 0.25rem 0.75rem 1rem; }
+.fz-foot { border-top: 1px solid var(--border); padding: 0.5rem 0.75rem 0.75rem; display: grid; gap: 0.5rem; }
+
+.fz-sec h3 { font: 600 0.875rem/1.4 var(--sans); color: var(--muted-fg); margin: 1.1rem 0.5rem 0.25rem; }
+.fz-sec ul { list-style: none; margin: 0; padding: 0; }
+.fz-link, .fz-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%; min-height: 3rem; padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem; border: 0; background: transparent; color: var(--fg); font: 500 1rem/1.35 var(--sans); text-align: left; text-decoration: none; cursor: pointer; }
+.fz-link:hover, .fz-row:hover { background: var(--muted); }
+.fz-link[aria-current="page"] { color: var(--primary); font-weight: 700; }
+.fz-chev { flex-shrink: 0; color: var(--muted-fg); transition: transform 0.15s; }
+.fz-row[aria-expanded="true"] .fz-chev { transform: rotate(90deg); }
+
+.fz-lang { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.25rem 0.5rem; }
+.fz-lang button { flex: 1 1 auto; min-width: 0; min-height: 3rem; padding: 0.25rem 0.75rem; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--fg); font: 600 1rem/1.2 var(--sans); cursor: pointer; }
+.fz-lang button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+
+.fz-danger { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 3rem; padding: 0.5rem 1rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--fz-danger); background: var(--fz-danger-bg); color: var(--fz-danger); font: 600 1rem/1.3 var(--sans); text-align: center; }
+.fz-danger:disabled { opacity: 0.6; cursor: default; }
+.fz-iconbtn { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; min-width: 3rem; min-height: 3rem; padding: 0 0.75rem; border-radius: 999px; border: 0; background: transparent; color: var(--fg); font: 600 1rem/1 var(--sans); cursor: pointer; }
+.fz-iconbtn:hover { background: var(--muted); }
+
+.fz-toast { margin: 0; padding: 0.75rem 1rem; border-top: 1px solid var(--border); background: var(--muted); font-size: 0.9375rem; line-height: 1.45; }
+.fz-toast:empty { display: none; }
+.fz-note { margin: 0.5rem 0.25rem 0.75rem; font-size: 0.9375rem; line-height: 1.5; color: var(--muted-fg); }
+
+/* ---------- library grid + big photo ---------- */
+.fz-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); }
+.fz-thumb { display: block; width: 100%; padding: 0; border: 1px solid var(--border); border-radius: 0.75rem; overflow: hidden; background: var(--muted); cursor: pointer; }
+.fz-thumb img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+.fz-lightbox { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: 3.5rem 0.75rem 0.75rem; background: rgba(0, 0, 0, 0.92); }
+.fz-lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 0.5rem; }
+.fz-lightbox .fz-iconbtn { position: absolute; top: max(0.5rem, env(safe-area-inset-top)); right: 0.5rem; background: rgba(255, 255, 255, 0.15); color: #fff; }
