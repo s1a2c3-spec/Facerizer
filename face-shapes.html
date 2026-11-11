@@ -18,6 +18,18 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/legal.css">
 <link rel="stylesheet" href="/guide.css">
+<style>
+  .fs-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+  .fs-bar label { font-size: 0.9375rem; font-weight: 600; }
+  main.guide .crumbs, main.guide .crumbs a, main.guide .updated, main.guide .shape-card small, main.guide th, main.guide td,
+  .legal-foot, .legal-foot a, .legal-foot p, header.legal-top .btn { font-size: 0.875rem !important; }
+  .shape-card { min-width: 0; }
+  :root { --accent: #d6ece8; }                                            /* the shape icons used this colour but it was never defined, so they came out black */
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --accent: #20423f; } }
+  :root[data-theme="dark"] { --accent: #20423f; }
+  .faq-list summary { min-height: 3rem; display: flex; align-items: center; }
+  .fs-bar select { min-height: 3rem; padding: 0 0.9rem; font: inherit; max-width: 100%; border: 1px solid var(--border); border-radius: 0.75rem; background: var(--card); color: inherit; }
+</style>
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 <script src="/hair.js" defer></script>
 <script type="application/ld+json">
@@ -140,6 +152,13 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Face shapes</nav>
 <h1>Face shapes guide</h1>
 <p class="updated">Updated 2026-10-21</p>
+<div class="fs-bar">
+  <label for="fs-lang" data-i18n="common.language">Language</label>
+  <select id="fs-lang">
+    <option value="en">English</option>
+    <option value="hinglish">Hinglish (Hindi in English letters)</option>
+  </select>
+</div>
 <p class="answer">Most faces fit one of seven shapes: <strong>oval, round, square, oblong, heart, diamond or triangle</strong>. Your shape depends on the length of your face, and on whether your forehead, cheekbones or jaw is the widest part. Knowing it helps you pick haircuts, glasses and beard styles that create balance.</p>
 
 <h2>How to find your face shape at home</h2>
@@ -194,6 +213,8 @@
   <p style="margin-top:1rem">General style and grooming ideas. Personal taste matters most, and none of this is a rule. Not medical advice.</p>
   <p style="margin-top:.5rem">&copy; 2026 Facerizer, operated by Sachin Patel. All rights reserved.</p>
 </footer>
+<script src="/translations.js"></script>
+<script src="/face-shapes.js"></script>
 <script src="/menu.js" defer></script>
 </body>
 </html>
