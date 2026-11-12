@@ -145,15 +145,36 @@ function buildPrompt(measured, prefs, lang) {
   "hairstyles": [ { "category": "Everyday|Trendy|Professional|Low-maintenance|Bold", "name": "", "why": "why it suits this face shape and this hair", "ask_barber": "one sentence the user can say to a barber or stylist", "maintenance": "low|medium|high", "styling": "easy|moderate|hard", "length": "short|medium|long" } ],
   "glasses": [ { "shape": "Round|Square|Rectangle|Aviator|Cat-eye|Browline", "why": "", "tier": "best|try" } ],
   "grooming": [ { "title": "", "text": "" } ],
+  "card": {
+    "hair": { "note": "one short sentence about the visible hair: texture, length, volume or hairline", "score": 1-10 },
+    "eyes": { "note": "one short sentence about eye area: clarity, spacing, brow framing", "score": 1-10 },
+    "skin": { "note": "one short cosmetic sentence about visible tone and texture", "score": 1-10, "type": "normal|dry|oily|combination|unclear", "type_confidence": "low|medium|high" },
+    "structure": { "note": "one short sentence about the visible face structure: jaw, cheekbones, proportions" },
+    "facial_hair": { "present": true or false, "note": "one short sentence about beard, moustache or stubble, or that none is visible", "score": 1-10 or null when none is visible },
+    "upgrades": [ { "title": "short action, at most 5 words", "area": "hair|eyes|skin|structure|facial_hair" } ]
+  },
   "skincare": { "morning": ["gentle cleanser", "moisturizer", "sunscreen"], "evening": ["gentle cleanser", "moisturizer"], "note": "General cosmetic guidance only." },
   "plan": [ { "week": 1, "title": "Grooming", "tasks": ["", ""] }, { "week": 2, "title": "Skin and self-care", "tasks": [] }, { "week": 3, "title": "Hair and styling", "tasks": [] }, { "week": 4, "title": "Presentation", "tasks": [] } ]
 }`,
     "",
     "Counts: 4 strengths, 3 improvements, 4 grooming tips, 4 plan weeks with 3 to 5 small daily-life tasks each.",
+    "Card: every note is one short sentence of at most 16 words. The 1 to 10 numbers are honest estimates of visible grooming in this one photo (hair condition and shape, eye-area clarity, how even the skin tone and texture look, how neat the facial hair is). They are never about attractiveness or personal worth. Most people land between 6 and 9; go lower only for a clear visible reason. Give exactly 4 upgrades, one per area where possible, written as friendly actions.",
     "Hairstyles: exactly 5, in this order and one per category: Everyday, Trendy, Professional, Low-maintenance, Bold. They must differ from each other in length or structure. First fill visible_hair from what you can see, then choose styles that work with that hair.",
     langLine,
     "Glasses: 3 different shapes. First a safe classic (tier best), then a modern choice (tier best), then one to experiment with (tier try). In each 'why' mention frame size relative to the face and a suitable frame colour or material.",
   ].join("\n");
+}
+
+// The 5 spots for the photo card, sent by the browser. Only known names, numbers from 0 to 1.
+const POINT_KEYS = ["hair", "eyes", "skin", "structure", "facial_hair"];
+function cleanPoints(p) {
+  if (!p || typeof p !== "object") return null;
+  const out = {};
+  POINT_KEYS.forEach((k) => {
+    const v = p[k];
+    if (v && typeof v.x === "number" && typeof v.y === "number" && v.x >= 0 && v.x <= 1 && v.y >= 0 && v.y <= 1) out[k] = { x: Math.round(v.x * 1000) / 1000, y: Math.round(v.y * 1000) / 1000 };
+  });
+  return Object.keys(out).length ? out : null;
 }
 
 function normalise(a, lang) {
@@ -169,7 +190,21 @@ function normalise(a, lang) {
   ["eyes", "eyebrows", "nose", "lips", "jawline", "chin", "cheekbones", "skin_appearance"].forEach((k) => {
     features[k] = feat((a.features || {})[k]);
   });
+  // Photo card notes and 1 to 10 estimates. Missing or odd values never fail the analysis, the card just shows less.
+  const sc = (x) => { const n = Math.round(Number(x)); return Number.isFinite(n) && x !== null && x !== "" ? Math.max(1, Math.min(10, n)) : null; };
+  const cd = a.card && typeof a.card === "object" ? a.card : {};
+  const part = (k) => ({ note: str(cd[k] && cd[k].note, 170), score: sc(cd[k] && cd[k].score) });
+  const hasFH = !!(cd.facial_hair && cd.facial_hair.present === true);
+  const card = {
+    hair: part("hair"),
+    eyes: part("eyes"),
+    skin: { ...part("skin"), type: pick(cd.skin && cd.skin.type, ["normal", "dry", "oily", "combination", "unclear"], "unclear"), type_confidence: pick(cd.skin && cd.skin.type_confidence, ["low", "medium", "high"], "low") },
+    structure: { note: str(cd.structure && cd.structure.note, 170) },
+    facial_hair: { present: hasFH, note: str(cd.facial_hair && cd.facial_hair.note, 170), score: hasFH ? sc(cd.facial_hair && cd.facial_hair.score) : null },
+    upgrades: arr(cd.upgrades).slice(0, 4).map((u) => ({ title: str(u && u.title, 48), area: pick(u && u.area, POINT_KEYS, "skin") })).filter((u) => u.title),
+  };
   const out = {
+    card,
     summary: str(a.summary, 500),
     face_shape_estimate: str(a.face_shape_estimate, 20),
     strengths: arr(a.strengths).slice(0, 5).map((s) => ({ icon: str(s.icon, 12) || "harmony", title: str(s.title, 70), text: str(s.text, 220) })).filter((s) => s.title),
@@ -434,6 +469,7 @@ module.exports = async function handler(req, res) {
       face_shape: faceShape,
       summary: full.summary,
       visible_hair: full.visible_hair,
+      card: { ...full.card, ...(cleanPoints(body.points) ? { points: cleanPoints(body.points) } : {}) },
     };
     const fullResult = { ...core, strengths: full.strengths, improvements: full.improvements, features: full.features, hairstyles: full.hairstyles, glasses: full.glasses, grooming: full.grooming, skincare: full.skincare, plan_weeks: full.plan };
     const visible = plan === "free"
