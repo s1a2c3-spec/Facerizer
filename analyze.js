@@ -186,6 +186,21 @@ function measureFace(lm, W, H) {
   };
 }
 
+// The photo card puts 5 numbered labels on the photo. We keep only these 5 spots (0 to 1 of the photo's width and height),
+// never the full 468-point face map.
+function cardPoints(lm) {
+  const c = (v, lo) => Math.round(Math.max(lo || 0, Math.min(1, v)) * 1000) / 1000;
+  const faceL = Math.hypot(lm[10].x - lm[152].x, lm[10].y - lm[152].y);
+  const eye = [33, 133, 159, 145].reduce((a, i) => ({ x: a.x + lm[i].x / 4, y: a.y + lm[i].y / 4 }), { x: 0, y: 0 });
+  return {
+    hair: { x: c(lm[10].x), y: c(lm[10].y - 0.16 * faceL, 0.04) },                      // just above the forehead
+    eyes: { x: c(eye.x), y: c(eye.y) },                                                  // one eye
+    skin: { x: c(lm[205].x), y: c(lm[205].y) },                                          // cheek
+    structure: { x: c(lm[172].x), y: c(lm[172].y) },                                     // jawline
+    facial_hair: { x: c(lm[152].x), y: c(lm[17].y + 0.6 * (lm[152].y - lm[17].y)) },     // chin area
+  };
+}
+
 async function analyzeNow(btn) {
   const photo = window.facerizerPhoto;
   if (!photo || !sb) return say("Please log in and try again.", "error");
@@ -228,11 +243,11 @@ async function analyzeNow(btn) {
   }
 
   // 2. Measure the face on this device
-  let metrics = null;
+  let metrics = null, points = null;
   try {
     const lmk = await getLandmarker();
     const out = lmk.detect(photo.canvas);
-    if (out.faceLandmarks && out.faceLandmarks[0]) metrics = measureFace(out.faceLandmarks[0], photo.width, photo.height);
+    if (out.faceLandmarks && out.faceLandmarks[0]) { metrics = measureFace(out.faceLandmarks[0], photo.width, photo.height); try { points = cardPoints(out.faceLandmarks[0]); } catch (e) {} }
   } catch (e) { console.error("landmarks", e); }
 
   // 3. Ask the server to run the analysis
@@ -243,7 +258,7 @@ async function analyzeNow(btn) {
     r = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-      body: JSON.stringify({ photo_id: ins.data.id, metrics: metrics, language: ($("lang") && $("lang").value) || undefined }),
+      body: JSON.stringify({ photo_id: ins.data.id, metrics: metrics, points: points, language: ($("lang") && $("lang").value) || undefined }),
     });
     const t = await r.text();
     try { j = JSON.parse(t); } catch (e) { j = {}; }

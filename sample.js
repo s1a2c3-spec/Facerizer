@@ -15,6 +15,16 @@
   var R = {
     plan: "pro",
     score: 82,
+    sub_scores: { harmony: 84, proportion: 81, symmetry: 79 },
+    card: {
+      hair: { note: "Wavy, medium length, with good thickness and an even hairline.", score: 8 },
+      eyes: { note: "Eyes are well spaced and sit in balance with the brows.", score: 8 },
+      skin: { note: "Tone looks fairly even, with a little natural texture.", score: 6, type: "combination", type_confidence: "medium" },
+      structure: { note: "A defined jaw and balanced proportions for an oval face." },
+      facial_hair: { present: true, note: "A short beard with a slightly uneven edge near the jaw.", score: 7 },
+      upgrades: [{ title: "Simple daily skin routine", area: "skin" }, { title: "Sharper beard line", area: "facial_hair" }, { title: "Defined curls", area: "hair" }, { title: "Regular grooming", area: "structure" }],
+      points: { hair: { x: 0.5, y: 0.17 }, eyes: { x: 0.41, y: 0.45 }, skin: { x: 0.64, y: 0.54 }, structure: { x: 0.33, y: 0.65 }, facial_hair: { x: 0.5, y: 0.73 } }
+    },
     face_shape: { type: "Oval", confidence: 87 },
     summary: "Your features are well balanced, and most hairstyles and frame shapes will work for you. A few grooming and styling choices can bring out your strengths even more.",
     visible_hair: { type: "wavy", length: "medium", density: "thick", hairline: "even" },
@@ -161,6 +171,10 @@
       document.head.appendChild(sc);
     });
   }
+  // Photo card with an illustrated face (no real person), same card as a real report.
+  var SAMPLE_FACE = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400"><rect width="300" height="400" fill="#cfe6e2"/><path d="M40 400c0-60 45-90 110-90s110 30 110 90z" fill="#2f5d66"/><rect x="128" y="268" width="44" height="52" rx="14" fill="#e0b894"/><ellipse cx="150" cy="190" rx="68" ry="90" fill="#edc9a6"/><path d="M84 200C86 256 116 290 150 290C184 290 214 256 216 200C204 226 180 246 150 246C120 246 96 226 84 200Z" fill="#4a3426" opacity=".8"/><path d="M82 170C76 96 116 66 152 68C190 68 226 96 218 170C208 142 190 122 150 120C112 122 94 142 82 170Z" fill="#4a3426"/><ellipse cx="122" cy="180" rx="10" ry="5.5" fill="#fff"/><circle cx="122" cy="180" r="3.8" fill="#3a2a22"/><ellipse cx="178" cy="180" rx="10" ry="5.5" fill="#fff"/><circle cx="178" cy="180" r="3.8" fill="#3a2a22"/><path d="M106 165q16-9 32-1M162 164q16-8 32 1" stroke="#4a3426" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M150 184v28q-8 6-14 2" stroke="#c99b78" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M132 232q18 9 36 0" stroke="#e8c3a8" stroke-width="4" fill="none" stroke-linecap="round"/></svg>');
+  try { if (window.FZCard && $("fz-card")) window.FZCard.render($("fz-card"), { result: R, photoUrl: SAMPLE_FACE, plan: "free", sample: true, hideScores: false }); } catch (e) { console.error("card", e); }
+
   $("dl-barber").addEventListener("click", function () {
     var m = $("dl-msg"); m.textContent = "Preparing your PDF..."; m.className = "msg";
     loadJsPdf().then(function () {

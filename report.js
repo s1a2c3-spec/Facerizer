@@ -267,14 +267,27 @@
     $("report").hidden = false;
   }
 
+  // The photo card on top of the report: the person's own photo with 5 numbered labels, scores, notes and a Download image button.
+  function showCard(row, hide, prof) {
+    var box = $("fz-card"); if (!box || !window.FZCard || !row.result) return;
+    var paid = !!(prof && prof.plan && prof.plan !== "free" && (!prof.plan_expires_at || new Date(prof.plan_expires_at) > new Date()));
+    var h = window.FZCard.render(box, { result: row.result, plan: paid ? "pro" : "free", hideScores: hide });
+    box.hidden = false;
+    if (!row.photo_id) { h.setPhoto(null); return; }
+    sb.from("photos").select("path").eq("id", row.photo_id).maybeSingle().then(function (p) {
+      if (!p.data || !p.data.path) return h.setPhoto(null);
+      return sb.storage.from("photos").createSignedUrl(p.data.path, 3600).then(function (u) { h.setPhoto(u.data && u.data.signedUrl ? u.data.signedUrl : null); });
+    }).catch(function () { h.setPhoto(null); });
+  }
+
   sb.auth.getSession().then(function (s) {
     var session = s.data.session;
     if (!session) { window.location.href = "/login"; return; }
     userIdRef = session.user.id; analysisIdRef = id;
     isGuest = !!(session.user && session.user.is_anonymous === true);
     Promise.all([
-      sb.from("analyses").select("id, status, plan, result, created_at").eq("id", id).maybeSingle(),
-      sb.from("profiles").select("hide_scores").eq("id", session.user.id).maybeSingle(),
+      sb.from("analyses").select("id, status, plan, result, created_at, photo_id").eq("id", id).maybeSingle(),
+      sb.from("profiles").select("hide_scores, plan, plan_expires_at").eq("id", session.user.id).maybeSingle(),
       sb.from("analysis_feedback").select("item_type, item_name, liked, note").eq("analysis_id", id)
     ]).then(function (out) {
       var a = out[0], p = out[1];
@@ -282,6 +295,7 @@
       if (a.error) { console.error(a.error); return state("Could not load this report (" + a.error.message + "). Run m5-setup.sql in Supabase.", true); }
       if (!a.data || a.data.status !== "done" || !a.data.result) return state("This report was not found, or it is not ready.", true);
       render(a.data.result, a.data.created_at, !!(p.data && p.data.hide_scores));
+      try { showCard(a.data, !!(p.data && p.data.hide_scores), p.data); } catch (e) { console.error("card", e); }
     });
   });
 })();
