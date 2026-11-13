@@ -40,11 +40,23 @@
     if (!ups.length) ups = (r.improvements || []).concat(r.grooming || []).slice(0, 4).map(function (x) { return { title: x.title, area: "skin" }; });
     var sub = r.sub_scores || {};
     return {
-      notes: notes, feats: feats, ups: ups, points: c.points || null,
+      notes: notes, feats: feats, ups: ups, points: fixPoints(c.points),
       overall: hide ? null : num(r.score),
       subs: hide ? [] : [["card.symmetry", "Symmetry (measured)", num(sub.symmetry)], ["card.proportion", "Proportion (measured)", num(sub.proportion)], ["card.harmony", "Harmony (measured)", num(sub.harmony)]].filter(function (x) { return x[2] != null; }),
       shape: r.face_shape ? r.face_shape.type : "", hide: !!hide
     };
+  }
+  // Earlier reports put the cheek dot on the same side of the face as the eye dot (all dots bunched on one side).
+  // Move that cheek dot to the other cheek. New reports already have it there, so they are left alone.
+  function fixPoints(p) {
+    if (!p) return null;
+    var q = {}, k; for (k in p) q[k] = p[k];
+    if (q.skin && q.eyes && q.facial_hair) {
+      var cx = q.hair ? (q.facial_hair.x + q.hair.x) / 2 : q.facial_hair.x;
+      if ((q.skin.x - cx) * (q.eyes.x - cx) > 0) q.skin = { x: Math.max(0.02, Math.min(0.98, cx + (cx - q.skin.x) * 1.35)), y: q.skin.y };
+    }
+    for (k in q) q[k] = { x: Math.max(0.07, Math.min(0.93, q[k].x)), y: Math.max(0.06, Math.min(0.94, q[k].y)) };   // keep the whole marker inside the photo
+    return q;
   }
   function tag(score) { return score >= 8 ? ["result.strength", "Strength", ""] : ["result.can_refine", "Can refine", "refine"]; }
 
@@ -68,8 +80,8 @@
     AREAS.forEach(function (a, i) {
       if (!m.notes[a]) return;
       var li = el("li", "fzc-note n" + (i + 1)), t = el("div");
-      li.appendChild(el("span", "fzc-num", String(i + 1))); var b = el("b", "", T(LABEL[a][0], LABEL[a][1])); t.appendChild(b); t.appendChild(el("span", "t", m.notes[a])); li.appendChild(t); ol.appendChild(li);
-      if (m.points && m.points[a]) { var d = el("span", "fzc-dot", String(i + 1)); d.setAttribute("aria-hidden", "true"); d.style.left = (m.points[a].x * 100) + "%"; d.style.top = (m.points[a].y * 100) + "%"; ph.appendChild(d); }
+      var nb = el("span", "fzc-num", String(i + 1)); nb.style.setProperty("--i", i); nb.setAttribute("aria-hidden", "true"); li.appendChild(nb); var b = el("b", "", T(LABEL[a][0], LABEL[a][1])); t.appendChild(b); t.appendChild(el("span", "t", m.notes[a])); li.appendChild(t); ol.appendChild(li);
+      if (m.points && m.points[a]) { var d = el("span", "fzc-dot", String(i + 1)); d.setAttribute("aria-hidden", "true"); d.style.setProperty("--i", i); d.style.left = (m.points[a].x * 100) + "%"; d.style.top = (m.points[a].y * 100) + "%"; ph.appendChild(d); }
     });
     card.appendChild(stage);
 
@@ -153,8 +165,12 @@
     c.textAlign = align || "left"; lines.forEach(function (l, i) { c.fillText(l, x, y + i * lh); }); return lines.length;
   }
   function draw(m, o, free) {
-    return Promise.all([loadImg(o.photoUrl, true), loadImg("/icon.svg", false)]).then(function (a) {
-      var photo = a[0], logo = a[1];
+    return Promise.all([loadImg(o.photoUrl, true), loadImg("/icon.svg", false), loadImg("/markers.png", false)]).then(function (a) {
+      var photo = a[0], logo = a[1], spr = a[2];
+      function marker(i, x, y, r) {
+        if (spr) { c.drawImage(spr, i * 128, 0, 128, 128, x - r, y - r, 2 * r, 2 * r); return; }
+        c.fillStyle = MINT; c.beginPath(); c.arc(x, y, r * 0.7, 0, 7); c.fill(); c.fillStyle = "#08262d"; c.font = "700 " + Math.round(r * 0.8) + "px " + FONT; c.textAlign = "center"; c.fillText(String(i + 1), x, y + r * 0.28);
+      }
       var cv = document.createElement("canvas"); cv.width = Math.round(W * SC); cv.height = Math.round(H * SC); var c = cv.getContext("2d"); c.scale(SC, SC);
       var BG = "#12323b", TILE = "rgba(255,255,255,0.07)", FG = "#f3fafb", MUTE = "#b4cbd0", MINT = "#5fd6c3";
       c.fillStyle = BG; c.fillRect(0, 0, W, H); c.textBaseline = "alphabetic";
@@ -174,9 +190,9 @@
         if (!m.notes[ar]) return;
         var s = side[ar], pt = m.points && m.points[ar], px = pt ? dx + pt.x * dw : null, py = pt ? dy + pt.y * dh : null;
         if (pt && photo) { c.strokeStyle = "rgba(95,214,195,0.7)"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(px, py); c.lineTo(s[2] === "left" ? 236 : 564, s[1] + 10); c.stroke(); }
-        if (pt && photo) { c.fillStyle = MINT; c.beginPath(); c.arc(px, py, 13, 0, 7); c.fill(); c.fillStyle = "#08262d"; c.font = "700 14px " + FONT; c.textAlign = "center"; c.fillText(String(i + 1), px, py + 5); }
-        var tx = s[0], al = s[2] === "left" ? "left" : "left";
-        c.fillStyle = MINT; c.beginPath(); c.arc(tx + 12, s[1], 12, 0, 7); c.fill(); c.fillStyle = "#08262d"; c.font = "700 13px " + FONT; c.textAlign = "center"; c.fillText(String(i + 1), tx + 12, s[1] + 4.5);
+        if (pt && photo) marker(i, px, py, 25);
+        var tx = s[0];
+        marker(i, tx + 14, s[1], 21);
         c.fillStyle = FG; c.font = "700 17px " + FONT; c.textAlign = "left"; c.fillText(T(LABEL[ar][0], LABEL[ar][1]), tx + 32, s[1] + 5);
         c.fillStyle = MUTE; c.font = "400 14px " + FONT; wrap(c, m.notes[ar], tx + 32, s[1] + 28, 160, 19, "left", 6);
       });

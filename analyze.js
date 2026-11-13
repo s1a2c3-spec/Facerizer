@@ -195,7 +195,7 @@ function cardPoints(lm) {
   return {
     hair: { x: c(lm[10].x), y: c(lm[10].y - 0.16 * faceL, 0.04) },                      // just above the forehead
     eyes: { x: c(eye.x), y: c(eye.y) },                                                  // one eye
-    skin: { x: c(lm[205].x), y: c(lm[205].y) },                                          // cheek
+    skin: { x: c(lm[280].x), y: c(lm[280].y) },                                          // cheek on the other side from the eye spot
     structure: { x: c(lm[172].x), y: c(lm[172].y) },                                     // jawline
     facial_hair: { x: c(lm[152].x), y: c(lm[17].y + 0.6 * (lm[152].y - lm[17].y)) },     // chin area
   };
