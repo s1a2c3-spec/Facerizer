@@ -114,6 +114,11 @@
         if (it[2].indexOf("#") < 0 && it[2] === path) a.setAttribute("aria-current", "page");
         li.appendChild(a); ul.appendChild(li);
       });
+      if (sec[0] === "menu.policies") {      // cookie choice (Google Analytics) can be changed any time
+        var cli = el("li"), cb = el("button", "fz-link", "", "menu.cookies", "Cookie settings"); cb.type = "button";
+        cb.addEventListener("click", function () { closeMenu(); if (window.FZ_ANALYTICS) window.FZ_ANALYTICS.open(); });
+        cli.appendChild(cb); ul.appendChild(cli);
+      }
       s.appendChild(ul); body.appendChild(s);
     });
     var ls = el("section", "fz-sec"); ls.appendChild(el("h3", "", "", "common.language", "Language"));
@@ -278,6 +283,7 @@
 
   /* ---------- start: css first, then texts, then build ---------- */
   function start() {
+    if (!document.querySelector('script[src="/analytics.js"]')) loadScript("/analytics.js");      // cookie notice + Google Analytics (only after Accept)
     var link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/menu.css"; var done = false;
     function go() {
       if (done) return; done = true;
