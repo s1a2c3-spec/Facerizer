@@ -69,7 +69,7 @@
       "card.footer_cta": "Discover your best look with Facerizer", "card.no_facial_hair": "No facial hair",
       "card.scores_hidden": "Scores are hidden. You can show them in your settings.", "card.photo_missing": "Photo not available", "card.example": "Example data",
       "card.fallback_hair": "Visible hair: {text}.", "card.dl_failed": "Could not make the image. Please try again.", "card.dl_nophoto": "The photo could not be added, so the image has no photo.",
-      "card.goals": "Goals", "card.hide_scores": "Hide scores", "card.show_scores": "Show scores",
+      "card.goals": "Goals", "card.open": "Tap to see it larger.", "card.hide_scores": "Hide scores", "card.show_scores": "Show scores",
       "card.disclaimer": "This score reflects visible facial characteristics in a photo and is not an objective measure of beauty. Lighting, angle and expression can change it.",
       "card.download": "Download image", "card.download_warning": "This image contains your photo. Share it only with people you trust.",
 
@@ -132,7 +132,7 @@
       "card.footer_cta": "Facerizer se apna best look dhoondhein", "card.no_facial_hair": "Facial hair nahi hai",
       "card.scores_hidden": "Scores chhupe hue hain. Aap unhe settings mein dikha sakte hain.", "card.photo_missing": "Photo available nahi hai", "card.example": "Example data",
       "card.fallback_hair": "Dikhte baal: {text}.", "card.dl_failed": "Image nahi ban payi. Dobara try karein.", "card.dl_nophoto": "Photo judi nahi, isliye image mein photo nahi hai.",
-      "card.goals": "Goals", "card.hide_scores": "Scores chhupayein", "card.show_scores": "Scores dikhayein",
+      "card.goals": "Goals", "card.open": "Bada dekhne ke liye tap karein.", "card.hide_scores": "Scores chhupayein", "card.show_scores": "Scores dikhayein",
       "card.disclaimer": "Ye score photo mein dikhne wali chehre ki khoobiyon par based hai, aur sundarta ka objective maap nahi hai. Roshni, angle aur expression se ye badal sakta hai.",
       "card.download": "Image download karein", "card.download_warning": "Is image mein aapki photo hai. Ise sirf unhi logon ke saath share karein jin par aapko bharosa ho.",
 
