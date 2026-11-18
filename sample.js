@@ -39,33 +39,34 @@
       { title: "Sides carry extra volume", text: "Slightly shorter sides will balance the top and elongate the face." },
       { title: "Facial hair is patchy near the jaw", text: "A short, even trim along the jaw line will add definition." }
     ],
+    recs_why: { hairstyles: "Layers and volume on top suit an oval face with thick, wavy hair.", glasses: "Straight and rounded frames balance a defined jaw.", grooming: "A few small habits that keep the beard, brows and hair looking sharp.", features: "Short notes on what stands out, each with one simple tip." },
     hairstyles: [
-      { category: "Everyday", name: "Layered medium cut", why: "Layers use your natural wave and keep volume off the sides, which suits an oval face.", ask_barber: "Medium layers, a little longer on top, light taper at the sides.", maintenance: "low", styling: "easy", length: "medium" },
-      { category: "Trendy", name: "Textured quiff", why: "Height on top lengthens a balanced face, and the texture works well with thick waves.", ask_barber: "Short sides with a taper, longer textured top that I can sweep up.", maintenance: "medium", styling: "moderate", length: "short" },
-      { category: "Professional", name: "Classic side part", why: "A clean side part frames the forehead and looks sharp for work.", ask_barber: "Scissor cut, natural side part, tidy neckline.", maintenance: "medium", styling: "easy", length: "short" },
-      { category: "Low-maintenance", name: "Short natural crop", why: "Needs only a quick wash and a touch of product, and keeps the face shape balanced.", ask_barber: "Even short crop, number 2 on the sides, a little longer on top.", maintenance: "low", styling: "easy", length: "short" },
-      { category: "Bold", name: "Taper fade with volume", why: "A clear fade makes the jawline stand out while the top keeps its volume.", ask_barber: "Mid taper fade, keep two to three inches on top, blend the sides.", maintenance: "high", styling: "moderate", length: "short" }
+      { category: "Everyday", name: "Layered medium cut", why: "Layers use your natural wave and keep volume off the sides, which suits an oval face.", ask_barber: "Medium layers, a little longer on top, light taper at the sides.", avoid: "Heavy thinning on the sides, it removes the layers' shape.", maintenance: "low", styling: "easy", length: "medium" },
+      { category: "Trendy", name: "Textured quiff", why: "Height on top lengthens a balanced face, and the texture works well with thick waves.", ask_barber: "Short sides with a taper, longer textured top that I can sweep up.", avoid: "Very glossy gel, it flattens the texture.", maintenance: "medium", styling: "moderate", length: "short" },
+      { category: "Professional", name: "Classic side part", why: "A clean side part frames the forehead and looks sharp for work.", ask_barber: "Scissor cut, natural side part, tidy neckline.", avoid: "A harsh, deep part. Keep it soft and natural.", maintenance: "medium", styling: "easy", length: "short" },
+      { category: "Low-maintenance", name: "Short natural crop", why: "Needs only a quick wash and a touch of product, and keeps the face shape balanced.", ask_barber: "Even short crop, number 2 on the sides, a little longer on top.", avoid: "One clipper guard all over. Leave the top longer.", maintenance: "low", styling: "easy", length: "short" },
+      { category: "Bold", name: "Taper fade with volume", why: "A clear fade makes the jawline stand out while the top keeps its volume.", ask_barber: "Mid taper fade, keep two to three inches on top, blend the sides.", avoid: "A skin-bald fade, if you want an easy grow-out.", maintenance: "high", styling: "moderate", length: "short" }
     ],
     glasses: [
-      { shape: "Rectangle", tier: "best", why: "Adds definition without hiding your features. Choose a frame about as wide as your cheekbones, in thin metal or slim acetate." },
-      { shape: "Round", tier: "best", why: "Softens a defined jaw and looks modern. A medium frame in a dark tortoise colour works well." },
-      { shape: "Browline", tier: "try", why: "Worth trying for a smart look. It highlights your brow line, so keep the frame lightweight." }
+      { shape: "Rectangle", tier: "best", why: "Adds definition without hiding your features. Choose a frame about as wide as your cheekbones, in thin metal or slim acetate.", size_colour: "Frame about as wide as your cheekbones; thin metal in black or gunmetal, or slim dark acetate." },
+      { shape: "Round", tier: "best", why: "Softens a defined jaw and looks modern. A medium frame in a dark tortoise colour works well.", size_colour: "Medium size, not wider than your cheeks; dark tortoise or matte black." },
+      { shape: "Browline", tier: "try", why: "Worth trying for a smart look. It highlights your brow line, so keep the frame lightweight.", size_colour: "Lightweight, medium width; a dark top rim with a thin lower rim." }
     ],
     grooming: [
-      { title: "Keep a short, even beard line", text: "Trim along the jaw and keep the cheek line clean to define your lower face." },
-      { title: "Tidy the brows every two weeks", text: "Remove only stray hairs under the arch and keep the natural shape." },
-      { title: "Style with a little product", text: "Use a small amount of texturing cream or clay on slightly damp hair." },
-      { title: "Explore a lighter moustache trim", text: "If you wear one, keep it just above the lip line so it does not weigh the face down." }
+      { title: "Keep a short, even beard line", text: "Trim along the jaw and keep the cheek line clean to define your lower face.", area: "beard", how_often: "Every 3 to 4 days", time: "3 minutes", tool: "Trimmer", steps: ["Set the trimmer to a short guard.", "Trim along the jaw and keep the cheek line clean.", "Check the neckline in a mirror."] },
+      { title: "Tidy the brows every two weeks", text: "Remove only stray hairs under the arch and keep the natural shape.", area: "brows", how_often: "Every 2 weeks", time: "5 minutes", tool: "Tweezers", steps: [] },
+      { title: "Style with a little product", text: "Use a small amount of texturing cream or clay on slightly damp hair.", area: "hair", how_often: "Daily", time: "2 minutes", tool: "Texturing cream or clay", steps: [] },
+      { title: "Explore a lighter moustache trim", text: "If you wear one, keep it just above the lip line so it does not weigh the face down.", area: "beard", how_often: "Weekly", time: "2 minutes", tool: "Small scissors", steps: [] }
     ],
     features: {
-      eyes: { observation: "Well spaced and in good proportion to the face.", suggestion: "Keep brows slightly lifted to open the eye area.", confidence: "high" },
-      eyebrows: { observation: "Medium thickness with a gentle arch.", suggestion: "Clean only the lower edge and keep the natural arch.", confidence: "high" },
-      nose: { observation: "In balance with the width of the face.", suggestion: "Frames with a light bridge keep the focus on the eyes.", confidence: "medium" },
-      lips: { observation: "Even and proportionate in this photo.", suggestion: "A simple lip balm is enough for everyday care.", confidence: "medium" },
-      jawline: { observation: "Clearly defined from ear to chin.", suggestion: "Keep facial hair short along the jaw to show the line.", confidence: "high" },
-      chin: { observation: "Balanced with the forehead width.", suggestion: "A short beard line below the lip keeps the chin balanced.", confidence: "medium" },
-      cheekbones: { observation: "Softly visible and balanced with the jaw.", suggestion: "Avoid very wide side volume that hides them.", confidence: "medium" },
-      skin_appearance: { observation: "Looks even with some natural texture in this photo.", suggestion: "A gentle cleanser, moisturizer and sunscreen is a good daily base.", confidence: "medium" }
+      eyes: { observation: "Well spaced and in good proportion to the face.", suggestion: "Keep brows slightly lifted to open the eye area.", confidence: "high", tag: "strength" },
+      eyebrows: { observation: "Medium thickness with a gentle arch.", suggestion: "Clean only the lower edge and keep the natural arch.", confidence: "high", tag: "refine" },
+      nose: { observation: "In balance with the width of the face.", suggestion: "Frames with a light bridge keep the focus on the eyes.", confidence: "medium", tag: "strength" },
+      lips: { observation: "Even and proportionate in this photo.", suggestion: "A simple lip balm is enough for everyday care.", confidence: "medium", tag: "strength" },
+      jawline: { observation: "Clearly defined from ear to chin.", suggestion: "Keep facial hair short along the jaw to show the line.", confidence: "high", tag: "strength" },
+      chin: { observation: "Balanced with the forehead width.", suggestion: "A short beard line below the lip keeps the chin balanced.", confidence: "medium", tag: "strength" },
+      cheekbones: { observation: "Softly visible and balanced with the jaw.", suggestion: "Avoid very wide side volume that hides them.", confidence: "medium", tag: "strength" },
+      skin_appearance: { observation: "Looks even with some natural texture in this photo.", suggestion: "A gentle cleanser, moisturizer and sunscreen is a good daily base.", confidence: "medium", tag: "refine" }
     },
     skincare: {
       morning: ["Gentle cleanser", "Moisturizer", "Sunscreen"],
@@ -115,31 +116,14 @@
   fill("r-strengths", R.strengths.map(function (s) { return row(s.icon, "", s.title, s.text); }));
   fill("r-improve", R.improvements.map(function (s) { return row("harmony", "", s.title, s.text); }));
 
-  var vh = R.visible_hair;
-  $("hair-based").textContent = "Based on what we can see: " + vh.type + ", " + vh.length + " length, " + vh.density + " hair. Your own report reads your hair from your photo.";
-  fill("r-hair", R.hairstyles.map(function (h) {
-    var tags = [h.category, "Upkeep: " + h.maintenance, "Styling: " + h.styling, h.length + " length"];
-    return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", h.ask_barber, hairArt(h));
-  }));
-  fill("r-glasses", R.glasses.map(function (g) {
-    return row("glasses", g.tier === "best" ? "Best match" : "Worth trying", g.shape + " frames", g.why, null, g.shape + " glasses frames");
-  }));
-  fill("r-grooming", R.grooming.map(function (g) { return row("grooming", "", g.title, g.text); }));
-
-  // features
-  var ft = $("r-features"); ft.textContent = "";
-  var grid = el("div", "fgrid");
-  var names = { eyes: "Eyes", eyebrows: "Eyebrows", nose: "Nose", lips: "Lips", jawline: "Jawline", chin: "Chin", cheekbones: "Cheekbones", skin_appearance: "Skin appearance" };
-  Object.keys(names).forEach(function (k) {
-    var f = R.features[k];
-    var c = el("div", "fcard");
-    c.appendChild(el("h3", "", names[k]));
-    c.appendChild(el("p", "", f.observation));
-    c.appendChild(el("p", "", "Suggestion: " + f.suggestion));
-    c.appendChild(el("span", "tag", "Confidence: " + f.confidence));
-    grid.appendChild(c);
+  // Your recommendations (recs.js). The sample shows everything, like a Pro report.
+  window.FZRecs.render($("fzr"), R, {
+    isFree: false,
+    hairArt: hairArt,
+    onBarber: function () { $("dl-barber").click(); },
+    planHref: null,
+    cardId: "fz-card"
   });
-  ft.appendChild(grid);
 
   // skincare
   var sk = $("r-skin"); sk.textContent = "";

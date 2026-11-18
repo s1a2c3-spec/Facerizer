@@ -190,49 +190,16 @@
     if (r.improvements && r.improvements.length) fill("r-improve", r.improvements.map(function (s) { return row("harmony", "", s.title, s.text); }));
     else fill("r-improve", [locked("Areas to refine, with a practical fix for each, are part of Pro.")]);
 
-    // what we noticed about the hair (so the user can spot a wrong reading)
-    var hb = $("hair-based"); hb.textContent = "";
-    var vh = r.visible_hair;
-    if (vh) {
-      var bits = [];
-      if (vh.type && vh.type !== "unclear") bits.push(vh.type);
-      if (vh.length && vh.length !== "unclear") bits.push(vh.length + " length");
-      if (vh.density && vh.density !== "unclear") bits.push(vh.density);
-      if (bits.length) hb.textContent = "Based on what we can see: " + bits.join(", ") + " hair. If this looks wrong, tell us with the buttons below.";
-    }
-
-    // hairstyles
-    fill("r-hair", (r.hairstyles || []).map(function (h) {
-      var tags = (h.category ? [h.category] : []).concat(["Upkeep: " + h.maintenance, "Styling: " + h.styling, h.length + " length"]);
-      return row("hair", "", h.name, h.why, tags, h.name + " hairstyle", { type: "hairstyle", name: h.name }, h.ask_barber, hairArt(h));
-    }));
-    $("hair-lock").textContent = "";
-    if (isFree) $("hair-lock").appendChild(locked("3 more hairstyles, each with upkeep and styling effort, are part of Pro."));
-
-    // glasses
-    fill("r-glasses", (r.glasses || []).map(function (g) {
-      return row("glasses", g.tier === "best" ? "Best match" : "Worth trying", g.shape + " frames", g.why, null, g.shape + " glasses frames", { type: "glasses", name: g.shape });
-    }));
-
-    // grooming
-    fill("r-grooming", (r.grooming || []).map(function (g) { return row("grooming", "", g.title, g.text); }));
-
-    // features
-    var ft = $("r-features"); ft.textContent = "";
-    if (r.features) {
-      var grid = el("div", "fgrid");
-      var names = { eyes: "Eyes", eyebrows: "Eyebrows", nose: "Nose", lips: "Lips", jawline: "Jawline", chin: "Chin", cheekbones: "Cheekbones", skin_appearance: "Skin appearance" };
-      Object.keys(names).forEach(function (k) {
-        var f = r.features[k]; if (!f) return;
-        var c = el("div", "fcard");
-        c.appendChild(el("h3", "", names[k]));
-        c.appendChild(el("p", "", f.observation));
-        c.appendChild(el("p", "", "Suggestion: " + f.suggestion));
-        c.appendChild(el("span", "tag", "Confidence: " + f.confidence));
-        grid.appendChild(c);
-      });
-      ft.appendChild(grid);
-    } else ft.appendChild(locked("A feature-by-feature breakdown of eyes, brows, nose, lips, jaw, chin, cheekbones and skin appearance is part of Pro."));
+    // Your recommendations: Hairstyles, Glasses, Grooming tips, Feature by feature (see recs.js)
+    window.FZRecs.render($("fzr"), r, {
+      isFree: isFree,
+      feedback: feedback,
+      hairArt: hairArt,
+      onBarber: function () { download("barber"); },
+      planHref: r.plan_weeks && r.plan_weeks.length ? "/plan" : null,
+      proHref: "/#pricing",
+      cardId: "fz-card"
+    });
 
     // skincare
     var sk = $("r-skin"); sk.textContent = "";

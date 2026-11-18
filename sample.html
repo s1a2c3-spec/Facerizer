@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="/report.css">
 <link rel="stylesheet" href="/legal.css">
 <link rel="stylesheet" href="/card.css">
+<link rel="stylesheet" href="/recs.css">
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 <script src="/script.js" defer></script>
 <script src="/pdf.js" defer></script>
@@ -45,6 +46,8 @@
     </section>
 
     <section id="fz-card" style="margin-bottom:1rem"></section>
+
+    <section id="fzr" class="fzr" hidden aria-label="Your recommendations"></section>
 
     <section class="cx" id="dl-box" aria-labelledby="dl-title">
       <h2 id="dl-title">Take it with you</h2>
@@ -80,10 +83,6 @@
       </section>
     </div>
 
-    <section class="cx" aria-labelledby="hair-title"><h2 id="hair-title">Hairstyles for you</h2><p class="card-text" id="hair-based"></p><ul class="rows" id="r-hair"></ul></section>
-    <section class="cx" aria-labelledby="gl-title"><h2 id="gl-title">Glasses that suit you</h2><ul class="rows" id="r-glasses"></ul></section>
-    <section class="cx" aria-labelledby="gr-title"><h2 id="gr-title">Grooming tips</h2><ul class="rows" id="r-grooming"></ul></section>
-    <section class="cx" aria-labelledby="ft-title"><h2 id="ft-title">Feature by feature</h2><div id="r-features"></div></section>
     <section class="cx" aria-labelledby="sk-title"><h2 id="sk-title">Skincare routine</h2><div id="r-skin"></div></section>
     <section class="cx" aria-labelledby="pl-title"><h2 id="pl-title">30-day improvement plan</h2><div id="r-plan"></div></section>
 
@@ -103,6 +102,7 @@
 </div>
 <script src="/translations.js"></script>
 <script src="/card.js" defer></script>
+<script src="/recs.js" defer></script>
 <script src="/sample.js" defer></script>
 <script src="/menu.js" defer></script>
 </body>

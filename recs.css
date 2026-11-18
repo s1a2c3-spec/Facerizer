@@ -1,0 +1,71 @@
+/* Report page: "Your recommendations" buttons (Phase 5A). Uses the site colour variables, so light and dark both work. */
+.fzr { margin-bottom: 1rem; }
+.fzr-head h2 { font: 600 1.2rem var(--serif); }
+.fzr-head p { margin-top: 0.15rem; font-size: 0.875rem; color: var(--muted-fg); }
+.fzr-sec { margin-top: 0.75rem; }
+
+.fzr-btn { display: flex; align-items: center; gap: 0.85rem; width: 100%; min-height: 4.5rem; text-align: left; background: var(--card); color: var(--fg); border: 1px solid var(--border); border-radius: 1rem; padding: 0.7rem 0.95rem; font: inherit; cursor: pointer; }
+.fzr-btn:hover { background: var(--muted); }
+.fzr-btn[aria-expanded="true"] { border-color: var(--primary); }
+.fzr-ic { flex: none; width: 2.75rem; height: 2.75rem; border-radius: 999px; background: var(--muted); display: flex; align-items: center; justify-content: center; }
+.fzr-ic svg { width: 1.45rem; height: 1.45rem; fill: none; stroke: var(--primary); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fzr-tx { flex: 1; min-width: 0; }
+.fzr-tx b { display: block; font-size: 1rem; line-height: 1.3; }
+.fzr-tx span { display: block; margin-top: 0.1rem; font-size: 0.875rem; color: var(--muted-fg); line-height: 1.4; }
+.fzr-bd { flex: none; font-size: 0.875rem; font-weight: 700; background: var(--primary); color: var(--on-primary); border-radius: 999px; padding: 0.1rem 0.7rem; }
+.fzr-chev { flex: none; width: 1.2rem; height: 1.2rem; fill: none; stroke: var(--muted-fg); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s; }
+.fzr-btn[aria-expanded="true"] .fzr-chev { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .fzr-chev { transition: none; } }
+
+.fzr-pn { margin-top: 0.5rem; padding: 0.35rem 1rem 1rem; background: var(--card); border: 1px solid var(--primary); border-radius: 1rem; }
+.fzr-pn[hidden] { display: none !important; }
+.fzr-why { margin: 0.7rem 0 0.2rem; padding: 0.65rem 0.85rem; background: var(--muted); border-radius: 0.75rem; font-size: 0.9rem; line-height: 1.55; }
+.fzr-why b { color: var(--primary); }
+.fzr-based { margin: 0.7rem 0 0; font-size: 0.875rem; color: var(--muted-fg); line-height: 1.55; }
+
+.fzr-list { list-style: none; margin: 0; padding: 0; }
+.fzr-it { display: flex; gap: 0.85rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+.fzr-it:last-child { border-bottom: 0; }
+.fzr-art { flex: none; width: 4.6rem; height: 5.1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 0.85rem; padding: 0.2rem; }
+.fzr-art svg { width: 100%; height: 100%; fill: none; stroke: none; }
+.fzr-ico { flex: none; width: 2.4rem; height: 2.4rem; border-radius: 0.7rem; background: var(--muted); display: flex; align-items: center; justify-content: center; }
+.fzr-ico svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: var(--primary); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fzr-body { flex: 1; min-width: 0; }
+.fzr-ct { display: inline-block; font-size: 0.875rem; font-weight: 700; background: var(--primary); color: var(--on-primary); border-radius: 999px; padding: 0.05rem 0.65rem; }
+.fzr-body > b { display: block; font-size: 1rem; margin: 0.35rem 0 0.15rem; line-height: 1.35; }
+.fzr-body p { margin: 0.2rem 0 0; font-size: 0.9rem; line-height: 1.55; color: var(--muted-fg); }
+.fzr-body p i { font-style: normal; font-weight: 600; color: var(--primary); }
+.fzr-q { font-style: italic; }
+.fzr-ol { margin: 0.4rem 0 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.6; color: var(--muted-fg); }
+.fzr-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.55rem; }
+.fzr-chips span { font-size: 0.875rem; border: 1px solid var(--border); border-radius: 999px; padding: 0.05rem 0.65rem; color: var(--muted-fg); }
+.fzr-link { display: inline-flex; align-items: center; min-height: 2.75rem; margin-top: 0.15rem; font-size: 0.9rem; font-weight: 600; color: var(--primary); text-decoration: none; }
+.fzr-link:hover { text-decoration: underline; }
+.fzr-sub { margin: 1rem 0 0.2rem; font-size: 0.95rem; color: var(--primary); }
+.fzr-ck { margin: 0.3rem 0 0; padding: 0; list-style: none; }
+.fzr-ck li { position: relative; padding: 0.3rem 0 0.3rem 1.5rem; font-size: 0.9rem; line-height: 1.5; color: var(--muted-fg); }
+.fzr-ck li::before { content: ""; position: absolute; left: 0.15rem; top: 0.6rem; width: 0.7rem; height: 0.4rem; border-left: 2px solid var(--primary); border-bottom: 2px solid var(--primary); transform: rotate(-45deg); }
+
+.fzr-grid { display: grid; gap: 0.7rem; margin-top: 0.8rem; }
+@media (min-width: 640px) { .fzr-grid { grid-template-columns: 1fr 1fr; } }
+.fzr-fc { border: 1px solid var(--border); border-radius: 0.9rem; padding: 0.85rem; background: var(--bg); }
+.fzr-fc h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; font-size: 1rem; }
+.fzr-tag { font-size: 0.875rem; font-weight: 700; color: var(--primary); }
+.fzr-tag.refine { color: var(--muted-fg); }
+.fzr-fc p { margin: 0.35rem 0 0; font-size: 0.9rem; line-height: 1.55; color: var(--muted-fg); }
+.fzr-fc p i { font-style: normal; font-weight: 600; color: var(--primary); }
+
+.fzr-lock { margin-top: 0.9rem; padding: 0.85rem 1rem; border: 1px dashed var(--primary); border-radius: 0.8rem; font-size: 0.9rem; line-height: 1.55; color: var(--muted-fg); }
+.fzr-lock a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--primary); font-weight: 600; }
+.fzr-act { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.9rem; }
+.fzr-act .btn { min-height: 3rem; }
+
+/* "What next?" row at the bottom of every opened panel */
+.fzr-nx { margin-top: 1rem; padding: 0.85rem 1rem; background: var(--muted); border-radius: 0.8rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; }
+.fzr-nx span { flex: 1 1 12rem; font-size: 0.9rem; line-height: 1.5; }
+.fzr-nx .btn { min-height: 3rem; }
+
+/* Like / Not for me (made by report.js) get bigger tap targets inside the recommendations */
+.fzr .fb { gap: 0.5rem; margin-top: 0.4rem; }
+.fzr .fb button { min-height: 3rem; padding: 0.3rem 1rem; font-size: 0.875rem; }
+.fzr .fb select { height: 3rem; font-size: 0.875rem; max-width: 100%; }
