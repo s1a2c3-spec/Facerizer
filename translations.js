@@ -157,7 +157,20 @@
       "recs.f.chin": "Chin",
       "recs.f.cheekbones": "Cheekbones",
       "recs.f.skin_appearance": "Skin appearance",
-      "recs.based": "Based on what we can see: {desc} hair. If this looks wrong, tell us with the buttons below."
+      "recs.based": "Based on what we can see: {desc} hair. If this looks wrong, tell us with the buttons below.",
+      "recs.skin.t": "Skin type",
+      "recs.skin.sub": "Our estimate from your photo",
+      "recs.skin.saw": "What we saw:",
+      "recs.skin.d.normal": "Your skin looks balanced: not very oily and not very dry. A light moisturiser and daily sunscreen are usually enough.",
+      "recs.skin.d.dry": "Your skin looks on the dry side and can feel tight. A gentle cleanser and a richer moisturiser usually help.",
+      "recs.skin.d.oily": "Your skin shows some shine, mostly on the forehead and nose. A gentle cleanser and a light, oil-free moisturiser usually work well.",
+      "recs.skin.d.combination": "Your skin looks oily in the T-zone (forehead, nose, chin) and normal or dry on the cheeks. Keep products light on the T-zone and add a little more moisture on the cheeks.",
+      "recs.skin.d.unclear": "The photo did not show enough to tell. Light, makeup and a freshly washed or tired face can change how skin looks. A new photo in even daylight can help.",
+      "recs.skin.check_h": "Check it yourself",
+      "recs.skin.check": "Wash your face with a gentle cleanser and put nothing on it for an hour. Tight means dry. Shiny all over means oily. Shiny only on the forehead and nose means combination. Comfortable means normal.",
+      "recs.skin.note": "This is a guess from one photo, so it can be wrong. Skin also changes with weather, sleep and season. It is general cosmetic information, not a skin check or medical advice.",
+      "recs.next_skin": "Curious about your skin?",
+      "recs.go_skin": "See skin type"
     },
 
     hinglish: {
@@ -300,7 +313,20 @@
       "recs.f.chin": "Chin",
       "recs.f.cheekbones": "Cheekbones",
       "recs.f.skin_appearance": "Skin ki dikhawat",
-      "recs.based": "Jo hum dekh sakte hain uske hisaab se: {desc} hair. Ye galat lage to neeche ke buttons se batayein."
+      "recs.based": "Jo hum dekh sakte hain uske hisaab se: {desc} hair. Ye galat lage to neeche ke buttons se batayein.",
+      "recs.skin.t": "Skin type",
+      "recs.skin.sub": "Aapki photo se humara andaza",
+      "recs.skin.saw": "Humne kya dekha:",
+      "recs.skin.d.normal": "Aapki skin balanced lagti hai: na zyada oily, na zyada dry. Halka moisturiser aur roz ka sunscreen aam taur par kaafi hota hai.",
+      "recs.skin.d.dry": "Aapki skin dry side par lagti hai aur kabhi kabhi kheenchi hui lag sakti hai. Gentle cleanser aur thoda rich moisturiser aam taur par madad karte hain.",
+      "recs.skin.d.oily": "Aapki skin par thodi chamak dikhti hai, zyada tar maathe aur naak par. Gentle cleanser aur halka, oil-free moisturiser aam taur par achha kaam karte hain.",
+      "recs.skin.d.combination": "Aapki skin T-zone (maatha, naak, chin) par oily aur cheeks par normal ya dry lagti hai. T-zone par products halke rakhein aur cheeks par thodi zyada moisture dein.",
+      "recs.skin.d.unclear": "Photo se pakka andaza nahi lag paya. Roshni, makeup aur taaza dhula ya thaka hua chehra skin ka look badal dete hain. Saaf daylight mein nayi photo se madad mil sakti hai.",
+      "recs.skin.check_h": "Khud check karein",
+      "recs.skin.check": "Gentle cleanser se chehra dhoyein aur ek ghante tak kuch na lagayein. Kheenchi hui lage to dry. Poore chehre par chamak ho to oily. Sirf maathe aur naak par chamak ho to combination. Aaram se lage to normal.",
+      "recs.skin.note": "Ye ek photo se lagaya gaya andaza hai, isliye galat bhi ho sakta hai. Mausam, neend aur season ke saath skin badalti hai. Ye general cosmetic jaankari hai, skin ki jaanch ya medical salah nahi.",
+      "recs.next_skin": "Apni skin ke baare mein jaanna chahte hain?",
+      "recs.go_skin": "Skin type dekhein"
     }
   };
 

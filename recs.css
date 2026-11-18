@@ -69,3 +69,10 @@
 .fzr .fb { gap: 0.5rem; margin-top: 0.4rem; }
 .fzr .fb button { min-height: 3rem; padding: 0.3rem 1rem; font-size: 0.875rem; }
 .fzr .fb select { height: 3rem; font-size: 0.875rem; max-width: 100%; }
+
+/* Skin type panel */
+.fzr-skin { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-top: 0.9rem; }
+.fzr-skin .fzr-ct { font-size: 1rem; padding: 0.15rem 0.9rem; }
+.fzr-conf { font-size: 0.875rem; color: var(--muted-fg); }
+.fzr-skin-d { margin: 0.7rem 0 0; font-size: 0.95rem; line-height: 1.6; }
+.fzr-based i { font-style: normal; font-weight: 600; color: var(--primary); }

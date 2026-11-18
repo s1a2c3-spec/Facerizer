@@ -1,4 +1,5 @@
 /* Facerizer "Your recommendations" (Phase 5A): Hairstyles, Glasses, Grooming tips, Feature by feature.
+ * Four buttons plus a fifth for skin type (Phase 5A).
  * Used by report.js and sample.js:   FZRecs.render(rootElement, result, options)
  * options: isFree (bool), feedback(type, name) -> node|null, hairArt(h) -> svg string|null,
  *          onBarber() -> download the barber card, planHref (string|null), proHref (string), cardId (element id)
@@ -22,6 +23,7 @@
     glasses: "M6.5 10.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z|M17.5 10.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z|M10 14h4|M3 12l1-5|M21 12l-1-5",
     groom: "M5 4h14v6a7 7 0 01-14 0z|M9 14c1 1.2 2 1.5 3 1.5s2-.3 3-1.5",
     feat: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z",
+    skin: "M12 3c3 4 6 7 6 10a6 6 0 01-12 0c0-3 3-6 6-10z",
     chev: "M6 9l6 6 6-6"
   };
 
@@ -157,7 +159,16 @@
       bt.addEventListener("click", function () { var c = document.getElementById(o.cardId); if (c) c.scrollIntoView({ block: "start", behavior: smooth() }); });
       row.appendChild(bt); p.appendChild(row);
     }
-    // last step: put it into practice
+    if (hasSkin(r)) p.appendChild(nextRow(T("recs.next_skin"), T("recs.go_skin"), "skin"));
+    else planRow(p, o);
+    return p;
+  }
+
+  var SKIN_TYPES = ["normal", "dry", "oily", "combination", "unclear"];
+  function hasSkin(r) { return !!(r.card && r.card.skin && SKIN_TYPES.indexOf(r.card.skin.type) >= 0); }
+
+  // last step of the page: put it into practice (30-day plan for paid users, a Pro line for free users)
+  function planRow(p, o) {
     if (o.planHref) {
       var nx = el("div", "fzr-nx"); nx.appendChild(el("span", "", T("recs.next_plan")));
       var a = el("a", "btn btn-primary", T("recs.go_plan")); a.href = o.planHref; nx.appendChild(a); p.appendChild(nx);
@@ -165,6 +176,19 @@
       var n2 = el("div", "fzr-nx"); n2.appendChild(el("span", "", T("recs.next_plan_free")));
       var a2 = el("a", "btn btn-primary", T("recs.see_pro")); a2.href = o.proHref; n2.appendChild(a2); p.appendChild(n2);
     }
+  }
+
+  function skinPanel(r, o) {
+    var p = el("div"), sk = r.card.skin, t = sk.type;
+    var top = el("div", "fzr-skin");
+    top.appendChild(el("span", "fzr-ct", T("skin." + t)));
+    if (t !== "unclear" && sk.type_confidence) top.appendChild(el("span", "fzr-conf", T("skin.ai_guess", { confidence: val(sk.type_confidence) })));
+    p.appendChild(top);
+    p.appendChild(el("p", "fzr-skin-d", T("recs.skin.d." + t)));
+    if (sk.note) { var sw = el("p", "fzr-based"); sw.appendChild(el("i", "", T("recs.skin.saw"))); sw.appendChild(document.createTextNode(" " + sk.note)); p.appendChild(sw); }
+    var ck = el("div", "fzr-why"); ck.appendChild(el("b", "", T("recs.skin.check_h"))); ck.appendChild(document.createElement("br")); ck.appendChild(document.createTextNode(T("recs.skin.check"))); p.appendChild(ck);
+    p.appendChild(el("p", "fzr-based", T("recs.skin.note")));
+    planRow(p, o);
     return p;
   }
 
@@ -231,6 +255,10 @@
     }
     var nFeat = r.features ? FEATS.filter(function (k) { return r.features[k]; }).length : 0;
     root.appendChild(section("feat", T("recs.feat.t"), T("recs.feat.sub"), r.features ? T("recs.badge_notes", { n: nFeat }) : T("recs.badge_pro"), P.feat, featPanel(r, o)));
+    if (hasSkin(r)) {
+      var sty = r.card.skin.type;
+      root.appendChild(section("skin", T("recs.skin.t"), T("recs.skin.sub"), T("skin." + sty), P.skin, skinPanel(r, o)));
+    }
     root.hidden = false;
   }
 
