@@ -55,7 +55,13 @@
     }
 
     function hairstyles(showWhy) {
-      (r.hairstyles || []).forEach(function (h, i) {
+      var list = r.hairstyles || [];
+      // barber card: only the styles the person added with "Add to barber card" (none added = all styles, as before)
+      if (kind === "barber" && opts.picks && opts.picks.length) {
+        var chosen = list.filter(function (h) { return opts.picks.indexOf(h.name) >= 0; });
+        if (chosen.length) list = chosen;
+      }
+      list.forEach(function (h, i) {
         ensure(34);
         text((i + 1) + ". " + h.name, 13, "bold", INK, 0.5);
         text((h.category ? h.category + "  |  " : "") + h.length + " length  |  Upkeep: " + h.maintenance + "  |  Styling: " + h.styling, 9, "normal", MUTED, 1.5);

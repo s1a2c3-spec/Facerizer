@@ -28,6 +28,7 @@
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
   var fbMap = {};
+  var profile = null; // saved choices from the grooming_profile table. null = table not set up yet, so the new controls stay hidden
   var isGuest = false; // true for a visitor who analysed without an account (guest mode)
 
   // Guest: show the sign-up box, hide Dashboard / New analysis / Pro upsell (a guest has no dashboard).
@@ -43,6 +44,18 @@
     if (su) su.addEventListener("click", function () { try { localStorage.setItem("fz_next", window.location.pathname + window.location.search); } catch (e) {} });
   }
   var userIdRef = null;
+  var PROFILE_FIELDS = ["skin_type", "sensitive_skin", "routine_in_plan", "barber_picks"];
+  // Save one or more choices. Resolves true when saved. The local copy changes only after the save worked.
+  function saveProfile(patch) {
+    if (!profile || !userIdRef) return Promise.resolve(false);
+    var row = { user_id: userIdRef, updated_at: new Date().toISOString() };
+    PROFILE_FIELDS.forEach(function (k) { row[k] = Object.prototype.hasOwnProperty.call(patch, k) ? patch[k] : profile[k]; });
+    return sb.from("grooming_profile").upsert(row, { onConflict: "user_id" }).then(function (res) {
+      if (res && res.error) { console.error(res.error); return false; }
+      Object.keys(patch).forEach(function (k) { profile[k] = patch[k]; });
+      return true;
+    }, function (e) { console.error(e); return false; });
+  }
   var analysisIdRef = null;
 
   function feedback(type, name) {
@@ -123,7 +136,7 @@
     m.textContent = "Preparing your PDF..."; m.className = "msg";
     loadJsPdf().then(function () {
       if (!window.facerizerPdf) throw new Error("PDF file is missing. Upload pdf.js to GitHub.");
-      window.facerizerPdf(current.r, current.created, kind, { hideScores: current.hide });
+      window.facerizerPdf(current.r, current.created, kind, { hideScores: current.hide, picks: ((profile && profile.barber_picks) || {})[analysisIdRef] || [] });
       m.textContent = "Done. Check your downloads."; m.className = "msg ok";
     }).catch(function (e) { console.error(e); m.textContent = e.message || "Could not create the PDF."; m.className = "msg error"; });
   }
@@ -194,6 +207,9 @@
     window.FZRecs.render($("fzr"), r, {
       isFree: isFree,
       feedback: feedback,
+      profile: profile,
+      saveProfile: saveProfile,
+      analysisId: analysisIdRef,
       hairArt: hairArt,
       onBarber: function () { download("barber"); },
       planHref: r.plan_weeks && r.plan_weeks.length ? "/plan" : null,
@@ -255,9 +271,11 @@
     Promise.all([
       sb.from("analyses").select("id, status, plan, result, created_at, photo_id").eq("id", id).maybeSingle(),
       sb.from("profiles").select("hide_scores, plan, plan_expires_at").eq("id", session.user.id).maybeSingle(),
-      sb.from("analysis_feedback").select("item_type, item_name, liked, note").eq("analysis_id", id)
+      sb.from("analysis_feedback").select("item_type, item_name, liked, note").eq("analysis_id", id),
+      sb.from("grooming_profile").select("skin_type, sensitive_skin, routine_in_plan, barber_picks").eq("user_id", session.user.id).maybeSingle()
     ]).then(function (out) {
       var a = out[0], p = out[1];
+      if (out[3] && !out[3].error) profile = Object.assign({ skin_type: null, sensitive_skin: false, routine_in_plan: false, barber_picks: {} }, out[3].data || {});
       ((out[2] && out[2].data) || []).forEach(function (f) { fbMap[f.item_type + "|" + f.item_name] = { liked: f.liked, note: f.note }; });
       if (a.error) { console.error(a.error); return state("Could not load this report (" + a.error.message + "). Run m5-setup.sql in Supabase.", true); }
       if (!a.data || a.data.status !== "done" || !a.data.result) return state("This report was not found, or it is not ready.", true);
