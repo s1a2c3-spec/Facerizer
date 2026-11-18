@@ -22,18 +22,18 @@ function envInt(name, dflt) {
 
 // Report language: the website stays in English; only the AI-written text follows this choice.
 const LANGS = ["en", "hinglish", "hi"];
-const LANG_MAX_TOKENS = { en: 6000, hinglish: 7500, hi: 9000 };
-const KEEP_ENGLISH = "Keep these exactly in English, because the app depends on them: all JSON keys; icon; category; maintenance; styling; length; tier; confidence; visible_hair type, length and density; face_shape_estimate; the hairstyle 'name' (use the standard English name a barber would know); and the glasses 'shape'.";
+const LANG_MAX_TOKENS = { en: 7500, hinglish: 9500, hi: 11000 };
+const KEEP_ENGLISH = "Keep these exactly in English, because the app depends on them: all JSON keys; icon; category; maintenance; styling; length; tier; confidence; visible_hair type, length and density; face_shape_estimate; the hairstyle 'name' (use the standard English name a barber would know); the glasses 'shape'; the grooming 'area'; and the features 'tag'.";
 const LANG_RULES = {
   en: "",
   hinglish: [
-    "LANGUAGE: Write every human-readable text value (summary, strengths, improvements, feature notes, hairline note, hairstyle 'why' and 'ask_barber', glasses 'why', grooming, skincare items, plan titles and tasks) in simple everyday Hinglish: Hindi written in English (Roman) letters, the way people in India chat on WhatsApp, for example 'Aapke face ka shape oval hai, isliye ...'. Do NOT use Devanagari script. Keep it friendly, clear and short. Common English words such as hairstyle, beard, trim and sunscreen are fine.",
+    "LANGUAGE: Write every human-readable text value (summary, strengths, improvements, feature notes, hairline note, hairstyle 'why', 'ask_barber' and 'avoid', glasses 'why' and 'size_colour', grooming title, text, how_often, time, tool and steps, feature suggestions, recs_why, skincare items, plan titles and tasks) in simple everyday Hinglish: Hindi written in English (Roman) letters, the way people in India chat on WhatsApp, for example 'Aapke face ka shape oval hai, isliye ...'. Do NOT use Devanagari script. Keep it friendly, clear and short. Common English words such as hairstyle, beard, trim and sunscreen are fine.",
     "'ask_barber' must be a short sentence the user can say to a barber in Hinglish, for example 'Sides chhote rakhna, upar thoda lamba chhodna.'",
     KEEP_ENGLISH,
     "The rules against judging looks apply in every language. Never use words meaning beautiful, attractive or handsome, such as sundar, khoobsurat or aakarshak.",
   ].join("\n"),
   hi: [
-    "LANGUAGE: Write every human-readable text value (summary, strengths, improvements, feature notes, hairline note, hairstyle 'why' and 'ask_barber', glasses 'why', grooming, skincare items, plan titles and tasks) in simple everyday Hindi in Devanagari script (आम बोलचाल की हिंदी). Keep sentences short. Common English words people really use, such as hairstyle, beard, trim and sunscreen, may stay in English letters.",
+    "LANGUAGE: Write every human-readable text value (summary, strengths, improvements, feature notes, hairline note, hairstyle 'why', 'ask_barber' and 'avoid', glasses 'why' and 'size_colour', grooming title, text, how_often, time, tool and steps, feature suggestions, recs_why, skincare items, plan titles and tasks) in simple everyday Hindi in Devanagari script (आम बोलचाल की हिंदी). Keep sentences short. Common English words people really use, such as hairstyle, beard, trim and sunscreen, may stay in English letters.",
     "'ask_barber' must be a short sentence the user can say to a barber in Hindi, for example 'साइड्स छोटे रखना, ऊपर थोड़ा लंबा छोड़ना।' It may keep the English hairstyle name.",
     KEEP_ENGLISH,
     "The rules against judging looks apply in every language. Never use words meaning beautiful, attractive or handsome, such as सुंदर, खूबसूरत or आकर्षक.",
@@ -132,19 +132,20 @@ function buildPrompt(measured, prefs, lang) {
   "strengths": [ { "icon": "jaw|eye|brow|skin|lips|nose|cheek|harmony", "title": "short", "text": "one sentence" } ],
   "improvements": [ { "title": "short, gentle wording", "text": "one sentence with a practical fix" } ],
   "features": {
-    "eyes": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "eyebrows": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "nose": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "lips": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "jawline": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "chin": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "cheekbones": { "observation": "", "suggestion": "", "confidence": "low|medium|high" },
-    "skin_appearance": { "observation": "visible, cosmetic only", "suggestion": "general habit", "confidence": "low|medium|high" }
+    "eyes": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "eyebrows": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "nose": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "lips": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "jawline": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "chin": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "cheekbones": { "observation": "", "suggestion": "", "confidence": "low|medium|high", "tag": "strength|refine" },
+    "skin_appearance": { "observation": "visible, cosmetic only", "suggestion": "general habit", "confidence": "low|medium|high", "tag": "strength|refine" }
   },
   "visible_hair": { "type": "straight|wavy|curly|coily|unclear", "length": "short|medium|long|unclear", "density": "thin|medium|thick|unclear", "hairline": "one short note, or unclear" },
-  "hairstyles": [ { "category": "Everyday|Trendy|Professional|Low-maintenance|Bold", "name": "", "why": "why it suits this face shape and this hair", "ask_barber": "one sentence the user can say to a barber or stylist", "maintenance": "low|medium|high", "styling": "easy|moderate|hard", "length": "short|medium|long" } ],
-  "glasses": [ { "shape": "Round|Square|Rectangle|Aviator|Cat-eye|Browline", "why": "", "tier": "best|try" } ],
-  "grooming": [ { "title": "", "text": "" } ],
+  "hairstyles": [ { "category": "Everyday|Trendy|Professional|Low-maintenance|Bold", "name": "", "why": "why it suits this face shape and this hair", "ask_barber": "one sentence the user can say to a barber or stylist", "avoid": "a short phrase naming what to avoid with this style, written without starting with the word Skip or Avoid", "maintenance": "low|medium|high", "styling": "easy|moderate|hard", "length": "short|medium|long" } ],
+  "glasses": [ { "shape": "Round|Square|Rectangle|Aviator|Cat-eye|Browline", "why": "", "size_colour": "frame size against the face and one or two suitable frame colours or materials", "tier": "best|try" } ],
+  "grooming": [ { "area": "beard|hair|brows|skin|lips|general", "title": "", "text": "", "how_often": "for example Every 3 to 4 days", "time": "for example 3 minutes", "tool": "for example Trimmer", "steps": ["2 to 3 very short steps, only when the tip needs them, otherwise an empty list"] } ],
+  "recs_why": { "hairstyles": "one short sentence: why these hairstyles for this face shape and this hair", "glasses": "one short sentence: why these frame shapes", "grooming": "one short sentence: why these tips", "features": "one short sentence introducing the feature notes" },
   "card": {
     "hair": { "note": "one short sentence about the visible hair: texture, length, volume or hairline", "score": 1-10 },
     "eyes": { "note": "one short sentence about eye area: clarity, spacing, brow framing", "score": 1-10 },
@@ -158,6 +159,7 @@ function buildPrompt(measured, prefs, lang) {
 }`,
     "",
     "Counts: 4 strengths, 3 improvements, 4 grooming tips, 4 plan weeks with 3 to 5 small daily-life tasks each.",
+    "Recommendation details: every hairstyle gets an 'avoid' sentence (what to skip). Every glasses entry gets 'size_colour'. Every grooming tip gets an 'area', plus how_often, time and tool in a few words each; add 2 to 3 short 'steps' only where a tip needs steps (for example a neckline), otherwise an empty list. Every feature gets a 'tag': strength when it is a clear plus, refine when a small grooming change would help; its 'suggestion' is one simple, doable tip. recs_why is four short sentences that each name the face shape or the visible hair or beard. Keep all of this cosmetic and practical. Never name a skin condition.",
     "Card: every note is one short sentence of at most 16 words. The 1 to 10 numbers are honest estimates of visible grooming in this one photo (hair condition and shape, eye-area clarity, how even the skin tone and texture look, how neat the facial hair is). They are never about attractiveness or personal worth. Most people land between 6 and 9; go lower only for a clear visible reason. Give exactly 4 upgrades, one per area where possible, written as friendly actions.",
     "Hairstyles: exactly 5, in this order and one per category: Everyday, Trendy, Professional, Low-maintenance, Bold. They must differ from each other in length or structure. First fill visible_hair from what you can see, then choose styles that work with that hair.",
     langLine,
@@ -181,11 +183,16 @@ function normalise(a, lang) {
   const arr = (x) => (Array.isArray(x) ? x : []);
   const str = (x, n = 400) => (typeof x === "string" ? x.trim().slice(0, n) : "");
   const pick = (x, list, fallback) => (list.includes(x) ? x : fallback);
-  const feat = (f) => ({
-    observation: str(f && f.observation, 300),
-    suggestion: str(f && f.suggestion, 300),
-    confidence: pick(f && f.confidence, ["low", "medium", "high"], "medium"),
-  });
+  const feat = (f) => {
+    const o = {
+      observation: str(f && f.observation, 300),
+      suggestion: str(f && f.suggestion, 300),
+      confidence: pick(f && f.confidence, ["low", "medium", "high"], "medium"),
+    };
+    const tg = f && f.tag;
+    if (tg === "strength" || tg === "refine") o.tag = tg; // optional: older reports and odd AI answers simply have no tag
+    return o;
+  };
   const features = {};
   ["eyes", "eyebrows", "nose", "lips", "jawline", "chin", "cheekbones", "skin_appearance"].forEach((k) => {
     features[k] = feat((a.features || {})[k]);
@@ -218,13 +225,22 @@ function normalise(a, lang) {
     },
     hairstyles: arr(a.hairstyles).slice(0, 5).map((h) => ({
       category: pick(h.category, ["Everyday", "Trendy", "Professional", "Low-maintenance", "Bold"], "Everyday"),
-      name: str(h.name, 60), why: str(h.why, 240), ask_barber: str(h.ask_barber, 220),
+      name: str(h.name, 60), why: str(h.why, 240), ask_barber: str(h.ask_barber, 220), avoid: str(h.avoid, 200),
       maintenance: pick(h.maintenance, ["low", "medium", "high"], "medium"),
       styling: pick(h.styling, ["easy", "moderate", "hard"], "moderate"),
       length: pick(h.length, ["short", "medium", "long"], "short"),
     })).filter((h) => h.name),
-    glasses: arr(a.glasses).slice(0, 4).map((g) => ({ shape: str(g.shape, 20), why: str(g.why, 220), tier: pick(g.tier, ["best", "try"], "best") })).filter((g) => g.shape),
-    grooming: arr(a.grooming).slice(0, 5).map((g) => ({ title: str(g.title, 70), text: str(g.text, 260) })).filter((g) => g.title),
+    glasses: arr(a.glasses).slice(0, 4).map((g) => ({ shape: str(g.shape, 20), why: str(g.why, 220), size_colour: str(g.size_colour, 200), tier: pick(g.tier, ["best", "try"], "best") })).filter((g) => g.shape),
+    grooming: arr(a.grooming).slice(0, 5).map((g) => ({
+      area: pick(g.area, ["beard", "hair", "brows", "skin", "lips", "general"], "general"),
+      title: str(g.title, 70), text: str(g.text, 260),
+      how_often: str(g.how_often, 50), time: str(g.time, 40), tool: str(g.tool, 50),
+      steps: arr(g.steps).slice(0, 4).map((x) => str(x, 140)).filter(Boolean),
+    })).filter((g) => g.title),
+    recs_why: {
+      hairstyles: str(a.recs_why && a.recs_why.hairstyles, 220), glasses: str(a.recs_why && a.recs_why.glasses, 220),
+      grooming: str(a.recs_why && a.recs_why.grooming, 220), features: str(a.recs_why && a.recs_why.features, 220),
+    },
     skincare: {
       morning: arr(a.skincare && a.skincare.morning).slice(0, 6).map((x) => str(x, 120)).filter(Boolean),
       evening: arr(a.skincare && a.skincare.evening).slice(0, 6).map((x) => str(x, 120)).filter(Boolean),
@@ -470,6 +486,7 @@ module.exports = async function handler(req, res) {
       summary: full.summary,
       visible_hair: full.visible_hair,
       card: { ...full.card, ...(cleanPoints(body.points) ? { points: cleanPoints(body.points) } : {}) },
+      recs_why: full.recs_why,
     };
     const fullResult = { ...core, strengths: full.strengths, improvements: full.improvements, features: full.features, hairstyles: full.hairstyles, glasses: full.glasses, grooming: full.grooming, skincare: full.skincare, plan_weeks: full.plan };
     const visible = plan === "free"
