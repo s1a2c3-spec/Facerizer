@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/account.css">
 <link rel="stylesheet" href="/report.css">
 <link rel="stylesheet" href="/plan.css">
+<link rel="stylesheet" href="/today.css">
 <script>try{var t=localStorage.getItem("theme");if(t){document.documentElement.setAttribute("data-theme",t)}}catch(e){}</script>
 <script src="/script.js" defer></script>
 </head>
@@ -41,6 +42,8 @@
         </div>
         <div class="hero-actions"><a href="/report" id="p-report" class="btn btn-outline">View full report</a></div>
       </section>
+
+      <section class="cx td" id="td" hidden aria-label="Today's Plan"></section>
 
       <div class="duo">
         <section class="cx" aria-labelledby="pg-title">
@@ -84,6 +87,8 @@
 <script src="/config.js"></script>
 <script src="/translations.js"></script>
 <script src="/skincare.js"></script>
+<script src="/plan-days.js"></script>
+<script src="/today.js"></script>
 <script src="/plan.js"></script>
 <script src="/menu.js" defer></script>
 </body>

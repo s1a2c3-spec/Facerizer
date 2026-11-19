@@ -257,6 +257,7 @@
         (o2[1].data || []).forEach(function (x) { days[x.day] = true; });
         var gp = o2[2] && !o2[2].error ? o2[2].data : null; // missing table or no row: the original routine is shown
         renderRoutine(r.skincare, gp, r, analysis.id);
+        if (window.FZToday) window.FZToday.init({ sb: sb, userId: userId, reportId: analysis.id, cardSkin: r.card && r.card.skin ? r.card.skin.type : "" });
         renderAll();
         $("state").hidden = true; $("plan").hidden = false;
       });

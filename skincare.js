@@ -3,7 +3,7 @@
  * and by the plan page (Daily routine, after "Add to plan"). The text is written by us, not by the AI.
  *
  *   FZSkin.build(skinType, sensitive, flags)  ->  (flags = { allergy: bool, caution: bool } from the grooming profile)  { type, sensitive, known, am: [step], pm: [step], later: [item], notes: [string], intro: string }
- *   step  = { title, product, amount, how, why, active (bool), strength, freq }
+ *   step  = { title, product, amount, how, why, active (bool), id (actives only), strength, freq }
  *   later = { name, strength, when, freq, why }
  *
  * Safety rules built in: only ONE active at a time (the rest are listed as "add later"), patch test, sunscreen every morning.
@@ -113,7 +113,7 @@
   function activeStep(id, type) {
     var how = type === "dry" ? T("ac_how_dry") : T("ac_how");
     if (id === "salicylic" && type === "combination") how += T("ac_tzone");
-    return { title: T(id), product: "", amount: T("ac_amt"), how: how, why: T("w_" + id), active: true, strength: STRENGTH[id], freq: T(FREQ[id]) };
+    return { id: id, title: T(id), product: "", amount: T("ac_amt"), how: how, why: T("w_" + id), active: true, strength: STRENGTH[id], freq: T(FREQ[id]) };
   }
 
   function build(skinType, sensitive, flags) {

@@ -1,0 +1,44 @@
+/* Today's Plan on /plan (Phase 6B). Uses the site colour variables, so light and dark both work. */
+.td { margin-top: 1rem; overflow-wrap: anywhere; }
+.td[hidden] { display: none !important; }
+.td-head h2 { font: 600 1.2rem var(--serif); }
+.td-counters { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--muted-fg); }
+.td-box { margin-top: 1rem; padding: 1rem; background: var(--muted); border-radius: 1rem; }
+.td-box h3 { font-size: 1.05rem; }
+.td-p { margin: 0.4rem 0 0; font-size: 0.95rem; line-height: 1.6; }
+.td-big { font-size: 1.05rem; font-weight: 600; }
+.td-hint { margin: 0.7rem 0 0; font-size: 0.9rem; color: var(--muted-fg); line-height: 1.55; }
+.td-hint a { color: var(--primary); font-weight: 600; }
+.td-main { margin-top: 1rem; min-height: 3rem; }
+.td-msg { min-height: 1.3rem; margin: 0.6rem 0 0; font-size: 0.9rem; color: #b3261e; }
+.td-missed { border: 1px solid var(--primary); }
+
+.td-top { margin-top: 1rem; }
+.td-dayno { margin: 0; font-size: 0.875rem; color: var(--muted-fg); }
+.td-daytitle { margin: 0.2rem 0 0; font: 600 1.25rem var(--serif); }
+.td-prog { margin-top: 0.9rem; }
+.td-ptxt { margin: 0.4rem 0 0; font-size: 0.95rem; font-weight: 600; }
+.td-sm { font-size: 0.875rem; font-weight: 400; color: var(--muted-fg); }
+.td-bar { height: 0.6rem; margin-top: 0.4rem; border-radius: 999px; background: var(--muted); overflow: hidden; }
+.td-bar span { display: block; height: 100%; background: var(--primary); border-radius: 999px; transition: width 0.3s; }
+@media (prefers-reduced-motion: reduce) { .td-bar span { transition: none; } }
+
+.td-tasks { display: grid; gap: 0.75rem; margin-top: 1rem; }
+.td-task { border: 1px solid var(--border); border-radius: 1rem; padding: 0.35rem 1rem 0.9rem; background: var(--bg); }
+.td-label { display: flex; align-items: center; gap: 0.75rem; min-height: 3.25rem; cursor: pointer; }
+.td-label input { flex: none; width: 1.5rem; height: 1.5rem; accent-color: var(--primary); cursor: pointer; }
+.td-tt { font-size: 1.05rem; font-weight: 700; }
+.td-new { margin-left: auto; font-size: 0.875rem; font-weight: 700; background: var(--primary); color: var(--on-primary); border-radius: 999px; padding: 0.05rem 0.7rem; }
+.td-items { list-style: none; margin: 0.2rem 0 0; padding: 0; }
+.td-items li { padding: 0.5rem 0; border-top: 1px solid var(--border); font-size: 0.9rem; line-height: 1.55; color: var(--muted-fg); }
+.td-items li b { color: var(--fg); }
+.td-note { margin: 0.4rem 0 0; font-size: 0.95rem; line-height: 1.6; }
+.td-link { display: inline-flex; align-items: center; min-height: 2.75rem; font-size: 0.95rem; font-weight: 600; color: var(--primary); }
+.td-ok { min-height: 1.4rem; margin: 0.8rem 0 0; font-size: 1rem; font-weight: 700; color: var(--primary); }
+
+.td-calh { margin: 1rem 0 0.4rem; font-size: 0.95rem; }
+.td-cal { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr)); gap: 0.4rem; }
+.td-d { display: flex; align-items: center; justify-content: center; min-height: 2.75rem; border-radius: 0.7rem; border: 1px solid var(--border); font-size: 0.9rem; color: var(--muted-fg); background: var(--bg); }
+.td-d.done { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 700; }
+.td-d.now { border: 2px solid var(--primary); color: var(--fg); font-weight: 700; }
+.td-fine { margin: 1rem 0 0; font-size: 0.875rem; color: var(--muted-fg); text-align: center; }
