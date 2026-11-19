@@ -210,6 +210,7 @@
       profile: profile,
       saveProfile: saveProfile,
       analysisId: analysisIdRef,
+      profileHref: "/profile?from=" + encodeURIComponent(analysisIdRef || ""),
       hairArt: hairArt,
       onBarber: function () { download("barber"); },
       planHref: r.plan_weeks && r.plan_weeks.length ? "/plan" : null,
@@ -272,7 +273,7 @@
       sb.from("analyses").select("id, status, plan, result, created_at, photo_id").eq("id", id).maybeSingle(),
       sb.from("profiles").select("hide_scores, plan, plan_expires_at").eq("id", session.user.id).maybeSingle(),
       sb.from("analysis_feedback").select("item_type, item_name, liked, note").eq("analysis_id", id),
-      sb.from("grooming_profile").select("skin_type, sensitive_skin, routine_in_plan, barber_picks").eq("user_id", session.user.id).maybeSingle()
+      sb.from("grooming_profile").select("*").eq("user_id", session.user.id).maybeSingle()
     ]).then(function (out) {
       var a = out[0], p = out[1];
       if (out[3] && !out[3].error) profile = Object.assign({ skin_type: null, sensitive_skin: false, routine_in_plan: false, barber_picks: {} }, out[3].data || {});

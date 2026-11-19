@@ -163,7 +163,7 @@
   // Daily routine built from the skincare library, after "Add to my plan" on the report page.
   function renderLibraryRoutine(box, gp, result, reportId) {
     var type = gp.skin_type || (result.card && result.card.skin && result.card.skin.type) || "unclear";
-    var R = window.FZSkin.build(type, !!gp.sensitive_skin);
+    var R = window.FZSkin.build(type, !!gp.sensitive_skin, { allergy: !!gp.has_allergy, caution: !!gp.medical_caution });
     var note = el("p", "rt-note", R.intro + " ");
     var a = el("a", "", "Change it in your report"); a.href = "/report?id=" + encodeURIComponent(reportId); a.style.color = "var(--primary)";
     note.appendChild(a); box.appendChild(note);
@@ -250,7 +250,7 @@
       Promise.all([
         sb.from("plan_progress").select("task_key").eq("analysis_id", analysis.id),
         sb.from("checkins").select("day").order("day", { ascending: false }).limit(120),
-        sb.from("grooming_profile").select("skin_type, sensitive_skin, routine_in_plan").eq("user_id", userId).maybeSingle()
+        sb.from("grooming_profile").select("*").eq("user_id", userId).maybeSingle()
       ]).then(function (o2) {
         if (o2[0].error || o2[1].error) { console.error(o2[0].error || o2[1].error); return state("Could not load your progress. Run m6-plan.sql in Supabase, then refresh.", true); }
         (o2[0].data || []).forEach(function (x) { done[x.task_key] = true; });

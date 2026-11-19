@@ -1,0 +1,20 @@
+/* Grooming profile page (Phase 6A). Chip and switch styles come from recs.css. */
+.pf-form { display: grid; gap: 1rem; }
+.pf-set { border: 1px solid var(--border); border-radius: 1.25rem; background: var(--card); padding: 1.25rem; margin: 0; min-width: 0; }
+.pf-set legend { padding: 0 0.4rem; font: 600 1.1rem var(--serif); }
+.pf-help { margin: 0.2rem 0 0; font-size: 0.9rem; color: var(--muted-fg); line-height: 1.5; }
+.pf-set .fzr-chs { margin-top: 0.7rem; }
+.pf-note { display: block; margin-top: 1rem; }
+.pf-note label { display: block; font-weight: 600; font-size: 0.95rem; }
+.pf-note textarea { width: 100%; min-height: 5rem; margin-top: 0.4rem; padding: 0.7rem 0.85rem; font: inherit; font-size: 1rem; color: var(--fg); background: var(--bg); border: 1px solid var(--border); border-radius: 0.8rem; resize: vertical; box-sizing: border-box; }
+.pf-note textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pf-note .pf-help { margin-top: 0.3rem; }
+.pf-basic { margin-top: 1rem; padding: 0.7rem 0.9rem; background: var(--muted); border-radius: 0.8rem; font-size: 0.95rem; line-height: 1.5; }
+.pf-save { width: 100%; min-height: 3.25rem; }
+.pf-after { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.8rem; }
+.pf-after .btn { min-height: 3rem; }
+.pf-msg { min-height: 1.4rem; margin: 0.7rem 0 0; font-size: 0.95rem; color: var(--primary); }
+.pf-msg.err { color: #b3261e; }
+@media (min-width: 720px) { .pf { max-width: 44rem; margin: 0 auto; } }
+.pf [hidden] { display: none !important; }
+.pf-fine { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--muted-fg); }

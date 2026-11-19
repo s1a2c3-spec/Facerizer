@@ -48,6 +48,7 @@
     if (ctx.msg && ctx.msg.sec === sec && !ctx.msg.ok) m.className += " err";
     return m;
   }
+  function flagsOf(o) { var pr = o.profile; return pr ? { allergy: !!pr.has_allergy, caution: !!pr.medical_caution } : {}; }
   function effType(r, o) {
     var pr = o.profile;
     if (pr && SKIN_TYPES.indexOf(pr.skin_type) >= 0) return pr.skin_type;
@@ -280,7 +281,7 @@
   function routinePanel(r, o) {
     var p = el("div");
     if (o.isFree) { p.appendChild(lockBox(T("recs.lock_skinr"), o.proHref)); return p; }
-    var R = window.FZSkin.build(effType(r, o), !!(o.profile && o.profile.sensitive_skin));
+    var R = window.FZSkin.build(effType(r, o), !!(o.profile && o.profile.sensitive_skin), flagsOf(o));
     p.appendChild(why(R.intro, true));
     p.appendChild(el("h3", "fzr-sub", R.amLabel)); p.appendChild(stepList(R.am));
     p.appendChild(el("h3", "fzr-sub", R.pmLabel)); p.appendChild(stepList(R.pm));
@@ -377,8 +378,15 @@
     }
     if (window.FZSkin) {
       var nSteps = 0;
-      if (!o.isFree) { var R0 = window.FZSkin.build(effType(r, o), !!(o.profile && o.profile.sensitive_skin)); nSteps = R0.am.length + R0.pm.length; }
+      if (!o.isFree) { var R0 = window.FZSkin.build(effType(r, o), !!(o.profile && o.profile.sensitive_skin), flagsOf(o)); nSteps = R0.am.length + R0.pm.length; }
       root.appendChild(section("routine", T("recs.skinr.t"), T("recs.skinr.sub"), o.isFree ? T("recs.badge_pro") : T("recs.badge_steps", { n: nSteps }), P.routine, routinePanel(r, o)));
+    }
+    // Phase 6A: invite paid users to fill the grooming profile (it feeds the daily plan and the safety rules)
+    if (o.profileHref && !o.isFree && canSave(o)) {
+      var done = !!o.profile.profile_done_at, cta = el("div", "fzr-nx fzr-cta");
+      cta.appendChild(el("span", "", T(done ? "recs.cta_done" : "recs.cta_text")));
+      var ca = el("a", "btn btn-primary", T(done ? "recs.cta_update" : "recs.cta_btn")); ca.href = o.profileHref; cta.appendChild(ca);
+      root.appendChild(cta);
     }
     root.hidden = false;
   }

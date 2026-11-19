@@ -2,12 +2,12 @@
  * One place that knows: what to apply, how much, when, how, and why. Used by the report page (Skincare routine button)
  * and by the plan page (Daily routine, after "Add to plan"). The text is written by us, not by the AI.
  *
- *   FZSkin.build(skinType, sensitive)  ->  { type, sensitive, known, am: [step], pm: [step], later: [item], notes: [string], intro: string }
+ *   FZSkin.build(skinType, sensitive, flags)  ->  (flags = { allergy: bool, caution: bool } from the grooming profile)  { type, sensitive, known, am: [step], pm: [step], later: [item], notes: [string], intro: string }
  *   step  = { title, product, amount, how, why, active (bool), strength, freq }
  *   later = { name, strength, when, freq, why }
  *
- * Safety rules built in: only ONE active at a time (the rest are listed as "add later"), patch test, sunscreen every morning,
- * sensitive skin gets the basic steps only. No brands, no prices, no medical claims.
+ * Safety rules built in: only ONE active at a time (the rest are listed as "add later"), patch test, sunscreen every morning.
+ * Sensitive skin, an allergy, or pregnancy / breastfeeding / a doctor's skin treatment gets the basic steps only (no actives). No brands, no prices, no medical claims.
  * NOTE: the strengths below come from HANDOFF-3 section 7. A dermatologist should read them once before launch.
  */
 (function () {
@@ -42,6 +42,10 @@
       i_sens: "Built for sensitive skin: only the basic steps, no actives.",
       i_unclear: "Choose your skin type above to get your first active. Until then, these basic steps are the right start.",
       n_sens: "Because your skin is sensitive, stay with the basic steps. Ask a dermatologist before adding any active.",
+      i_allergy: "Built with your allergy in mind: only the basic steps, no actives.",
+      n_allergy: "You told us you have an allergy. Read the ingredient list of every product and skip anything that contains what you react to. Ask a doctor before adding any active.",
+      i_caution: "Built for your situation (pregnancy, breastfeeding or a doctor's skin treatment): only the basic steps, no actives.",
+      n_caution: "Because of your situation, ask your doctor before using any serum or active. These basic steps are only a general starting point.",
       n1: "Patch test first: put a small amount behind your ear or on your inner forearm and wait 24 hours before using a new product on your face.",
       n2: "Add one new active at a time and wait 2 weeks before the next one.",
       n3: "Never skip sunscreen in the morning, especially after using an active.",
@@ -78,6 +82,10 @@
       i_sens: "Sensitive skin ke liye bana: sirf basic steps, koi active nahi.",
       i_unclear: "Pehle upar apna skin type chunein, tab pehla active milega. Tab tak ye basic steps sahi shuruaat hain.",
       n_sens: "Aapki skin sensitive hai, isliye basic steps par hi rahein. Koi bhi active jodne se pehle dermatologist se poochhein.",
+      i_allergy: "Aapki allergy ko dhyan mein rakh kar bana: sirf basic steps, koi active nahi.",
+      n_allergy: "Aapne batayi ki aapko allergy hai. Har product ki ingredient list padhein aur jis cheez se reaction hota hai wo jisme ho use na lagayein. Koi bhi active jodne se pehle doctor se poochhein.",
+      i_caution: "Aapki halat (pregnancy, breastfeeding ya doctor ka skin treatment) ke liye bana: sirf basic steps, koi active nahi.",
+      n_caution: "Aapki halat ki wajah se koi bhi serum ya active lagane se pehle doctor se poochhein. Ye basic steps sirf ek general shuruaat hain.",
       n1: "Pehle patch test: kaan ke peeche ya kalai ke andar thodi matra lagayein aur 24 ghante rukein, tab chehre par naya product lagayein.",
       n2: "Ek baar mein sirf ek naya active jodein aur agla jodne se pehle 2 hafte rukein.",
       n3: "Subah sunscreen kabhi na chhodein, khaas kar active lagane ke baad.",
@@ -108,25 +116,29 @@
     return { title: T(id), product: "", amount: T("ac_amt"), how: how, why: T("w_" + id), active: true, strength: STRENGTH[id], freq: T(FREQ[id]) };
   }
 
-  function build(skinType, sensitive) {
+  function build(skinType, sensitive, flags) {
+    flags = flags || {};
+    var basic = !!(sensitive || flags.allergy || flags.caution); // basic steps only, no actives
     var type = KNOWN.indexOf(skinType) >= 0 ? skinType : "unclear";
     var known = type !== "unclear", oilyish = type === "oily" || type === "combination";
-    var cleanse = { title: T("cleanse"), product: sensitive || !oilyish ? T("cl_cream") : T("cl_gel"), amount: T("cl_amt"), how: T("cl_how"), why: T("cl_why"), active: false };
-    var moist = { title: T("moist"), product: sensitive ? T("mo_sens") : oilyish ? T("mo_gel") : type === "dry" ? T("mo_rich") : T("mo_light"), amount: T("mo_amt"), how: T("mo_how"), why: T("mo_why"), active: false };
-    var spf = { title: T("spf"), product: sensitive ? T("sp_sens") : T("sp_prod"), amount: T("sp_amt"), how: T("sp_how"), why: T("sp_why"), active: false };
+    var cleanse = { title: T("cleanse"), product: basic || !oilyish ? T("cl_cream") : T("cl_gel"), amount: T("cl_amt"), how: T("cl_how"), why: T("cl_why"), active: false };
+    var moist = { title: T("moist"), product: basic ? T("mo_sens") : oilyish ? T("mo_gel") : type === "dry" ? T("mo_rich") : T("mo_light"), amount: T("mo_amt"), how: T("mo_how"), why: T("mo_why"), active: false };
+    var spf = { title: T("spf"), product: basic ? T("sp_sens") : T("sp_prod"), amount: T("sp_amt"), how: T("sp_how"), why: T("sp_why"), active: false };
 
     var am = [cleanse], pm = [cleanse], later = [], notes = [];
-    if (known && !sensitive) {
+    if (known && !basic) {
       var ids = ORDER[type], first = ids[0];
       var st = activeStep(first, type);
       (WHEN[first] === "pm" ? pm : am).push(st);
       ids.slice(1).forEach(function (id) { later.push({ name: T(id), strength: STRENGTH[id], when: T(WHEN[id]), freq: T(FREQ[id]), why: T("w_" + id) + (id === "salicylic" && type === "combination" ? T("ac_tzone") : "") }); });
     }
     am.push(moist, spf); pm.push(moist);
-    var intro = sensitive ? T("i_sens") : known ? T("i_known").replace("{type}", T("t_" + type)) : T("i_unclear");
+    var intro = flags.caution ? T("i_caution") : flags.allergy ? T("i_allergy") : sensitive ? T("i_sens") : known ? T("i_known").replace("{type}", T("t_" + type)) : T("i_unclear");
+    if (flags.caution) notes.push(T("n_caution"));
+    if (flags.allergy) notes.push(T("n_allergy"));
     if (sensitive) notes.push(T("n_sens"));
     ["n1", "n2", "n3", "n4", "n5", "n6"].forEach(function (k) { notes.push(T(k)); });
-    return { type: type, sensitive: !!sensitive, known: known, am: am, pm: pm, later: later, notes: notes, intro: intro, amLabel: T("am"), pmLabel: T("pm") };
+    return { type: type, sensitive: !!sensitive, basic: basic, known: known, am: am, pm: pm, later: later, notes: notes, intro: intro, amLabel: T("am"), pmLabel: T("pm") };
   }
 
   window.FZSkin = { build: build, strings: X /* used by the test script */ };
