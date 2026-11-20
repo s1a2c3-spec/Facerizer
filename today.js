@@ -4,6 +4,8 @@
  *   Calendar Day    = days since the plan was started (worked out here, from the date)
  *   Active Plan Day = the day the person is on. It moves forward only when that day is finished.
  * A missed day never resets anything and never deletes finished tasks: the page says "You missed N days" and "Continue My Plan".
+ * Phase 6C adds the night check-in (plan_checkins, sql/17: if that column is missing the check-in is simply not shown) and the weekly / final reports,
+ * which are worked out here from the ticks and check-ins (see FZDays.report in plan-days.js). No AI, no photos.
  * Everything is saved in grooming_profile (sql/14, 15 and 16). If those columns are not there yet, the card stays hidden.
  * The day content comes from plan-days.js, the skincare steps from skincare.js. Text from them is always added with textContent. */
 (function () {
@@ -21,7 +23,8 @@
   var C = null;      // { sb, userId, reportId }
   var P = null;      // the saved row (profile + plan)
   var S = null;      // { started, active, dayDate, missed, done }
-  var root = null, msg = "";
+  var root = null, msg = "", ciMsg = "";
+  var openReps = {}; // which report <details> are open, kept when the page is redrawn
   var today = null;  // "YYYY-MM-DD", set at start and again when the page comes back to the front
 
   function isDone(day) { var l = S.done[String(day)] || []; return TASKS.every(function (t) { return l.indexOf(t) >= 0; }); }
@@ -54,7 +57,7 @@
     return {
       skinType: (P && P.skin_type) || (C.cardSkin || "unclear"), sensitive: !!(P && P.sensitive_skin),
       flags: { allergy: !!(P && P.has_allergy), caution: !!(P && P.medical_caution) },
-      profileDone: !!(P && P.profile_done_at), dailyMinutes: P && P.daily_minutes, productsHave: (P && P.products_have) || []
+      profileDone: !!(P && P.profile_done_at), dailyMinutes: P && P.daily_minutes, productsHave: (P && P.products_have) || [], checkins: S && S.checkins ? S.checkins : {}
     };
   }
 
@@ -136,13 +139,68 @@
     var top = el("div", "td-top");
     top.appendChild(el("p", "td-dayno", T("td.day_of", { n: day }) + "  ·  " + T("td.phase", { p: plan.phase.n, name: plan.phase.name })));
     top.appendChild(el("h3", "td-daytitle", plan.title)); b.appendChild(top);
+    if (plan.advice) { var adv = el("p", "td-advice", plan.advice); adv.id = "td-advice"; b.appendChild(adv); }
     var pr = el("div", "td-prog"); pr.id = "td-prog"; b.appendChild(pr);
     var list = el("div", "td-tasks"); plan.tasks.forEach(function (t) { list.appendChild(taskNode(t, day, plan)); }); b.appendChild(list);
+    if (S.checkins) b.appendChild(checkinNode(day));
     var ok = el("p", "td-ok"); ok.id = "td-ok"; ok.setAttribute("role", "status"); ok.setAttribute("aria-live", "polite"); b.appendChild(ok);
     b.appendChild(note());
     b.appendChild(el("h3", "td-calh", T("td.cal_h")));
     var cal = el("ol", "td-cal"); cal.id = "td-cal"; b.appendChild(cal);
     return b;
+  }
+
+  // ---------- night check-in ----------
+  var CI = ["good", "dry", "oily", "irritated", "breakouts"];
+  function checkinNode(day) {
+    var box = el("section", "td-ci"); box.setAttribute("aria-labelledby", "td-ci-h");
+    var h = el("h3", "", T("td.ci_h")); h.id = "td-ci-h"; box.appendChild(h); box.appendChild(el("p", "td-p", T("td.ci_q")));
+    var g = el("div", "td-chips"); g.setAttribute("role", "group"); g.setAttribute("aria-labelledby", "td-ci-h");
+    function paintChips() { CI.forEach(function (k) { var b = document.getElementById("td-ci-" + k); if (!b) return; var on = S.checkins[day] === k; b.className = "td-chip" + (on ? " on" : ""); b.setAttribute("aria-pressed", on ? "true" : "false"); }); }
+    CI.forEach(function (k) {
+      var on = S.checkins[day] === k, b = el("button", "td-chip" + (on ? " on" : ""), T("td.ci." + k)); b.type = "button"; b.id = "td-ci-" + k; b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.addEventListener("click", function () {
+        var before = S.checkins[day], want = before === k ? null : k;
+        if (want) S.checkins[day] = want; else delete S.checkins[day];
+        paintChips(); var m = document.getElementById("td-ci-msg"); if (m) m.textContent = "";
+        save({ plan_checkins: S.checkins }).then(function (ok) {
+          if (!ok) { if (before) S.checkins[day] = before; else delete S.checkins[day]; paintChips(); }
+          var m2 = document.getElementById("td-ci-msg"); if (m2) { m2.textContent = ok ? T("td.ci_saved") : T("td.save_err"); m2.className = "td-ci-msg" + (ok ? "" : " err"); }
+          paintReports();
+        });
+      });
+      g.appendChild(b);
+    });
+    box.appendChild(g);
+    var m = el("p", "td-ci-msg"); m.id = "td-ci-msg"; m.setAttribute("role", "status"); m.setAttribute("aria-live", "polite"); box.appendChild(m);
+    return box;
+  }
+
+  // ---------- weekly and final reports ----------
+  function repNode(k) {
+    var r = window.FZDays.report(k, { done: S.done, checkins: S.checkins, missed: S.missed, active: S.active });
+    var d = el("details", "td-rep"); d.open = !!openReps[k]; d.setAttribute("data-key", k);
+    d.addEventListener("toggle", function () { openReps[k] = d.open; });
+    d.appendChild(el("summary", "", r.title));
+    var rows = el("div", "td-rows");
+    r.rows.forEach(function (x) { var row = el("div", "td-row"); row.appendChild(el("span", "", x.label)); row.appendChild(el("b", "", x.value)); rows.appendChild(row); });
+    d.appendChild(rows);
+    r.notes.forEach(function (n) { d.appendChild(el("p", "td-p", n)); });
+    var ph = el("p", "td-p", r.photo + " "); var a = el("a", "td-link", r.photoLink.text); a.href = r.photoLink.href; ph.appendChild(a); d.appendChild(ph);
+    d.appendChild(el("p", "td-basis", r.basis));
+    return d;
+  }
+  function repsBlock() {
+    if (!S || !S.started) return null;
+    var keys = window.FZDays.reportsAvailable(S); if (!keys.length) return null;
+    var w = el("section", "td-reps"); w.id = "td-reps"; w.appendChild(el("h3", "", T("td.rep_h")));
+    keys.slice().reverse().forEach(function (k) { w.appendChild(repNode(k)); });
+    return w;
+  }
+  function paintReports() {
+    var old = document.getElementById("td-reps"), nb = repsBlock();
+    if (old && nb) old.replaceWith(nb); else if (old) old.remove();
+    else if (nb && root) { var fine = root.querySelector(".td-fine"); if (fine) root.insertBefore(nb, fine); }
   }
 
   // update the numbers and the calendar without redrawing the tasks (keeps focus on the checkbox)
@@ -164,6 +222,7 @@
         cal.appendChild(li);
       }
     }
+    paintReports();
     if (isDone(30)) draw();
   }
 
@@ -177,15 +236,20 @@
     else if (state === "finished") root.appendChild(drawFinished());
     else { root.appendChild(drawDay()); paint(S.active); }
     root.appendChild(el("p", "td-fine", T("td.fine")));
+    paintReports(); // adds the reports block (once) in front of the small print
   }
 
   function init(c) {
     C = c; root = document.getElementById("td"); if (!root) return;
     today = ymd(new Date());
-    C.sb.from("grooming_profile").select(COLS).eq("user_id", C.userId).maybeSingle().then(function (res) {
+    var q1 = C.sb.from("grooming_profile").select(COLS).eq("user_id", C.userId).maybeSingle();
+    var q2 = C.sb.from("grooming_profile").select("plan_checkins").eq("user_id", C.userId).maybeSingle(); // separate, so a missing sql/17 only hides the check-in
+    Promise.all([q1, q2]).then(function (out) {
+      var res = out[0], r2 = out[1];
       if (res.error) { console.warn(res.error); return; } // sql/14, 15 or 16 not run yet: the card stays hidden
       P = res.data || {};
-      S = { started: P.plan_started_on || null, active: P.plan_active_day || 1, dayDate: P.plan_day_date || null, missed: P.plan_missed || 0, done: (P.plan_done && typeof P.plan_done === "object" && !Array.isArray(P.plan_done)) ? P.plan_done : {} };
+      S = { started: P.plan_started_on || null, active: P.plan_active_day || 1, dayDate: P.plan_day_date || null, missed: P.plan_missed || 0, done: (P.plan_done && typeof P.plan_done === "object" && !Array.isArray(P.plan_done)) ? P.plan_done : {}, checkins: null };
+      if (!r2.error) { var c = r2.data && r2.data.plan_checkins; S.checkins = c && typeof c === "object" && !Array.isArray(c) ? c : {}; }
       draw();
       document.addEventListener("fz:lang", function () { draw(); });
       // the tab was left open overnight: look at the date again when it comes back to the front

@@ -275,7 +275,16 @@
       "td.cal_now": "Day {n}, active day",
       "td.cal_next": "Day {n}, coming up",
       "td.save_err": "Could not save. Check your internet and try again.",
-      "td.fine": "General style and grooming guidance only. Not medical advice."
+      "td.fine": "General style and grooming guidance only. Not medical advice.",
+      "td.ci_h": "Night check-in",
+      "td.ci_q": "How does your skin feel after today's routine?",
+      "td.ci.good": "Comfortable",
+      "td.ci.dry": "Dry",
+      "td.ci.oily": "Oily",
+      "td.ci.irritated": "Irritated",
+      "td.ci.breakouts": "New breakouts",
+      "td.ci_saved": "Saved. Tomorrow's plan will use this.",
+      "td.rep_h": "Your reports"
     },
 
     hinglish: {
@@ -536,7 +545,16 @@
       "td.cal_now": "Day {n}, active din",
       "td.cal_next": "Day {n}, aane wala",
       "td.save_err": "Save nahi ho paya. Internet check karke dobara koshish karein.",
-      "td.fine": "Sirf general style aur grooming jaankari. Medical salah nahi."
+      "td.fine": "Sirf general style aur grooming jaankari. Medical salah nahi.",
+      "td.ci_h": "Raat ka check-in",
+      "td.ci_q": "Aaj ke routine ke baad aapki skin kaisi lag rahi hai?",
+      "td.ci.good": "Aaramdeh",
+      "td.ci.dry": "Dry",
+      "td.ci.oily": "Oily",
+      "td.ci.irritated": "Jalan",
+      "td.ci.breakouts": "Naye breakouts",
+      "td.ci_saved": "Save ho gaya. Kal ka plan isse banega.",
+      "td.rep_h": "Aapki reports"
     }
   };
 

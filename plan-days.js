@@ -27,6 +27,23 @@
       a8_type: "Keep your basic routine today. Choose your skin type in your report to unlock a first active.",
       a9_on: "Tolerance check: after using {name}, did you feel burning, redness or itching? If yes, stop it and rinse. If your skin feels comfortable, carry on with the schedule shown.",
       a9_off: "Tolerance check: does your skin feel comfortable with your routine? Any burning, redness or itching means you should stop the newest product.",
+      a_paused: "Keep your basic routine today. Your skin felt irritated recently, so the serum is paused. If it does not settle in a few days, please see a doctor.",
+      adv_pause: "Your skin felt irritated recently, so today's plan skips the serum. Keep to the basic steps. If it does not settle in a few days, please see a doctor.",
+      adv_irritated: "Your skin felt irritated recently. Keep to the basic steps, add nothing new, and see a doctor if it does not settle.",
+      adv_dry: "Your skin felt dry last night. Use a slightly thicker layer of moisturiser and wash with lukewarm, not hot, water.",
+      adv_oily: "Your skin felt oily last night. Keep the moisturiser light, and do not over-wash: twice a day is enough.",
+      adv_breakouts: "You noticed new breakouts last night. Keep the routine gentle, add nothing new, and avoid picking or scrubbing.",
+      r_week: "Week {n} report", r_final: "Final report",
+      r_consistency: "Routine consistency", r_days: "Days finished", r_special: "Special tasks done", r_comfort: "Skin comfort", r_checkins: "Check-ins", r_tol: "New product", r_missed: "Days missed so far", r_next: "Next phase",
+      c_good: "Good", c_mixed: "Mixed", c_care: "Needs care", c_none: "No check-ins yet",
+      tol_none: "Not started", tol_ok: "No irritation reported", tol_bad: "Irritation reported, so it was paused", tol_nodata: "No check-ins yet",
+      ci_good: "Comfortable", ci_dry: "Dry", ci_oily: "Oily", ci_irritated: "Irritated", ci_breakouts: "New breakouts",
+      n_good: "Your skin felt comfortable. Keep going.", n_mixed: "Your skin felt mixed. Keep the routine simple and steady.",
+      n_care: "Your skin felt irritated. Keep the routine gentle and add nothing new. If it does not settle, please see a doctor.",
+      n_nothing: "Nothing stronger is ever added automatically.",
+      n_photo: "To see changes, compare your photos taken in the same light and angle.", n_photo_link: "Compare my photos",
+      n_basis: "This report is based on your own ticks and answers. It is not a skin check or medical advice.",
+      r_of: "{a} of {b}",
       d1: "Start Your Journey", s1: "Save a first face photo in daylight, looking straight ahead, and note the skincare products you use now.",
       d2: "Build Consistency", s2: "Change your pillowcase today.",
       d3: "Skin Hydration Day", s3: "After washing your face, notice if it feels tight or dry, and write it down.",
@@ -74,6 +91,23 @@
       a8_type: "Aaj apna basic routine rakhein. Pehla active kholne ke liye apni report mein skin type chunein.",
       a9_on: "Tolerance check: {name} lagane ke baad jalan, laali ya khujli hui? Haan to use band karke dho dein. Skin aaramdeh lage to bataye schedule se aage badhein.",
       a9_off: "Tolerance check: kya aapki skin routine ke saath aaramdeh hai? Jalan, laali ya khujli ho to sabse naya product band karein.",
+      a_paused: "Aaj apna basic routine rakhein. Aapki skin ko haal hi mein jalan hui thi, isliye serum roka gaya hai. Kuch din mein theek na ho to doctor ko dikhayein.",
+      adv_pause: "Aapki skin ko haal hi mein jalan hui thi, isliye aaj ke plan mein serum nahi hai. Basic steps par hi rahein. Kuch din mein theek na ho to doctor ko dikhayein.",
+      adv_irritated: "Aapki skin ko haal hi mein jalan hui thi. Basic steps par hi rahein, kuch naya na jodein, aur theek na ho to doctor ko dikhayein.",
+      adv_dry: "Kal raat skin dry lagi thi. Moisturiser ki thodi mota layer lagayein aur chehra garm nahi, lukewarm paani se dhoyein.",
+      adv_oily: "Kal raat skin oily lagi thi. Moisturiser halka rakhein aur zyada na dhoyein: din mein do baar kaafi hai.",
+      adv_breakouts: "Kal raat aapne naye breakouts dekhe. Routine gentle rakhein, kuch naya na jodein, aur nochne ya ragadne se bachein.",
+      r_week: "Hafta {n} ki report", r_final: "Final report",
+      r_consistency: "Routine consistency", r_days: "Poore kiye din", r_special: "Special tasks poore", r_comfort: "Skin comfort", r_checkins: "Check-ins", r_tol: "Naya product", r_missed: "Ab tak chhoote din", r_next: "Agla phase",
+      c_good: "Achha", c_mixed: "Mila-jula", c_care: "Dhyan chahiye", c_none: "Abhi koi check-in nahi",
+      tol_none: "Shuru nahi hua", tol_ok: "Koi jalan nahi batayi", tol_bad: "Jalan batayi, isliye roka gaya", tol_nodata: "Abhi koi check-in nahi",
+      ci_good: "Aaramdeh", ci_dry: "Dry", ci_oily: "Oily", ci_irritated: "Jalan", ci_breakouts: "Naye breakouts",
+      n_good: "Aapki skin aaramdeh rahi. Aise hi chalte rahein.", n_mixed: "Aapki skin mili-juli rahi. Routine saada aur ek jaisa rakhein.",
+      n_care: "Aapki skin ko jalan hui. Routine gentle rakhein aur kuch naya na jodein. Theek na ho to doctor ko dikhayein.",
+      n_nothing: "Koi bhi tez cheez apne aap kabhi nahi jodi jaati.",
+      n_photo: "Badlav dekhne ke liye usi roshni aur angle mein li gayi apni photos ko milayein.", n_photo_link: "Meri photos milayein",
+      n_basis: "Ye report aapke apne tick aur jawabon par hai. Ye skin ki jaanch ya medical salah nahi hai.",
+      r_of: "{b} mein se {a}",
       d1: "Safar ki shuruaat", s1: "Din ki roshni mein seedhe dekhte hue ek pehli face photo save karein, aur jo skincare products abhi use karte hain unhe likh lein.",
       d2: "Consistency banayein", s2: "Aaj apna pillowcase badlein.",
       d3: "Skin Hydration Day", s3: "Chehra dhone ke baad dekhein ki skin kheenchi hui ya dry lag rahi hai, aur likh lein.",
@@ -136,7 +170,9 @@
   function build(day, ctx) {
     day = Math.max(1, Math.min(30, day | 0)); ctx = ctx || {};
     var R = window.FZSkin ? window.FZSkin.build(ctx.skinType, !!ctx.sensitive, ctx.flags || {}) : { am: [], pm: [], basic: true, known: false };
-    var canActive = !R.basic && R.known && !!ctx.profileDone && day >= 8;
+    var ck = ctx.checkins || {};
+    var paused = ck[day - 1] === "irritated" || ck[day - 2] === "irritated"; // irritation in the last two check-ins: no serum
+    var canActive = !R.basic && R.known && !!ctx.profileDone && day >= 8 && !paused;
 
     function skinItems(list) {
       var out = [], newActive = null;
@@ -161,7 +197,9 @@
 
     // special task
     var special = T("s" + day), link = null, needNote = "";
-    if (day === 8) {
+    if ((day === 8 || day === 9) && paused && !R.basic && R.known && ctx.profileDone) {
+      special = T("a_paused");
+    } else if (day === 8) {
       special = canActive && activeStep ? T("a8_on", { name: activeStep.title, strength: activeStep.strength })
         : R.basic ? T("a8_basic") : !ctx.profileDone ? T("a8_profile") : T("a8_type");
       if (!ctx.profileDone) link = { href: "/profile", text: T("sp_profile") };
@@ -176,8 +214,12 @@
     if (day === 30) link = { href: "/analyze/", text: T("sp_analyze") };
     if (day === 19 || day === 23) link = { href: "/exercises", text: T("sp_exercises") };
 
+    var prev = ck[day - 1], advice = "";
+    if (paused) advice = day >= 8 && !R.basic && R.known && ctx.profileDone ? T("adv_pause") : T("adv_irritated");
+    else if (prev === "dry") advice = T("adv_dry"); else if (prev === "oily") advice = T("adv_oily"); else if (prev === "breakouts") advice = T("adv_breakouts");
+
     return {
-      day: day, phase: { n: phaseOf(day), name: T("p" + phaseOf(day)) }, title: T("d" + day),
+      advice: advice, paused: paused, day: day, phase: { n: phaseOf(day), name: T("p" + phaseOf(day)) }, title: T("d" + day),
       newActive: am.newActive || pm.newActive ? true : false,
       tasks: [
         { id: "am", title: T("t_am"), items: am.items },
@@ -189,5 +231,52 @@
     };
   }
 
-  window.FZDays = { build: build, activeDue: activeDue, phaseOf: phaseOf, TASKS: ["am", "ex", "life", "pm", "special"], strings: X /* used by the test script */ };
+  // ---------- weekly and final reports: worked out from the person's own ticks and check-ins, no AI, no photos ----------
+  var TASKS5 = ["am", "ex", "life", "pm", "special"];
+  var WEEKS = [[1, 7], [8, 14], [15, 21], [22, 28]];
+  function ticks(done, day) { var l = (done && done[String(day)]) || []; return TASKS5.filter(function (t) { return l.indexOf(t) >= 0; }); }
+  function dayDone(done, day) { return ticks(done, day).length === 5; }
+  function pct(a, b) { return b ? Math.round(100 * a / b) : 0; }
+
+  // which reports can be shown now? [ "w1", "w2", ..., "final" ]
+  function reportsAvailable(S) {
+    var out = [];
+    WEEKS.forEach(function (w, i) { if (dayDone(S.done, w[1]) || S.active > w[1]) out.push("w" + (i + 1)); });
+    if (dayDone(S.done, 30)) out.push("final");
+    return out;
+  }
+  // S = { done, checkins (or null when the check-in column is not there), missed, active }
+  function report(key, S) {
+    var from = 1, to = 30, title = T("r_final"), idx = 0;
+    if (key !== "final") { idx = parseInt(String(key).slice(1), 10); from = WEEKS[idx - 1][0]; to = WEEKS[idx - 1][1]; title = T("r_week", { n: idx }); }
+    var n = to - from + 1, t = 0, d = 0, sp = 0;
+    for (var day = from; day <= to; day++) { var k = ticks(S.done, day); t += k.length; if (k.length === 5) d++; if (k.indexOf("special") >= 0) sp++; }
+    var rows = [
+      { label: T("r_consistency"), value: pct(t, 5 * n) + "%" },
+      { label: T("r_days"), value: T("r_of", { a: d, b: n }) },
+      { label: T("r_special"), value: T("r_of", { a: sp, b: n }) }
+    ];
+    var notes = [], ck = S.checkins, counts = { good: 0, dry: 0, oily: 0, irritated: 0, breakouts: 0 }, total = 0, afterTol = 0;
+    if (ck) {
+      for (var d2 = from; d2 <= to; d2++) { var c = ck[d2]; if (counts[c] != null) { counts[c]++; total++; } }
+      var irr = counts.irritated, mixedN = counts.dry + counts.oily + counts.breakouts;
+      var level = !total ? "none" : irr > 0 ? "care" : mixedN * 2 >= total ? "mixed" : "good";
+      rows.push({ label: T("r_comfort"), value: T("c_" + level) });
+      if (total) rows.push({ label: T("r_checkins"), value: ["good", "dry", "oily", "irritated", "breakouts"].filter(function (x) { return counts[x]; }).map(function (x) { return T("ci_" + x) + " " + counts[x]; }).join("  ·  ") });
+      if (to >= 8) {
+        var tolIrr = 0, tolAny = 0;
+        for (var d3 = Math.max(9, from); d3 <= to; d3++) { if (ck[d3]) { tolAny++; if (ck[d3] === "irritated") tolIrr++; } }
+        var started = false; for (var d4 = 8; d4 <= to; d4++) if (dayDone(S.done, d4) || ticks(S.done, d4).length) started = true;
+        rows.push({ label: T("r_tol"), value: !started ? T("tol_none") : !tolAny ? T("tol_nodata") : tolIrr ? T("tol_bad") : T("tol_ok") });
+      }
+      notes.push(level === "care" ? T("n_care") : level === "mixed" ? T("n_mixed") : level === "good" ? T("n_good") : "");
+    }
+    rows.push({ label: T("r_missed"), value: String(S.missed || 0) });
+    if (key !== "final") rows.push({ label: T("r_next"), value: T("p" + phaseOf(Math.min(30, to + 1))) });
+    notes.push(T("n_nothing"));
+    notes = notes.filter(Boolean);
+    return { key: key, title: title, rows: rows, notes: notes, basis: T("n_basis"), photo: T("n_photo"), photoLink: { href: "/compare", text: T("n_photo_link") } };
+  }
+
+  window.FZDays = { report: report, reportsAvailable: reportsAvailable, build: build, activeDue: activeDue, phaseOf: phaseOf, TASKS: ["am", "ex", "life", "pm", "special"], strings: X /* used by the test script */ };
 })();

@@ -42,3 +42,23 @@
 .td-d.done { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 700; }
 .td-d.now { border: 2px solid var(--primary); color: var(--fg); font-weight: 700; }
 .td-fine { margin: 1rem 0 0; font-size: 0.875rem; color: var(--muted-fg); text-align: center; }
+
+/* 6C: advice from yesterday's check-in, night check-in, reports */
+.td-advice { margin: 0.9rem 0 0; padding: 0.8rem 1rem; border: 1px solid var(--primary); border-radius: 0.9rem; background: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+.td-ci { margin-top: 1rem; padding: 0.9rem 1rem 1rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--bg); }
+.td-ci h3 { font-size: 1.05rem; }
+.td-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.td-chip { min-height: 3rem; padding: 0.3rem 1.1rem; font: inherit; font-size: 0.95rem; color: var(--fg); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
+.td-chip.on { background: var(--primary); color: var(--on-primary); border-color: var(--primary); font-weight: 700; }
+.td-ci-msg { min-height: 1.3rem; margin: 0.6rem 0 0; font-size: 0.9rem; color: var(--primary); }
+.td-ci-msg.err { color: #b3261e; }
+.td-reps { margin-top: 1.4rem; }
+.td-reps h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+.td-rep { border: 1px solid var(--border); border-radius: 1rem; background: var(--bg); padding: 0 1rem; margin-top: 0.6rem; }
+.td-rep summary { display: flex; align-items: center; min-height: 3.25rem; font-weight: 700; font-size: 1rem; cursor: pointer; }
+.td-rep[open] { padding-bottom: 0.9rem; border-color: var(--primary); }
+.td-rows { display: grid; gap: 0; }
+.td-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.2rem 1rem; padding: 0.55rem 0; border-top: 1px solid var(--border); font-size: 0.95rem; }
+.td-row span { color: var(--muted-fg); }
+.td-row b { text-align: right; }
+.td-basis { margin: 0.6rem 0 0; font-size: 0.875rem; color: var(--muted-fg); line-height: 1.5; }
