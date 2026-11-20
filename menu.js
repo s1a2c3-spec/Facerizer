@@ -11,6 +11,9 @@
   var path = (window.location.pathname || "/").replace(/\/+$/, "") || "/";
   if (/^\/checkout(\.html)?$/.test(path)) return;
   window.__fzMenu = true;
+  // Pages may report an action (fzTrack) before analytics.js has loaded (or before this file ran): it waits in a short queue. analytics.js sends the queue only if the
+  // person already pressed Accept, and drops it otherwise (nothing is ever sent before consent). Real fzTrack replaces this stub.
+  if (!window.fzTrack) { window.fzQ = window.fzQ || []; window.fzTrack = function (n, p) { if (window.fzQ && window.fzQ.length < 50) window.fzQ.push([n, p]); }; }
 
   var SB_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   var NAV = [

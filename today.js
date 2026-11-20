@@ -15,6 +15,8 @@
 
   function T(k, v) { return window.FZ_I18N ? window.FZ_I18N.t(k, v) : k; }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  var sentDone = {}; // one "day complete" event per day and visit
+  function track(n, p) { try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })(n, p); } catch (e) {} }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function ymd(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function dayNum(s) { var p = String(s).split("-"); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
@@ -84,7 +86,7 @@
     var btn = el("button", "btn btn-primary td-main", T("td.start_btn")); btn.type = "button"; btn.id = "td-start";
     btn.addEventListener("click", function () {
       btn.disabled = true; S.started = today; S.active = 1; S.dayDate = today; S.missed = 0; S.done = {};
-      save(planPatch()).then(function (ok) { if (!ok) { S.started = null; msg = T("td.save_err"); } else msg = ""; draw(); });
+      save(planPatch()).then(function (ok) { if (!ok) { S.started = null; msg = T("td.save_err"); } else { msg = ""; track("plan_start"); } draw(); });
     });
     b.appendChild(btn); b.appendChild(note()); return b;
   }
@@ -94,7 +96,7 @@
     var btn = el("button", "btn btn-primary td-main", T("td.continue")); btn.type = "button"; btn.id = "td-continue";
     btn.addEventListener("click", function () {
       btn.disabled = true; var old = { d: S.dayDate, m: S.missed }; S.missed += gap; S.dayDate = today;
-      save(planPatch()).then(function (ok) { if (!ok) { S.dayDate = old.d; S.missed = old.m; msg = T("td.save_err"); } else msg = ""; draw(); });
+      save(planPatch()).then(function (ok) { if (!ok) { S.dayDate = old.d; S.missed = old.m; msg = T("td.save_err"); } else { msg = ""; track("plan_continue"); } draw(); });
     });
     b.appendChild(btn); b.appendChild(note()); return b;
   }
@@ -128,7 +130,7 @@
       var before = S.done[key]; S.done[key] = list; paint(day);
       save({ plan_done: S.done }).then(function (ok) {
         if (!ok) { if (before) S.done[key] = before; else delete S.done[key]; cb.checked = !want; msg = T("td.save_err"); paint(day); }
-        else if (msg) { msg = ""; paint(day); }
+        else { if (want && isDone(day) && !sentDone[day]) { sentDone[day] = true; track("plan_day_complete", { day: day }); } if (msg) { msg = ""; paint(day); } }
       });
     });
     return box;
@@ -165,6 +167,7 @@
         paintChips(); var m = document.getElementById("td-ci-msg"); if (m) m.textContent = "";
         save({ plan_checkins: S.checkins }).then(function (ok) {
           if (!ok) { if (before) S.checkins[day] = before; else delete S.checkins[day]; paintChips(); }
+          if (ok && want) track("checkin_saved");
           var m2 = document.getElementById("td-ci-msg"); if (m2) { m2.textContent = ok ? T("td.ci_saved") : T("td.save_err"); m2.className = "td-ci-msg" + (ok ? "" : " err"); }
           paintReports();
         });
@@ -180,7 +183,7 @@
   function repNode(k) {
     var r = window.FZDays.report(k, { done: S.done, checkins: S.checkins, missed: S.missed, active: S.active });
     var d = el("details", "td-rep"); d.open = !!openReps[k]; d.setAttribute("data-key", k);
-    d.addEventListener("toggle", function () { openReps[k] = d.open; });
+    d.addEventListener("toggle", function () { openReps[k] = d.open; if (d.open) track("plan_report_open", { report: k }); });
     d.appendChild(el("summary", "", r.title));
     var rows = el("div", "td-rows");
     r.rows.forEach(function (x) { var row = el("div", "td-row"); row.appendChild(el("span", "", x.label)); row.appendChild(el("b", "", x.value)); rows.appendChild(row); });
@@ -197,7 +200,10 @@
     keys.slice().reverse().forEach(function (k) { w.appendChild(repNode(k)); });
     return w;
   }
+  // read which reports are open straight from the page (the "toggle" event arrives a moment late)
+  function rememberOpen() { document.querySelectorAll("#td-reps details[data-key]").forEach(function (d) { openReps[d.getAttribute("data-key")] = d.open; }); }
   function paintReports() {
+    rememberOpen();
     var old = document.getElementById("td-reps"), nb = repsBlock();
     if (old && nb) old.replaceWith(nb); else if (old) old.remove();
     else if (nb && root) { var fine = root.querySelector(".td-fine"); if (fine) root.insertBefore(nb, fine); }
@@ -228,6 +234,7 @@
 
   function draw() {
     if (!root) return;
+    rememberOpen();
     root.textContent = ""; root.hidden = false;
     var state = reconcile();
     root.appendChild(head(state));

@@ -136,6 +136,7 @@
     m.textContent = "Preparing your PDF..."; m.className = "msg";
     loadJsPdf().then(function () {
       if (!window.facerizerPdf) throw new Error("PDF file is missing. Upload pdf.js to GitHub.");
+      try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("pdf_download", { kind: kind }); } catch (e) {}
       window.facerizerPdf(current.r, current.created, kind, { hideScores: current.hide, picks: ((profile && profile.barber_picks) || {})[analysisIdRef] || [] });
       m.textContent = "Done. Check your downloads."; m.className = "msg ok";
     }).catch(function (e) { console.error(e); m.textContent = e.message || "Could not create the PDF."; m.className = "msg error"; });
@@ -203,6 +204,7 @@
     if (r.improvements && r.improvements.length) fill("r-improve", r.improvements.map(function (s) { return row("harmony", "", s.title, s.text); }));
     else fill("r-improve", [locked("Areas to refine, with a practical fix for each, are part of Pro.")]);
 
+    try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("report_view", { plan: isFree ? "free" : "paid" }); } catch (e) {}
     // Your recommendations: Hairstyles, Glasses, Grooming tips, Feature by feature (see recs.js)
     window.FZRecs.render($("fzr"), r, {
       isFree: isFree,

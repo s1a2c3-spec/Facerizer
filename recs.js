@@ -325,6 +325,7 @@
     var n = nodes[key]; if (!n) return;
     n.btn.setAttribute("aria-expanded", on ? "true" : "false");
     n.pn.hidden = !on;
+    if (on && !ctx.o.sample) { try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("recs_open", { section: key }); } catch (e) {} }
   }
   function goNext(key) {
     Object.keys(ctx.open).forEach(function (k) { if (ctx.open[k]) setOpen(k, false); });

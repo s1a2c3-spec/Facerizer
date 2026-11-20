@@ -119,6 +119,7 @@
   // Your recommendations (recs.js). The sample shows everything, like a Pro report.
   window.FZRecs.render($("fzr"), R, {
     isFree: false,
+    sample: true, // the example report: its clicks are not counted as real activity
     hairArt: hairArt,
     onBarber: function () { $("dl-barber").click(); },
     planHref: null,

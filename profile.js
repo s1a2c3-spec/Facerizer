@@ -129,7 +129,7 @@
       profile_done_at: now, updated_at: now
     };
     sb.from("grooming_profile").upsert(row, { onConflict: "user_id" }).then(function (res) {
-      var ok = !(res && res.error); if (!ok) console.error(res.error);
+      var ok = !(res && res.error); if (!ok) console.error(res.error); else { try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("profile_saved"); } catch (e) {} }
       savedOnce = savedOnce || ok; msg = { ok: ok, text: T(ok ? "prof.saved" : "prof.save_err") };
       build(); var b = $("pf-save"); if (b) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
     }, function (e) { console.error(e); msg = { ok: false, text: T("prof.save_err") }; build(); });

@@ -31,6 +31,7 @@
         redirectTo: window.location.origin + "/account",
         queryParams: { prompt: "select_account" } // always show the Google account chooser
       };
+      try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("auth_start", { method: "google" }); } catch (e) {}
       // A guest who signs up with Google keeps their report: the Google login is linked to the same account.
       sb.auth.getSession().then(function (s) {
         var cur = s.data && s.data.session;
@@ -84,6 +85,7 @@
       ).then(function (res) {
         setBusy(f, false);
         if (res.error) return show(friendly(res.error), "error");
+        try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("sign_up", { method: "email" }); } catch (e) {}
         var u = res.data && res.data.user;
         if (u && name) { try { sb.from("profiles").update({ display_name: name }).eq("id", u.id).then(function () {}); } catch (e) {} }
         // Email confirmation off: the user is permanent now. On: they stay a guest until they open the emailed link.
@@ -119,6 +121,7 @@
         if (u && u.identities && u.identities.length === 0) {
           return show("This email is already registered. Please log in instead.", "error");
         }
+        try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("sign_up", { method: "email" }); } catch (e) {}
         if (res.data.session) { window.location.href = nextUrl(); return; }
         f.reset();
         show("Account created. Check your email and click the verification link, then log in.", "ok");
@@ -138,6 +141,7 @@
       sb.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
         setBusy(lf, false);
         if (res.error) return show(friendly(res.error), "error");
+        try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("login", { method: "email" }); } catch (e) {}
         window.location.href = nextUrl();
       });
     });

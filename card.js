@@ -149,6 +149,7 @@
     function save(blob) { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "facerizer-card.png"; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
     btn.addEventListener("click", function () {
       msg.textContent = "";
+      if (!o.sample) { try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("card_download"); } catch (e) {} }
       if (state.blob) { save(state.blob); return; }
       btn.disabled = true;                      // the photo could not be read into a PNG: make the image without the photo
       draw(m, { photoUrl: null }, free, false).then(function (res) {

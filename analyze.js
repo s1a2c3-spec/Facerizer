@@ -223,6 +223,7 @@ async function analyzeNow(btn) {
   const steps = ["Preparing your photo...", "Mapping visible facial features...", "Analyzing proportions...", "Generating personalized recommendations...", "Building your improvement plan..."];
   let i = 0;
   say(steps[0]);
+  try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("analysis_start"); } catch (e) {}
   const timer = setInterval(() => { i = Math.min(i + 1, steps.length - 1); say(steps[i]); }, 5000);
   const stop = () => clearInterval(timer);
 
@@ -269,11 +270,13 @@ async function analyzeNow(btn) {
   stop();
 
   if (r.ok && j.ok) {
+    try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })("analysis_complete"); } catch (e) {}
     say("Done. Opening your report...", "ok");
     window.location.href = "/report?id=" + encodeURIComponent(j.id);
     return;
   }
   btn.disabled = false;
+  try { (window.fzTrack || function (n, p) { (window.fzQ = window.fzQ || []).push([n, p]); })(r.status === 403 && j.error === "limit" ? "limit_hit" : r.status === 429 && j.error === "busy" ? "limit_hit" : "analysis_error", { reason: j.error === "busy" ? "busy" : j.guest ? "guest" : "limit" }); } catch (e) {}
   if (r.status === 429 && j.error === "busy") {
     return say(T("limit.busy", j.message || "Free analyses are paused for today. Please try again tomorrow."), "error");
   }

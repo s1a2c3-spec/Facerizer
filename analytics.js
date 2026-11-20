@@ -1,8 +1,11 @@
 /* Facerizer analytics (Google Analytics 4) with an Accept / Decline cookie notice.
    - Loaded by menu.js on every page except /checkout (payment page: no analytics there).
    - NOTHING is sent to Google, and Google's script is not even downloaded, until the person presses Accept.
-   - Only page views are sent. Addresses are cleaned first: everything after "?" or "#" is removed (so /report?id=... becomes /report),
-     the same for the "came from" address. No photo, score, email or login data is ever sent.
+   - Page views, and a short fixed list of actions (see EVENTS below: for example "started an analysis", "chose a plan"), are sent.
+     Addresses are cleaned first: everything after "?" or "#" is removed (so /report?id=... becomes /report), EXCEPT the standard campaign
+     tags utm_source, utm_medium, utm_campaign, utm_content and utm_term (letters, digits and a few symbols only, 100 characters at most),
+     which show which link brought a person here. The "came from" address is always cut at "?". Events carry no free text:
+     only the whitelisted names and short values below. No photo, score, email, login data, skin type or health answer is ever sent.
    - Advertising features are off. The choice is kept in localStorage "fz_consent" ("granted" or "denied"). "Cookie settings" in the menu reopens it.
    Measurement ID below is public (it is visible in every page that uses Google Analytics). */
 (function () {
@@ -13,7 +16,19 @@
   function get() { try { return window.localStorage.getItem(KEY); } catch (e) { return null; } }
   function set(v) { try { window.localStorage.setItem(KEY, v); } catch (e) {} }
   function T(k, fb) { var s = window.FZ_I18N ? window.FZ_I18N.t(k) : k; return s === k ? fb : s; }
-  function clean(u) { try { var a = new URL(u, window.location.href); return a.origin + a.pathname; } catch (e) { return ""; } }
+  var UTM = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  function bare(u) { try { var a = new URL(u, window.location.href); return a.origin + a.pathname; } catch (e) { return ""; } }
+  // the page address we send: no "?..." or "#...", except the campaign tags, and only when their value is plain (no @, no slashes)
+  function clean(u) {
+    try {
+      var a = new URL(u, window.location.href), keep = [];
+      UTM.forEach(function (k) {
+        var v = a.searchParams.get(k); if (!v) return;
+        v = v.trim().slice(0, 100); if (v && /^[A-Za-z0-9_\-. +:]+$/.test(v)) keep.push(k + "=" + encodeURIComponent(v));
+      });
+      return a.origin + a.pathname + (keep.length ? "?" + keep.join("&") : "");
+    } catch (e) { return ""; }
+  }
 
   /* ---------- Google Analytics ---------- */
   function start() {
@@ -21,10 +36,11 @@
     window["ga-disable-" + ID] = false;
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () { window.dataLayer.push(arguments); };
-    var here = clean(window.location.href), ref = document.referrer ? clean(document.referrer) : "";
+    var here = clean(window.location.href), ref = document.referrer ? bare(document.referrer) : "";
     window.gtag("js", new Date());
-    window.gtag("config", ID, { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false, page_location: here, page_referrer: ref });
+    window.gtag("config", ID, { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false, transport_type: "beacon", page_location: here, page_referrer: ref });
     window.gtag("event", "page_view", { page_title: document.title, page_location: here, page_path: new URL(here).pathname, page_referrer: ref });
+    listen();
     var s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID; document.head.appendChild(s);
   }
   function stop() {
@@ -38,6 +54,51 @@
         document.cookie = n + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
       });
     } catch (e) {}
+  }
+
+  /* ---------- actions ---------- */
+  // Every event and the only parameters it may carry. Anything else is dropped. Values: short plain words or whole numbers.
+  var EVENTS = {
+    cta_analyze: ["page"], signup_click: ["page"], select_plan: ["plan", "period"], profile_cta_click: [],
+    analysis_start: [], analysis_complete: [], analysis_error: [], limit_hit: ["reason"],
+    auth_start: ["method"], sign_up: ["method"], login: ["method"],
+    report_view: ["plan"], recs_open: ["section"], card_download: [], pdf_download: ["kind"],
+    profile_saved: [], plan_start: [], plan_day_complete: ["day"], plan_continue: [], checkin_saved: [], plan_report_open: ["report"]
+  };
+  function safeVal(v) {
+    if (typeof v === "number") return isFinite(v) && v >= 0 && v <= 999 ? Math.round(v) : undefined;
+    if (typeof v === "string" && v.length <= 30 && /^[A-Za-z0-9_\-]+$/.test(v)) return v;
+    return undefined;
+  }
+  function track(name, params) {
+    try {
+      var allowed = EVENTS[name]; if (!allowed) return;
+      if (!window.__fzGA || window["ga-disable-" + ID] || typeof window.gtag !== "function") return; // nothing unless the person pressed Accept
+      var out = {}; allowed.forEach(function (k) { var v = params ? safeVal(params[k]) : undefined; if (v !== undefined) out[k] = v; });
+      window.gtag("event", name, out);
+    } catch (e) {}
+  }
+  window.fzTrack = track;
+  // actions reported before this file loaded (see menu.js): send them only if Accept was already pressed, otherwise forget them
+  function drain() {
+    var q = window.fzQ; window.fzQ = null; if (!q || !q.length) return;
+    if (get() !== "granted") return;
+    q.forEach(function (e) { track(e[0], e[1]); });
+  }
+
+  // Clicks on links are noticed here, so the pages need no changes: analysis links, sign-up links, plan buttons, profile button
+  function listen() {
+    if (window.__fzGAListen) return; window.__fzGAListen = true;
+    document.addEventListener("click", function (e) {
+      var a = e.target && e.target.closest ? e.target.closest("a[href]") : null; if (!a) return;
+      var href = a.getAttribute("href") || "", page = window.location.pathname.replace(/[^A-Za-z0-9_\-]/g, "").slice(0, 30) || "home";
+      if (/^\/checkout(\?|$)/.test(href)) {
+        var m = /[?&]plan=(pro|premium)\b/.exec(href), per = /[?&](?:period|billing)=(month|year)\b/.exec(href);
+        track("select_plan", { plan: m ? m[1] : "", period: per ? per[1] : "" });
+      } else if (/^\/analyze(\/|\?|#|$)/.test(href)) track("cta_analyze", { page: page });
+      else if (/^\/signup(\?|#|$)/.test(href)) track("signup_click", { page: page });
+      else if (/^\/profile(\?|#|$)/.test(href)) track("profile_cta_click");
+    }, true);
   }
 
   /* ---------- the notice ---------- */
@@ -75,6 +136,6 @@
     if (!document.querySelector('script[src="/translations.js"]')) { var t = document.createElement("script"); t.src = "/translations.js"; t.onload = cb; t.onerror = cb; document.head.appendChild(t); return; }
     var n = 0, iv = setInterval(function () { if (window.FZ_I18N || ++n > 30) { clearInterval(iv); cb(); } }, 100);
   }
-  function init() { var c = get(); if (c === "granted") start(); else if (c !== "denied") withI18n(build); }
+  function init() { var c = get(); if (c === "granted") start(); else if (c !== "denied") withI18n(build); drain(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
