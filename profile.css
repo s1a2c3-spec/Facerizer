@@ -4,6 +4,7 @@
 .pf-set legend { padding: 0 0.4rem; font: 600 1.1rem var(--serif); }
 .pf-help { margin: 0.2rem 0 0; font-size: 0.9rem; color: var(--muted-fg); line-height: 1.5; }
 .pf-set .fzr-chs { margin-top: 0.7rem; }
+.pf-privlink { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--primary); font-weight: 600; }
 .pf-note { display: block; margin-top: 1rem; }
 .pf-note label { display: block; font-weight: 600; font-size: 0.95rem; }
 .pf-note textarea { width: 100%; min-height: 5rem; margin-top: 0.4rem; padding: 0.7rem 0.85rem; font: inherit; font-size: 1rem; color: var(--fg); background: var(--bg); border: 1px solid var(--border); border-radius: 0.8rem; resize: vertical; box-sizing: border-box; }

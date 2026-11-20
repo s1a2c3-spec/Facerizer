@@ -93,6 +93,7 @@
     var bg = fieldset(T("prof.budget_h")); bg.appendChild(single(function () { return draft.budget; }, function (v) { draft.budget = v; }, BUDGETS, function (v) { return T("prof.b." + v); })); box.appendChild(bg);
 
     var sf = fieldset(T("prof.safety_h"), T("prof.safety_help"));
+    var pn = el("p", "pf-help", T("prof.privacy_note") + " "); var pa = el("a", "pf-privlink", T("prof.privacy_link")); pa.href = "/privacy#grooming-profile"; pn.appendChild(pa); sf.appendChild(pn);
     var noteWrap = el("div", "pf-note"); noteWrap.hidden = !draft.has_allergy;
     var nl = el("label", "", T("prof.allergy_note")); nl.setAttribute("for", "pf-allergy-note");
     var ta = el("textarea"); ta.id = "pf-allergy-note"; ta.maxLength = 200; ta.value = draft.allergy_note; ta.setAttribute("aria-describedby", "pf-allergy-hint");

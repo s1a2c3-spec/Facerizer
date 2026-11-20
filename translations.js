@@ -284,7 +284,9 @@
       "td.ci.irritated": "Irritated",
       "td.ci.breakouts": "New breakouts",
       "td.ci_saved": "Saved. Tomorrow's plan will use this.",
-      "td.rep_h": "Your reports"
+      "td.rep_h": "Your reports",
+      "prof.privacy_note": "These answers are optional. We use them only to keep your routine safe, and we never send them to the AI service. Details in our",
+      "prof.privacy_link": "Privacy Policy."
     },
 
     hinglish: {
@@ -554,7 +556,9 @@
       "td.ci.irritated": "Jalan",
       "td.ci.breakouts": "Naye breakouts",
       "td.ci_saved": "Save ho gaya. Kal ka plan isse banega.",
-      "td.rep_h": "Aapki reports"
+      "td.rep_h": "Aapki reports",
+      "prof.privacy_note": "Ye jawab zaroori nahi hain. Hum inhe sirf aapke routine ko surakshit rakhne ke liye use karte hain, aur AI service ko kabhi nahi bhejte. Poori jaankari hamari",
+      "prof.privacy_link": "Privacy Policy mein hai."
     }
   };
 
