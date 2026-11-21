@@ -30,7 +30,7 @@
 
     <div id="locked" class="cx" hidden style="margin-top:2rem">
       <h2>Your 30-day plan is part of Pro</h2>
-      <p class="card-text">Pro gives you a personalized plan built from your analysis, with tasks to tick off, a daily routine and a streak.</p>
+      <p class="card-text">Pro gives you a day-by-day plan with daily tasks, a skincare routine for your skin, night check-ins and weekly reports, plus weekly goals built from your analysis.</p>
       <a href="/#pricing" class="btn btn-primary" style="margin-top:1rem">See Pro</a>
     </div>
 
@@ -45,34 +45,16 @@
 
       <section class="cx td" id="td" hidden aria-label="Today's Plan"></section>
 
-      <div class="duo">
-        <section class="cx" aria-labelledby="pg-title">
-          <h2 id="pg-title" style="font:600 1.05rem var(--sans)">Progress</h2>
-          <div class="big" id="p-pct">0%</div>
-          <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="p-barwrap"><span id="p-bar"></span></div>
-          <p class="card-text" id="p-count"></p>
-        </section>
+      <details class="cx wkwrap" id="p-weekly">
+<summary><h2 id="p-weekly-h">Weekly goals from your report</h2><span class="count" id="p-wk-total"></span></summary>
+<p class="card-text">The goals your report suggested, week by week. Pro covers your first 30 days. Premium can extend them to 60 and 90 days.</p>
+<div class="tabs" id="p-tabs" role="tablist" aria-label="Plan months"></div>
+<div id="p-month"></div>
+<div id="p-weeks"></div>
+<p id="p-msg" class="msg" role="status" aria-live="polite" style="margin-top:.6rem"></p>
+</details>
 
-        <section class="cx" aria-labelledby="dr-title">
-          <h2 id="dr-title" style="font:600 1.05rem var(--sans)">Daily routine</h2>
-          <span class="streak" id="p-streak">Streak: 0 days</span>
-          <div class="routine" id="p-routine"></div>
-          <button type="button" id="p-today" class="btn btn-primary today-btn">I did my routine today</button>
-          <p id="p-msg" class="msg" role="status" aria-live="polite" style="margin-top:.6rem"></p>
-        </section>
-      </div>
-
-      <div class="tabs" id="p-tabs" role="tablist" aria-label="Plan months"></div>
-      <div id="p-month"></div>
-      <div id="p-weeks"></div>
-
-      <section class="upsell" id="p-finish" hidden>
-        <h2 id="p-finish-h">Your 30 days are done</h2>
-        <p id="p-finish-p">Time to see what changed. Take a fresh photo in the same light and angle, and run a new analysis.</p>
-        <a href="/analyze/" class="btn btn-lg">New analysis</a>
-      </section>
-
-      <section class="cx" aria-labelledby="ex-title">
+<section class="cx" aria-labelledby="ex-title">
         <h2 id="ex-title" style="font:600 1.05rem var(--sans)">Face exercises</h2>
         <p class="card-text">Add a few gentle face and neck exercises to your daily routine. Step-by-step instructions in English, Hinglish and Hindi, with a daily tick and a weekly progress graph.</p>
         <a class="card-link" href="/exercises">Open face exercises</a>

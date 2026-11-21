@@ -41,7 +41,7 @@
 .td-d { display: flex; align-items: center; justify-content: center; min-height: 2.75rem; border-radius: 0.7rem; border: 1px solid var(--border); font-size: 0.9rem; color: var(--muted-fg); background: var(--bg); }
 .td-d.done { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 700; }
 .td-d.now { border: 2px solid var(--primary); color: var(--fg); font-weight: 700; }
-.td-fine { margin: 1rem 0 0; font-size: 0.875rem; color: var(--muted-fg); text-align: center; }
+.td-fine:empty { display: none; }
 
 /* 6C: advice from yesterday's check-in, night check-in, reports */
 .td-advice { margin: 0.9rem 0 0; padding: 0.8rem 1rem; border: 1px solid var(--primary); border-radius: 0.9rem; background: var(--muted); font-size: 0.95rem; line-height: 1.55; }
@@ -62,3 +62,14 @@
 .td-row span { color: var(--muted-fg); }
 .td-row b { text-align: right; }
 .td-basis { margin: 0.6rem 0 0; font-size: 0.875rem; color: var(--muted-fg); line-height: 1.5; }
+
+/* The weekly goals from the report, tucked under Today's Plan (they used to sit beside a second, older daily routine) */
+.wkwrap { margin-top: 1.5rem; }
+.wkwrap > summary { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 3.25rem; cursor: pointer; list-style: none; }
+.wkwrap > summary::-webkit-details-marker { display: none; }
+.wkwrap > summary h2 { font: 600 1.05rem var(--sans); }
+.wkwrap > summary .count { margin-left: auto; font-size: 0.875rem; color: var(--muted-fg); }
+.wkwrap > summary::after { content: "+"; font-weight: 700; font-size: 1.2rem; color: var(--primary); }
+.wkwrap[open] > summary::after { content: "\2013"; }
+.wkwrap > .card-text { margin-top: 0.2rem; }
+.wkwrap .tabs { margin-top: 0.9rem; }

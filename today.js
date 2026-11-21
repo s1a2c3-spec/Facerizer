@@ -6,6 +6,8 @@
  * A missed day never resets anything and never deletes finished tasks: the page says "You missed N days" and "Continue My Plan".
  * Phase 6C adds the night check-in (plan_checkins, sql/17: if that column is missing the check-in is simply not shown) and the weekly / final reports,
  * which are worked out here from the ticks and check-ins (see FZDays.report in plan-days.js). No AI, no photos.
+ * When a day is finished, one row is also written to "checkins" (the habit table the Progress page and its heatmap read), and removed again
+ * if the day is un-ticked, so Progress keeps working now that the old "I did my routine today" button is gone.
  * Everything is saved in grooming_profile (sql/14, 15 and 16). If those columns are not there yet, the card stays hidden.
  * The day content comes from plan-days.js, the skincare steps from skincare.js. Text from them is always added with textContent. */
 (function () {
@@ -40,6 +42,16 @@
       if (res && res.error) { console.error(res.error); return false; }
       return true;
     }, function (e) { console.error(e); return false; });
+  }
+  // keep the old habit table (checkins) in step with the plan: one row for the date a day was finished. Never blocks the plan: errors are only logged.
+  function markDay(on) {
+    var d = today, q = C.sb.from("checkins");
+    if (!on) { q.delete().eq("day", d).then(function (r) { if (r && r.error) console.warn(r.error); }, function (e) { console.warn(e); }); return; }
+    q.select("day").eq("day", d).limit(1).then(function (r) {
+      if (r && r.error) { console.warn(r.error); return; }
+      if (r && r.data && r.data.length) return;
+      return C.sb.from("checkins").insert({ user_id: C.userId, day: d }).then(function (r2) { if (r2 && r2.error) console.warn(r2.error); });
+    }, function (e) { console.warn(e); });
   }
   function planPatch() { return { plan_started_on: S.started, plan_active_day: S.active, plan_day_date: S.dayDate, plan_missed: S.missed, plan_done: S.done }; }
 
@@ -125,12 +137,17 @@
       a.href = t.link.report && C.reportId ? "/report?id=" + encodeURIComponent(C.reportId) : t.link.href; box.appendChild(a);
     }
     cb.addEventListener("change", function () {
-      var key = String(day), list = (S.done[key] || []).slice(), i = list.indexOf(t.id), want = cb.checked;
+      var key = String(day), list = (S.done[key] || []).slice(), i = list.indexOf(t.id), want = cb.checked, wasDone = isDone(day);
       if (want && i < 0) list.push(t.id); if (!want && i >= 0) list.splice(i, 1);
       var before = S.done[key]; S.done[key] = list; paint(day);
       save({ plan_done: S.done }).then(function (ok) {
         if (!ok) { if (before) S.done[key] = before; else delete S.done[key]; cb.checked = !want; msg = T("td.save_err"); paint(day); }
-        else { if (want && isDone(day) && !sentDone[day]) { sentDone[day] = true; track("plan_day_complete", { day: day }); } if (msg) { msg = ""; paint(day); } }
+        else {
+          var nowDone = isDone(day);
+          if (nowDone && !wasDone) markDay(true); else if (!nowDone && wasDone) markDay(false);
+          if (want && nowDone && !sentDone[day]) { sentDone[day] = true; track("plan_day_complete", { day: day }); }
+          if (msg) { msg = ""; paint(day); }
+        }
       });
     });
     return box;
@@ -242,7 +259,7 @@
     else if (state === "missed") root.appendChild(drawMissed());
     else if (state === "finished") root.appendChild(drawFinished());
     else { root.appendChild(drawDay()); paint(S.active); }
-    root.appendChild(el("p", "td-fine", T("td.fine")));
+    var anchor = el("p", "td-fine"); anchor.setAttribute("aria-hidden", "true"); root.appendChild(anchor); // empty: only marks where the reports go. The medical-advice line is already at the bottom of /plan
     paintReports(); // adds the reports block (once) in front of the small print
   }
 
@@ -253,15 +270,16 @@
     var q2 = C.sb.from("grooming_profile").select("plan_checkins").eq("user_id", C.userId).maybeSingle(); // separate, so a missing sql/17 only hides the check-in
     Promise.all([q1, q2]).then(function (out) {
       var res = out[0], r2 = out[1];
-      if (res.error) { console.warn(res.error); return; } // sql/14, 15 or 16 not run yet: the card stays hidden
+      if (res.error) { console.warn(res.error); if (C.onReady) C.onReady(false); return; } // sql/14, 15 or 16 not run yet: the card stays hidden
       P = res.data || {};
       S = { started: P.plan_started_on || null, active: P.plan_active_day || 1, dayDate: P.plan_day_date || null, missed: P.plan_missed || 0, done: (P.plan_done && typeof P.plan_done === "object" && !Array.isArray(P.plan_done)) ? P.plan_done : {}, checkins: null };
       if (!r2.error) { var c = r2.data && r2.data.plan_checkins; S.checkins = c && typeof c === "object" && !Array.isArray(c) ? c : {}; }
       draw();
+      if (C.onReady) C.onReady(true);
       document.addEventListener("fz:lang", function () { draw(); });
       // the tab was left open overnight: look at the date again when it comes back to the front
       document.addEventListener("visibilitychange", function () { if (!document.hidden && ymd(new Date()) !== today) { today = ymd(new Date()); draw(); } });
-    }, function (e) { console.warn(e); });
+    }, function (e) { console.warn(e); if (C.onReady) C.onReady(false); });
   }
 
   window.FZToday = { init: init };

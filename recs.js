@@ -297,16 +297,7 @@
     }
     p.appendChild(el("h3", "fzr-sub", T("recs.r.safety_h")));
     var sf = el("ul", "fzr-ck"); R.notes.forEach(function (n) { sf.appendChild(el("li", "", n)); }); p.appendChild(sf);
-    if (o.planHref && canSave(o)) {
-      var inPlan = !!o.profile.routine_in_plan, row = el("div", "fzr-act");
-      var bt = el("button", "btn " + (inPlan ? "btn-outline" : "btn-primary"), inPlan ? T("recs.r.in_plan") : T("recs.r.add_plan")); bt.type = "button"; bt.id = "fzr-c-plan"; bt.setAttribute("aria-pressed", inPlan ? "true" : "false");
-      bt.addEventListener("click", function () { save("routine", { routine_in_plan: !inPlan }, "fzr-c-plan", inPlan ? "recs.r.plan_removed" : "recs.r.plan_added"); });
-      row.appendChild(bt);
-      if (inPlan) { var a = el("a", "btn btn-primary", T("recs.r.open_plan")); a.href = o.planHref; row.appendChild(a); }
-      p.appendChild(row); p.appendChild(msgNode("routine"));
-    }
-    // the "Open your plan" button above already covers the last step once the routine is in the plan
-    if (!(o.planHref && canSave(o) && o.profile.routine_in_plan)) planRow(p, o);
+    planRow(p, o);
     return p;
   }
 

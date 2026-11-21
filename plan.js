@@ -10,42 +10,26 @@
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
   var userId = null, analysis = null, token = null, isPremium = false;
-  var plan = [], ext = null, allWeeks = [], done = {}, days = {};
+  var plan = [], ext = null, allWeeks = [], done = {};
   var activeMonth = 0, dayNo = 1;
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function ymd(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function today() { return ymd(new Date()); }
 
-  function streak() {
-    var d = new Date();
-    if (!days[ymd(d)]) d.setDate(d.getDate() - 1);
-    var n = 0;
-    while (days[ymd(d)]) { n++; d.setDate(d.getDate() - 1); }
-    return n;
-  }
   function totals() {
     var total = 0, got = 0;
     allWeeks.forEach(function (w) { (w.tasks || []).forEach(function (t, i) { total++; if (done["w" + w.week + "t" + i]) got++; }); });
     return { total: total, got: got };
   }
   function paintProgress() {
-    var t = totals(), pct = t.total ? Math.round(100 * t.got / t.total) : 0;
-    $("p-pct").textContent = pct + "%"; $("p-bar").style.width = pct + "%";
-    $("p-barwrap").setAttribute("aria-valuenow", String(pct));
-    $("p-count").textContent = t.got + " of " + t.total + " tasks done";
+    var t = totals();
+    $("p-wk-total").textContent = t.got + " of " + t.total + " tasks done";
     allWeeks.forEach(function (w) {
       var c = document.getElementById("wk-count-" + w.week); if (!c) return;
       var g = 0; (w.tasks || []).forEach(function (x, i) { if (done["w" + w.week + "t" + i]) g++; });
       c.textContent = g + " of " + (w.tasks || []).length;
     });
-  }
-  function paintStreak() {
-    var s = streak();
-    $("p-streak").textContent = "Streak: " + s + (s === 1 ? " day" : " days");
-    var did = !!days[today()], btn = $("p-today");
-    btn.textContent = did ? "Done for today. Tap to undo" : "I did my routine today";
-    btn.className = "btn " + (did ? "btn-outline" : "btn-primary") + " today-btn";
   }
 
   function toggleTask(key, checked, li, input) {
@@ -160,59 +144,13 @@
     });
   }
 
-  // Daily routine built from the skincare library, after "Add to my plan" on the report page.
-  function renderLibraryRoutine(box, gp, result, reportId) {
-    var type = gp.skin_type || (result.card && result.card.skin && result.card.skin.type) || "unclear";
-    var R = window.FZSkin.build(type, !!gp.sensitive_skin, { allergy: !!gp.has_allergy, caution: !!gp.medical_caution });
-    var note = el("p", "rt-note", R.intro + " ");
-    var a = el("a", "", "Change it in your report"); a.href = "/report?id=" + encodeURIComponent(reportId); a.style.color = "var(--primary)";
-    note.appendChild(a); box.appendChild(note);
-    [[R.amLabel, R.am], [R.pmLabel, R.pm]].forEach(function (g) {
-      var d = el("div"); d.appendChild(el("h3", "", g[0]));
-      var ul = el("ul");
-      g[1].forEach(function (st) {
-        var li = el("li"); li.appendChild(el("strong", "", st.title + (st.active ? " (" + st.strength + ")" : "")));
-        li.appendChild(document.createTextNode(": " + (st.product ? st.product + ". " : "") + st.amount + ". " + st.how));
-        ul.appendChild(li);
-      });
-      d.appendChild(ul); box.appendChild(d);
-    });
-  }
-
-  function renderRoutine(sk, gp, result, reportId) {
-    var r = $("p-routine"); r.textContent = "";
-    if (gp && gp.routine_in_plan && window.FZSkin) return renderLibraryRoutine(r, gp, result || {}, reportId);
-    if (!sk) return;
-    [["Morning", sk.morning], ["Evening", sk.evening]].forEach(function (p) {
-      if (!p[1] || !p[1].length) return;
-      var d = el("div"); d.appendChild(el("h3", "", p[0]));
-      var ul = el("ul"); p[1].forEach(function (x) { ul.appendChild(el("li", "", x)); });
-      d.appendChild(ul); r.appendChild(d);
-    });
-  }
-
   function renderAll() {
     var span = ext ? 90 : 30;
-    var shown = Math.max(1, Math.min(span, dayNo));
     $("p-title").textContent = ext ? "Your 90-day plan" : "Your 30-day plan";
-    $("p-sub").textContent = dayNo > span ? "Your " + span + " days are complete." : "Day " + shown + " of " + span;
-    var fin = dayNo > span;
-    $("p-finish").hidden = !fin;
-    $("p-finish-h").textContent = "Your " + span + " days are done";
-    renderTabs(); renderMonth(); paintProgress(); paintStreak();
+    // the day you are on is shown in Today's Plan (Active Plan Day), so this line no longer counts calendar days
+    $("p-sub").textContent = "A small plan for every day, plus the weekly goals from your report.";
+    renderTabs(); renderMonth(); paintProgress();
   }
-
-  $("p-today").addEventListener("click", function () {
-    var key = today(), has = !!days[key], btn = $("p-today");
-    btn.disabled = true;
-    var req = has ? sb.from("checkins").delete().eq("day", key) : sb.from("checkins").insert({ user_id: userId, day: key });
-    req.then(function (res) {
-      btn.disabled = false;
-      if (res.error) { console.error(res.error); return say("Could not save that. Run m6-plan.sql in Supabase, then try again.", "error"); }
-      if (has) delete days[key]; else days[key] = true;
-      say(""); paintStreak();
-    });
-  });
 
   sb.auth.getSession().then(function (s) {
     var session = s.data.session;
@@ -247,17 +185,13 @@
       var cw = Math.ceil(Math.min(dayNo, ext ? 90 : 30) / 7);
       activeMonth = ext && cw > 8 ? 2 : ext && cw > 4 ? 1 : 0;
 
-      Promise.all([
-        sb.from("plan_progress").select("task_key").eq("analysis_id", analysis.id),
-        sb.from("checkins").select("day").order("day", { ascending: false }).limit(120),
-        sb.from("grooming_profile").select("*").eq("user_id", userId).maybeSingle()
-      ]).then(function (o2) {
-        if (o2[0].error || o2[1].error) { console.error(o2[0].error || o2[1].error); return state("Could not load your progress. Run m6-plan.sql in Supabase, then refresh.", true); }
-        (o2[0].data || []).forEach(function (x) { done[x.task_key] = true; });
-        (o2[1].data || []).forEach(function (x) { days[x.day] = true; });
-        var gp = o2[2] && !o2[2].error ? o2[2].data : null; // missing table or no row: the original routine is shown
-        renderRoutine(r.skincare, gp, r, analysis.id);
-        if (window.FZToday) window.FZToday.init({ sb: sb, userId: userId, reportId: analysis.id, cardSkin: r.card && r.card.skin ? r.card.skin.type : "" });
+      sb.from("plan_progress").select("task_key").eq("analysis_id", analysis.id).then(function (o2) {
+        if (o2.error) { console.error(o2.error); return state("Could not load your progress. Run m6-plan.sql in Supabase, then refresh.", true); }
+        (o2.data || []).forEach(function (x) { done[x.task_key] = true; });
+        // the weekly goals stay closed under Today's Plan, and open by themselves if Today's Plan cannot be shown
+        var weekly = $("p-weekly");
+        if (window.FZToday) window.FZToday.init({ sb: sb, userId: userId, reportId: analysis.id, cardSkin: r.card && r.card.skin ? r.card.skin.type : "", onReady: function (shown) { weekly.open = !shown; } });
+        else weekly.open = true;
         renderAll();
         $("state").hidden = true; $("plan").hidden = false;
       });
